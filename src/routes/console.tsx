@@ -55,7 +55,7 @@ function ConsolePage() {
             </div>
           </div>
           <p className="text-sm text-muted-foreground mb-5">
-            {actor.name} doesn't run one of the four operator playbooks. Switch into one of these roles to see the console:
+            {actor.name} doesn't have an operator playbook yet. Switch into one of these roles to see the console:
           </p>
           <div className="grid sm:grid-cols-2 gap-3">
             {owners.map((o) => {
