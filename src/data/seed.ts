@@ -10,7 +10,8 @@ export type Role =
   | "TCM"
   | "HR"
   | "Owner"
-  | "Coach";
+  | "Coach"
+  | "Recruiter";
 export type AppRole = "admin" | "manager" | "employee";
 
 export interface Employee {
@@ -54,6 +55,7 @@ export const EMPLOYEES: Employee[] = [
   { id: "e8", name: "Megha Pillai", role: "HR", appRole: "manager", experience: "Core", attendance: 99, performance: 86, consistency: 91, revenueImpact: 0, taskCompletion: 95, conversion: 0, callsToday: 0, callTarget: 0, leadsActive: 0, closedDeals: 0, lostDeals: 0, flags: [], status: "Active", streakDays: 35, team: "People Ops", shift: "09:30 - 18:30", avatarSeed: "Megha", zone: "All", managerId: "e1", bio: "Knows everyone's name, shift, and coffee order.", joinedYearsAgo: 3, birthdayMMDD: "04-02" },
   { id: "e9", name: "Devansh Patel", role: "Sales Agent", appRole: "employee", experience: "New", attendance: 60, performance: 38, consistency: 30, revenueImpact: 25000, taskCompletion: 42, conversion: 5, callsToday: 6, callTarget: 30, leadsActive: 4, closedDeals: 0, lostDeals: 7, flags: ["Late login", "Low response speed", "Poor follow-up"], status: "Offline", streakDays: 0, team: "Andheri Hub", shift: "10:00 - 19:00", avatarSeed: "Devansh", zone: "Andheri", managerId: "e2", bio: "Reset week — coach plan active.", joinedYearsAgo: 0, birthdayMMDD: "08-25" },
   { id: "e10", name: "Nisha Kapoor", role: "Owner", appRole: "employee", experience: "Core", attendance: 100, performance: 92, consistency: 100, revenueImpact: 0, taskCompletion: 90, conversion: 0, callsToday: 0, callTarget: 0, leadsActive: 0, closedDeals: 0, lostDeals: 0, flags: [], status: "Active", streakDays: 60, team: "Property Partners", shift: "Anytime", avatarSeed: "Nisha", zone: "Bandra", managerId: null, bio: "Owns 3 properties on the Gharpayy network.", joinedYearsAgo: 2, birthdayMMDD: "02-17" },
+  { id: "e11", name: "Tanya Bhatt", role: "Recruiter", appRole: "manager", experience: "Core", attendance: 97, performance: 89, consistency: 93, revenueImpact: 0, taskCompletion: 92, conversion: 34, callsToday: 24, callTarget: 30, leadsActive: 18, closedDeals: 4, lostDeals: 2, flags: [], status: "Active", streakDays: 19, team: "Talent Ops", shift: "10:00 - 19:00", avatarSeed: "Tanya", zone: "Mumbai", managerId: "e8", bio: "Hires faster than the floor can absorb.", joinedYearsAgo: 2, birthdayMMDD: "06-08" },
 ];
 
 export function tierFor(perf: number): Tier {
