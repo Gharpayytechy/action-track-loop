@@ -24,7 +24,11 @@ import {
   X,
   MessageSquareText,
   UserPlus,
+  Zap,
+  Shield,
 } from "lucide-react";
+import { playbookFor } from "@/data/playbooks";
+import { shieldNow } from "@/lib/console-store";
 import { useAttendanceState } from "@/hooks/useAttendance";
 import { liveStatusFor } from "@/lib/attendance-store";
 import { unreadCount } from "@/lib/notification-store";
@@ -49,6 +53,7 @@ const ALL: Tier[] = ["leadership", "hr", "leader", "recruiter", "teammate"];
 
 const NAV: NavItem[] = [
   { to: "/",            label: "Arena Home",   icon: LayoutDashboard, tiers: ALL },
+  { to: "/console",     label: "Operator Console", icon: Zap,         tiers: ["leadership","hr","leader","recruiter"] },
   { to: "/score",       label: "My Score",     icon: Trophy,          tiers: ALL },
   { to: "/tasks",       label: "Tasks",        icon: CheckSquare,     tiers: ALL },
   { to: "/achievements",label: "Achievements", icon: Award,           tiers: ALL },
