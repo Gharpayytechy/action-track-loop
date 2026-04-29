@@ -24,9 +24,9 @@ export function computeScore(emp: Employee): ScoreBreakdown {
 
   // Role-specific KPI proxy
   let roleKpi = emp.performance;
-  if (emp.role === "Sales Agent") roleKpi = Math.round(emp.conversion * 3 + (emp.callsToday / Math.max(1, emp.callTarget)) * 50);
+  if (emp.role === "Operator") roleKpi = Math.round(emp.conversion * 3 + (emp.callsToday / Math.max(1, emp.callTarget)) * 50);
   else if (emp.role === "TCM") roleKpi = Math.round(emp.taskCompletion);
-  else if (emp.role === "Sales Lead") roleKpi = Math.round(emp.performance);
+  else if (emp.role === "Floor Lead") roleKpi = Math.round(emp.performance);
   roleKpi = Math.max(0, Math.min(100, roleKpi));
 
   const total = Math.round(att * 0.4 + taskOnTime * 0.3 + kudos * 0.15 + roleKpi * 0.15);

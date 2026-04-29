@@ -63,7 +63,7 @@ export function lastNDays(emp: Employee, n = 14): DayScore[] {
 
     // Output: role-aware activity volume (calls/tours/tasks) on this day.
     const outputBase =
-      emp.role === "Sales Agent"
+      emp.role === "Operator"
         ? Math.round((emp.callsToday / Math.max(1, emp.callTarget)) * 100)
         : emp.role === "TCM"
         ? emp.taskCompletion

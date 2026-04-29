@@ -22,9 +22,9 @@ export const TIER_TAGLINE: Record<Tier, string> = {
 
 const LEADERSHIP_ROLES: Role[] = ["Admin", "Owner"];
 const HR_ROLES: Role[] = ["HR"];
-const LEADER_ROLES: Role[] = ["Sales Lead", "Coach"];
+const LEADER_ROLES: Role[] = ["Floor Lead", "Coach"];
 const RECRUITER_ROLES: Role[] = ["Recruiter"];
-// Teammates: Sales Agent, Flow Ops, TCM, and anyone unmatched.
+// Teammates: Operator, Flow Ops, TCM, and anyone unmatched.
 
 export function tierOf(emp: Pick<Employee, "role" | "appRole">): Tier {
   if (LEADERSHIP_ROLES.includes(emp.role)) return "leadership";
