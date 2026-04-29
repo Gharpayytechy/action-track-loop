@@ -584,11 +584,575 @@ Would you be open to a quick 15-min conversation this week? Here's our link: {{c
   ],
 };
 
+// =================== PRIYA — POD COMMAND (Floor Lead, Bandra/Andheri) ===================
+const PRIYA_POD: RolePlaybook = {
+  key: "pod_command",
+  title: "Pod Command",
+  subtitle: "Floor Lead · Hub-Level Revenue Owner",
+  oneLiner:
+    "Own the hub. Every Operator on your pod hits 70 connections, books their tours, and ends the day with a clean CRM.",
+  interdependence:
+    "If Pod Command fails → Sneha's tours dry up → Jiya's trainees join a broken floor → Nithya's discipline can't save the day.",
+  collapseRule:
+    "If pod connections < 50% of target by 1:00 PM, OR any Operator below 30 calls by 3 PM → escalate to Nithya at the 1 PM window.",
+  ownerId: "e2",
+  accent: "primary",
+  kpis: [
+    { id: "pod_conn", label: "Pod avg connections / person", target: 70, kind: "count", why: "Hub baseline. Below 70 = pipeline starves." },
+    { id: "tours_booked", label: "Tours booked from pod", target: 16, kind: "count", why: "16 booked → 10 done at 60% show-up." },
+    { id: "morning_huddle", label: "Morning huddle on time", target: 1, kind: "boolean", why: "10:35 sharp. Targets spoken aloud, by name." },
+    { id: "live_listen", label: "Live calls listened-in", target: 6, kind: "count", why: "Listen, intervene, score. Not from your desk only." },
+    { id: "ride_alongs", label: "Field ride-alongs", target: 2, kind: "count", why: "2 site visits with Operators today." },
+    { id: "crm_clean", label: "Pod CRM ghost-lead = 0", target: 1, kind: "boolean", why: "Every lead has a next-step task by 5 PM." },
+    { id: "one_on_ones", label: "1:1s with C-players", target: 100, unit: "%", kind: "percent", why: "Every C-player gets a written plan today." },
+    { id: "kudos", label: "Kudos given (public)", target: 3, kind: "count", why: "3 named callouts. Energy is a job." },
+    { id: "blockers_closed", label: "Blockers closed today", target: 5, kind: "count", why: "If Operators escalate it, you close it." },
+    { id: "eod_signed", label: "Pod EOD report signed", target: 1, kind: "boolean", why: "Numbers + 1 hard call + 1 fix for tomorrow." },
+    { id: "owner_calls", label: "Property-owner check-ins", target: 3, kind: "count", why: "Inventory health = booking health." },
+  ],
+  shieldBlocks: [
+    { startMin: t(10, 40), endMin: t(13, 0), label: "Pod Sprint · No outbound noise" },
+  ],
+  sprints: [
+    {
+      id: "p_s1", index: 1, name: "Huddle + CRM Clean",
+      startMin: t(10, 30), endMin: t(12, 0),
+      objective: "Targets spoken. CRM clean. Pod aligned before first cold call.",
+      actions: [
+        { time: "10:30", do: "Stand-up — every Operator states call + tour target", output: "Targets spoken" },
+        { time: "10:45–11:30", do: "CRM audit — assign next-step to ghost leads on the pod", output: "Zero ghosts" },
+        { time: "11:30–12:00", do: "Listen-in on 2 cold calls. Coach in real time", output: "2 corrections" },
+      ],
+      metric: "100% target alignment. CRM ghost-free. 2 live coaching moments.",
+    },
+    {
+      id: "p_s2", index: 2, name: "Field + Owner Pulse",
+      startMin: t(12, 0), endMin: t(13, 15),
+      objective: "Be where the deals happen. Inventory and trust check.",
+      actions: [
+        { time: "12:00–12:45", do: "1 ride-along with a Mid Operator", output: "Field coaching done" },
+        { time: "12:45–1:15", do: "3 owner check-ins — vacancies, complaints, payments", output: "Owner pulse logged" },
+      ],
+      metric: "1 ride-along + 3 owner calls.",
+    },
+    {
+      id: "p_s3", index: 3, name: "Live Coaching Block",
+      startMin: t(14, 30), endMin: t(16, 0),
+      objective: "Floor coaching at scale. Catch the gap before EOD.",
+      actions: [
+        { time: "2:30–3:30", do: "Listen-in on 4 live calls. Score: ask, objection, close", output: "4 scored" },
+        { time: "3:30–4:00", do: "Resolve 5 blockers escalated by Operators", output: "5 closed" },
+      ],
+      metric: "4 calls scored. 5 blockers closed.",
+      shielded: true,
+    },
+    {
+      id: "p_s4", index: 4, name: "Push to 70",
+      startMin: t(16, 0), endMin: t(17, 0),
+      objective: "Pull every Operator above 50 connections by 5 PM.",
+      actions: [
+        { time: "4:00–4:30", do: "Public count on the board. Name top 3, name bottom 3", output: "Board updated" },
+        { time: "4:30–5:00", do: "Protected sprint for laggards — no comms, calls only", output: "Laggards in sprint" },
+      ],
+      metric: "All Operators on track for 70+.",
+    },
+    {
+      id: "p_s5", index: 5, name: "1:1s + EOD",
+      startMin: t(17, 20), endMin: t(19, 30),
+      objective: "Close the day with action plans, not vibes.",
+      actions: [
+        { time: "5:20–6:30", do: "1:1 with every C-player — written plan for tomorrow", output: "Plans signed" },
+        { time: "6:30–7:30", do: "Pod EOD report → Nithya & Sneha", output: "Report sent" },
+      ],
+      metric: "Every C-player has a written plan. EOD signed.",
+    },
+  ],
+  commWindows: [
+    {
+      id: "p_w1", label: "Pod Morning Brief", atMin: t(10, 35), channel: "WhatsApp Group",
+      template: `🏠 Pod {{pod}} — Morning brief
+Targets today:
+📞 70 connections / person
+🏠 16 tours booked (pod total)
+💬 CRM clean by 5 PM
+On-floor by 10:30. Targets stated. Let's go. 💪`,
+    },
+    {
+      id: "p_w2", label: "Mid-Day Pod Pulse", atMin: t(13, 0), channel: "WhatsApp Group",
+      template: `📊 1 PM pod pulse
+Conn avg: {{avg}}/70
+Tours booked: {{booked}}/16
+Top: {{top}} · Push: {{push}}
+Break 1:15–2:00. Back sharp. 🍽️`,
+    },
+    {
+      id: "p_w3", label: "Specific Coaching (1:1)", atMin: t(15, 30), channel: "WhatsApp 1:1",
+      template: `Hey {{name}}, listened to your {{time}} call.
+When the lead said "{{quote}}" you went silent. Try: "{{better}}".
+Use it in your next 3 calls. Tell me what shifts.`,
+    },
+    {
+      id: "p_w4", label: "Pod EOD", atMin: t(19, 30), channel: "WhatsApp Group",
+      template: `🌙 Pod {{pod}} EOD
+Conn avg: {{avg}}/70 · Tours: {{tours}}/10
+🏆 {{top}} · ⚠️ Red zone: {{red}}
+1 fix tomorrow: {{fix}}`,
+    },
+  ],
+  eodFields: [
+    { id: "pod", label: "Pod / Hub name", kind: "text" },
+    { id: "avg_conn", label: "Pod avg connections", kind: "number" },
+    { id: "tours_done", label: "Tours done from pod", kind: "number" },
+    { id: "blockers", label: "Blockers closed", kind: "number" },
+    { id: "ride_alongs", label: "Ride-alongs done", kind: "number" },
+    { id: "owner_calls", label: "Owner check-ins", kind: "number" },
+    { id: "a", label: "A players", kind: "list" },
+    { id: "c", label: "C players (with plan)", kind: "list" },
+    { id: "kudos", label: "Public kudos given", kind: "list" },
+    { id: "hard", label: "The hard decision today", kind: "text", placeholder: "e.g., Moved Vikram off cold calls — pairing him with Karan." },
+    { id: "flag", label: "Flag for Nithya / Sneha", kind: "text" },
+  ],
+};
+
+// =================== ANANYA — TOUR CONDUCTOR (TCM) ===================
+const ANANYA_TCM: RolePlaybook = {
+  key: "tour_conductor",
+  title: "Tour Conductor",
+  subtitle: "TCM · The 6-Tour-to-2-Closing Standard",
+  oneLiner:
+    "Conduct visits people remember. After 6 tours, 2 must close. The ask is your job — every single time.",
+  interdependence:
+    "If Tour Conductor fails → Sneha's revenue engine grinds → Pod Command's bookings turn into wasted tours → owners lose trust.",
+  collapseRule:
+    "If 4 tours done with zero closings by 5 PM → flag Sneha at the 5 PM window with the 'missed-ask' moment.",
+  ownerId: "e6",
+  accent: "destructive",
+  kpis: [
+    { id: "tours_done", label: "Tours conducted", target: 6, kind: "count", why: "Six is the floor. Below six, no claim on output." },
+    { id: "closings", label: "Closings made (after 6)", target: 2, kind: "count", why: "2 minimum. Six tours and zero = the ask was missed." },
+    { id: "ask_made", label: "Explicit ask made / tour", target: 100, unit: "%", kind: "percent", why: "Every tour ends with a closing question. No exceptions." },
+    { id: "showup", label: "Tour show-up rate today", target: 60, unit: "%", kind: "percent", why: "Below 60% = your confirmation calls were soft." },
+    { id: "confirm_calls", label: "Confirmation calls made", target: 10, kind: "count", why: "Confirm 90 min before — every booking, every time." },
+    { id: "objections_logged", label: "Objections logged with quote", target: 6, kind: "count", why: "Real words, real timestamp. Coaching gold." },
+    { id: "tomorrow_locked", label: "Tomorrow's morning tours locked", target: 4, kind: "count", why: "Re-confirmed today, before you leave." },
+    { id: "site_clean", label: "Site presentation OK", target: 100, unit: "%", kind: "percent", why: "If the room isn't show-ready, you don't tour it." },
+    { id: "owner_intro", label: "Owner intros done", target: 2, kind: "count", why: "Trust built where the deal happens." },
+    { id: "deposit_collected", label: "Deposits/holds collected", target: 1, kind: "count", why: "Money on the table or it isn't a close." },
+    { id: "no_show_root", label: "No-show root causes named", target: 100, unit: "%", kind: "percent", why: "Every no-show has a reason. Logged, not guessed." },
+  ],
+  shieldBlocks: [],
+  sprints: [
+    {
+      id: "a_s1", index: 1, name: "Confirmation Sweep + Site Check",
+      startMin: t(11, 0), endMin: t(12, 30),
+      objective: "Every tour confirmed. Every site show-ready.",
+      actions: [
+        { time: "11:00–11:30", do: "Confirm every tour 90 min ahead — call + WhatsApp", output: "All confirmed" },
+        { time: "11:30–12:30", do: "Site walk — cleanliness, AC, water, owner ready", output: "Sites green" },
+      ],
+      metric: "100% confirmed. 100% sites show-ready.",
+    },
+    {
+      id: "a_s2", index: 2, name: "Tour Block 1 — The Ask",
+      startMin: t(12, 30), endMin: t(15, 30),
+      objective: "Conduct 3 tours. Make the ask on every single one.",
+      actions: [
+        { time: "12:30–3:30", do: "3 tours back-to-back. Closing question every time", output: "3 done · 3 asks" },
+      ],
+      metric: "3 tours · 3 asks · objections logged with quote.",
+    },
+    {
+      id: "a_s3", index: 3, name: "Tour Block 2 + Deposit Push",
+      startMin: t(15, 30), endMin: t(18, 0),
+      objective: "Conduct 3 more. Close 2. Collect deposit.",
+      actions: [
+        { time: "3:30–6:00", do: "3 tours. After tour #4, push for deposit on yes signals", output: "3 done · 1 deposit" },
+      ],
+      metric: "Total 6 tours. ≥2 closings. ≥1 deposit collected.",
+    },
+    {
+      id: "a_s4", index: 4, name: "Tomorrow's Lock",
+      startMin: t(18, 0), endMin: t(19, 0),
+      objective: "Re-confirm tomorrow's morning tours before leaving.",
+      actions: [
+        { time: "6:00–6:45", do: "Call every 10am-1pm tour for tomorrow", output: "Confirmed" },
+        { time: "6:45–7:00", do: "Brief Sneha on the missed ask + the deposit story", output: "Sneha looped" },
+      ],
+      metric: "100% tomorrow confirmed. Sneha briefed.",
+    },
+  ],
+  commWindows: [
+    {
+      id: "a_w1", label: "Tour Confirmation (1:1)", atMin: t(11, 0), channel: "WhatsApp 1:1",
+      template: `Hi {{name}} 👋 Confirming your visit at {{property}} today at {{time}}.
+I'll meet you at the gate — please share your live location 15 min before.
+Reply "Confirmed" ✅`,
+    },
+    {
+      id: "a_w2", label: "Post-Tour Follow-Up", atMin: t(15, 0), channel: "WhatsApp 1:1",
+      template: `Thanks for visiting today, {{name}}!
+You mentioned "{{concern}}" — here's the answer: {{answer}}.
+Locking the room only takes a 1-day deposit. Shall we move ahead? 🏠`,
+    },
+    {
+      id: "a_w3", label: "Tomorrow Re-Confirm", atMin: t(18, 30), channel: "WhatsApp 1:1",
+      template: `Hi {{name}} — looking forward to tomorrow at {{time}}.
+The room I'm showing you is held for you only till 24h after your visit. See you sharp! 🔑`,
+    },
+  ],
+  eodFields: [
+    { id: "tours_done", label: "Tours conducted", kind: "number" },
+    { id: "showup", label: "Show-up rate today (%)", kind: "number" },
+    { id: "closings", label: "Closings", kind: "number" },
+    { id: "deposits", label: "Deposits collected", kind: "number" },
+    { id: "missed_ask", label: "The missed-ask moment (quote)", kind: "text" },
+    { id: "objections", label: "Top objections today", kind: "list" },
+    { id: "owners_seen", label: "Owners introduced", kind: "list" },
+    { id: "tomorrow", label: "Tomorrow's morning tours locked (X/X)", kind: "text" },
+    { id: "no_shows", label: "No-show reasons", kind: "list" },
+    { id: "flag", label: "Flag for Sneha", kind: "text" },
+  ],
+};
+
+// =================== SNEHA K — LEAD ROUTER (Flow Ops) ===================
+const SNEHAK_FLOWOPS: RolePlaybook = {
+  key: "lead_router",
+  title: "Lead Router",
+  subtitle: "Flow Ops · Air Traffic Control for Every Lead",
+  oneLiner:
+    "No lead waits. No Operator sits idle. You route, you load-balance, you keep the floor full.",
+  interdependence:
+    "If Lead Router fails → Operators run dry → Pod Command can't book tours → revenue stalls in your queue.",
+  collapseRule:
+    "If unassigned-lead queue > 25, OR avg first-touch > 5 min → page Pod Leads at the 1 PM window.",
+  ownerId: "e4",
+  accent: "info",
+  kpis: [
+    { id: "first_touch", label: "Avg first-touch time (min)", target: 3, kind: "count", why: "3 min or it goes cold." },
+    { id: "unassigned", label: "Unassigned queue size", target: 0, kind: "count", why: "Every lead has an owner inside 5 min." },
+    { id: "load_balance", label: "Operator load delta", target: 5, kind: "count", why: "No Operator >5 leads ahead of another." },
+    { id: "dup_merged", label: "Duplicates merged", target: 10, kind: "count", why: "Duplicate leads = duplicate calls = lost trust." },
+    { id: "stale_recycled", label: "Stale leads recycled (>72h)", target: 15, kind: "count", why: "Yesterday's silence is today's pipeline." },
+    { id: "source_health", label: "Source health checks", target: 6, kind: "count", why: "Every channel pulse-checked twice/day." },
+    { id: "spam_blocked", label: "Spam/junk leads blocked", target: 100, unit: "%", kind: "percent", why: "Don't pollute the floor's funnel." },
+    { id: "tour_handoff", label: "Tour handoffs to TCM", target: 10, kind: "count", why: "Clean handoff w/ note + intent score." },
+    { id: "intent_tag", label: "Intent-tagged leads", target: 100, unit: "%", kind: "percent", why: "Hot/Warm/Cold tagged before assignment." },
+    { id: "wa_response", label: "WhatsApp first-reply <2 min", target: 100, unit: "%", kind: "percent", why: "Speed kills competitors." },
+    { id: "queue_zero", label: "Queue zero by 7 PM", target: 1, kind: "boolean", why: "End the day with a clean board." },
+  ],
+  shieldBlocks: [],
+  sprints: [
+    {
+      id: "f_s1", index: 1, name: "Inbox Zero + Source Pulse",
+      startMin: t(9, 30), endMin: t(11, 30),
+      objective: "Clear overnight queue. Verify every source is firing.",
+      actions: [
+        { time: "9:30–10:15", do: "Drain overnight queue. Tag intent. Route", output: "Queue clean" },
+        { time: "10:15–11:30", do: "Pulse-check 6 sources (Housing, NoBroker, MagicBricks, Insta, Referrals, Walk-ins)", output: "All sources green" },
+      ],
+      metric: "Queue 0. Sources verified.",
+    },
+    {
+      id: "f_s2", index: 2, name: "Live Routing + Load Balance",
+      startMin: t(11, 30), endMin: t(14, 0),
+      objective: "Route as they land. No Operator more than 5 ahead.",
+      actions: [
+        { time: "11:30–2:00", do: "Live routing. Merge dups. Block spam", output: "Real-time flow" },
+      ],
+      metric: "First-touch <3 min. Load delta ≤5.",
+    },
+    {
+      id: "f_s3", index: 3, name: "Stale Sweep + Tour Handoffs",
+      startMin: t(14, 30), endMin: t(16, 30),
+      objective: "Recycle stale leads. Hand off tour-bound leads with notes.",
+      actions: [
+        { time: "2:30–3:30", do: "Sweep leads >72h. Recycle to fresh Operator", output: "15 recycled" },
+        { time: "3:30–4:30", do: "Handoff to TCM with intent score + last quote", output: "10 handoffs" },
+      ],
+      metric: "15 recycled. 10 clean handoffs.",
+    },
+    {
+      id: "f_s4", index: 4, name: "Queue-Zero Push",
+      startMin: t(16, 30), endMin: t(18, 30),
+      objective: "End day with empty board.",
+      actions: [
+        { time: "4:30–6:30", do: "Drain remaining queue. Pre-load tomorrow's morning", output: "Board clean" },
+      ],
+      metric: "Queue 0 by 7 PM. Tomorrow pre-loaded.",
+    },
+  ],
+  commWindows: [
+    {
+      id: "f_w1", label: "Lead Assigned (1:1)", atMin: t(11, 0), channel: "WhatsApp 1:1",
+      template: `🟢 New lead assigned: {{name}} · {{intent}} · Source: {{source}}
+Last quote: "{{quote}}"
+First touch in <3 min. Tag once contacted.`,
+    },
+    {
+      id: "f_w2", label: "Source Health Alert", atMin: t(13, 0), channel: "Internal",
+      template: `⚠️ Source pulse — {{source}}
+Volume vs avg: {{delta}}
+Spam %: {{spam}}
+Action: {{action}}`,
+    },
+    {
+      id: "f_w3", label: "Stale Recycle", atMin: t(15, 0), channel: "WhatsApp 1:1",
+      template: `♻️ Recycled lead — {{name}} (silent 72h+).
+Last note: "{{note}}". Try a fresh angle: {{angle}}.`,
+    },
+    {
+      id: "f_w4", label: "EOD Queue Report", atMin: t(19, 0), channel: "Internal",
+      template: `📦 Queue EOD
+Routed: {{routed}} · Recycled: {{recycled}} · Handoffs: {{handoffs}}
+First-touch avg: {{ft}} min
+Tomorrow pre-load: {{preload}}`,
+    },
+  ],
+  eodFields: [
+    { id: "routed", label: "Leads routed today", kind: "number" },
+    { id: "first_touch", label: "Avg first-touch (min)", kind: "number" },
+    { id: "recycled", label: "Stale leads recycled", kind: "number" },
+    { id: "handoffs", label: "Tour handoffs to TCM", kind: "number" },
+    { id: "merged", label: "Duplicates merged", kind: "number" },
+    { id: "spam", label: "Spam blocked", kind: "number" },
+    { id: "weakest_source", label: "Weakest source today", kind: "text" },
+    { id: "queue_zero", label: "Queue zero by 7 PM?", kind: "yesno" },
+    { id: "preload", label: "Tomorrow pre-load count", kind: "number" },
+    { id: "flag", label: "Flag for Pod Leads", kind: "text" },
+  ],
+};
+
+// =================== MEGHA — PEOPLE PULSE (HR) ===================
+const MEGHA_HR: RolePlaybook = {
+  key: "people_pulse",
+  title: "People Pulse",
+  subtitle: "HR · Attendance, Pay, Wellbeing, Policy",
+  oneLiner:
+    "Own the human signal. Attendance lock by 10:35. Payroll without surprise. Pulse before it becomes a fire.",
+  interdependence:
+    "If People Pulse fails → attendance is fiction → payroll breaks trust → coaching loses its weapon → the floor drifts.",
+  collapseRule:
+    "If unverified absences > 2, OR any payroll exception unresolved by 6 PM → escalate to Divyanshu at the 6 PM window.",
+  ownerId: "e8",
+  accent: "warning",
+  kpis: [
+    { id: "att_locked", label: "Attendance locked by 10:35", target: 1, kind: "boolean", why: "After 10:35 it's a story, not a fact." },
+    { id: "late_called", label: "Late arrivals called", target: 100, unit: "%", kind: "percent", why: "Every late mark gets a human call within 15 min." },
+    { id: "leave_decided", label: "Leave requests decided", target: 100, unit: "%", kind: "percent", why: "No 'pending' carries past 6 PM." },
+    { id: "pulse_1on1", label: "Pulse 1:1s done", target: 4, kind: "count", why: "4 quiet conversations a day. Catch fires early." },
+    { id: "birthdays", label: "Birthdays/anniversaries acknowledged", target: 100, unit: "%", kind: "percent", why: "If we miss it, we're not a team." },
+    { id: "payroll_exc", label: "Payroll exceptions cleared", target: 100, unit: "%", kind: "percent", why: "Trust pays compounding interest." },
+    { id: "policy_q", label: "Policy questions answered", target: 100, unit: "%", kind: "percent", why: "<24h SLA. Always." },
+    { id: "exit_done", label: "Exit interviews on time", target: 100, unit: "%", kind: "percent", why: "Honest exit = better hires next month." },
+    { id: "onboarding_kit", label: "Onboarding kits ready (D-1)", target: 100, unit: "%", kind: "percent", why: "Day-1 chaos = month-1 attrition." },
+    { id: "wellness_check", label: "C-player wellness checks", target: 2, kind: "count", why: "C is a signal. Sometimes it's burnout, not skill." },
+    { id: "compliance", label: "Compliance audit clean", target: 1, kind: "boolean", why: "PF, ESI, statutory — no skipped weeks." },
+  ],
+  shieldBlocks: [],
+  sprints: [
+    {
+      id: "h_s1", index: 1, name: "Attendance Lock + Late Calls",
+      startMin: t(10, 0), endMin: t(11, 30),
+      objective: "Attendance is a fact by 10:35. Lates have a human reason.",
+      actions: [
+        { time: "10:00–10:30", do: "Open biometric + manual board. Reconcile", output: "Boards live" },
+        { time: "10:30–10:35", do: "LOCK attendance. Mark Present/Late/Absent", output: "Locked" },
+        { time: "10:35–11:30", do: "Call every Late + Absent. Log reason", output: "All called" },
+      ],
+      metric: "Attendance locked. 100% lates called within 15 min.",
+    },
+    {
+      id: "h_s2", index: 2, name: "Leaves + Payroll Exceptions",
+      startMin: t(11, 30), endMin: t(13, 30),
+      objective: "Decisions today, not tomorrow.",
+      actions: [
+        { time: "11:30–12:30", do: "Process every pending leave. Approve/reject with reason", output: "Zero pending" },
+        { time: "12:30–1:30", do: "Reconcile payroll exceptions (overtime, deductions, bonuses)", output: "Exceptions cleared" },
+      ],
+      metric: "Leave queue 0. Payroll exceptions 0.",
+    },
+    {
+      id: "h_s3", index: 3, name: "Pulse 1:1s + Wellness",
+      startMin: t(14, 30), endMin: t(16, 30),
+      objective: "Quiet conversations before quiet quitting.",
+      actions: [
+        { time: "2:30–4:00", do: "4 pulse 1:1s — quiet, off-floor, listen", output: "4 done" },
+        { time: "4:00–4:30", do: "2 wellness checks on Pod Leads' C-list", output: "Notes logged" },
+      ],
+      metric: "4 pulse 1:1s. 2 wellness checks. Notes private to HR.",
+    },
+    {
+      id: "h_s4", index: 4, name: "Onboarding + Compliance",
+      startMin: t(16, 30), endMin: t(18, 30),
+      objective: "Tomorrow's joiners ready. Compliance never slipping.",
+      actions: [
+        { time: "4:30–5:30", do: "Pack onboarding kits. Coordinate with Jiya", output: "Kits ready" },
+        { time: "5:30–6:30", do: "Compliance check (PF, ESI, statutory)", output: "Clean" },
+      ],
+      metric: "Kits 100% ready. Compliance week clean.",
+    },
+  ],
+  commWindows: [
+    {
+      id: "h_w1", label: "Late Call Script (1:1)", atMin: t(10, 45), channel: "WhatsApp 1:1",
+      template: `Hi {{name}}, marking you Late today.
+What happened? Reply with reason — I'll log it.
+If something's off, tell me. I'd rather know.`,
+    },
+    {
+      id: "h_w2", label: "Leave Decision (1:1)", atMin: t(13, 0), channel: "WhatsApp 1:1",
+      template: `Hi {{name}}, your leave for {{date}} is {{decision}}.
+{{reason}}
+Logged in HRMS. Anything else, ping me.`,
+    },
+    {
+      id: "h_w3", label: "Birthday Note", atMin: t(11, 0), channel: "WhatsApp Group",
+      template: `🎂 Today we celebrate {{name}} — {{years}} years with us.
+A round for {{name}}. Tonight's snack on Gharpayy. 🎉`,
+    },
+    {
+      id: "h_w4", label: "Payroll Exception Sync", atMin: t(13, 30), channel: "Internal",
+      template: `💰 Payroll exception — {{name}}
+Type: {{type}} · Amount: {{amt}}
+Status: {{status}} · Resolved by: {{by}}`,
+    },
+  ],
+  eodFields: [
+    { id: "att_lock_time", label: "Attendance lock time", kind: "text" },
+    { id: "late", label: "Lates today", kind: "number" },
+    { id: "absent", label: "Absent (unverified)", kind: "number" },
+    { id: "leaves_pending", label: "Leaves still pending", kind: "number" },
+    { id: "pulse_done", label: "Pulse 1:1s done", kind: "number" },
+    { id: "wellness_flags", label: "Wellness flags raised", kind: "list" },
+    { id: "payroll_open", label: "Payroll exceptions open", kind: "number" },
+    { id: "joiners_tomorrow", label: "Joiners tomorrow (names)", kind: "list" },
+    { id: "compliance", label: "Compliance status", kind: "text" },
+    { id: "hard", label: "The hard decision today", kind: "text", placeholder: "e.g., Final warning issued — 3rd unexplained late." },
+    { id: "flag", label: "Flag for Divyanshu", kind: "text" },
+  ],
+};
+
+// =================== OPERATOR — DAILY DAY (Operators / general teammates) ===================
+const OPERATOR_DAY: RolePlaybook = {
+  key: "operator_day",
+  title: "Operator Day",
+  subtitle: "Teammate · Calls, Tours, Closures",
+  oneLiner:
+    "Own your day. 70 connections, 4 tours booked, 1 closure. The pod wins because you do.",
+  interdependence:
+    "If your day is sloppy → Pod Lead can't deliver → TCM has no tours → the floor pretends.",
+  collapseRule:
+    "If <30 connections by 3 PM, OR no tour booked by 4 PM → flag your Pod Lead immediately.",
+  ownerId: "e3",
+  accent: "primary",
+  kpis: [
+    { id: "calls", label: "Calls dialed", target: 100, kind: "count", why: "Dial volume = surface area. No volume, no luck." },
+    { id: "conn", label: "Connections (>30s)", target: 70, kind: "count", why: "Pod baseline. Below 70 = below standard." },
+    { id: "tours_booked", label: "Tours booked today", target: 4, kind: "count", why: "Personal floor. 4 booked → 2-3 done." },
+    { id: "closures", label: "Closures", target: 1, kind: "count", why: "1 a day adds up to a great month." },
+    { id: "wa_replied", label: "WhatsApp chats actioned", target: 100, unit: "%", kind: "percent", why: "Zero chats older than 24h." },
+    { id: "next_step", label: "Every lead has a next-step task", target: 100, unit: "%", kind: "percent", why: "No ghost leads on your CRM." },
+    { id: "objections_logged", label: "Objections logged with quote", target: 5, kind: "count", why: "Real words. Coach uses them tomorrow." },
+    { id: "ride_along", label: "1 site visit / week (today?)", target: 1, kind: "boolean", why: "Field knowledge beats deck knowledge." },
+    { id: "kudos_given", label: "Kudos given to a teammate", target: 1, kind: "count", why: "Energy is contagious. So is silence." },
+    { id: "training_module", label: "Skill module reviewed", target: 1, kind: "count", why: "10 min/day. 60 hrs/year." },
+    { id: "eod_submitted", label: "EOD submitted by 7:30 PM", target: 1, kind: "boolean", why: "Numbers + 1 win + 1 ask. Every day." },
+  ],
+  shieldBlocks: [
+    { startMin: t(10, 40), endMin: t(13, 0), label: "Sprint Block · Heads-down dialing" },
+    { startMin: t(14, 0), endMin: t(17, 0), label: "Sprint Block · Heads-down dialing" },
+  ],
+  sprints: [
+    {
+      id: "o_s1", index: 1, name: "Morning Dial Block",
+      startMin: t(10, 30), endMin: t(13, 0),
+      objective: "Front-load the day. Dial hard before lunch.",
+      actions: [
+        { time: "10:30", do: "Stand-up — state target out loud", output: "Target spoken" },
+        { time: "10:40–1:00", do: "Heads-down dialing. Goal: 50 calls / 35 connections by lunch", output: "50/35 by 1 PM" },
+      ],
+      metric: "50 calls + 35 connections by lunch.",
+      shielded: true,
+    },
+    {
+      id: "o_s2", index: 2, name: "WhatsApp + Tour Confirms",
+      startMin: t(14, 0), endMin: t(15, 30),
+      objective: "Action every chat. Confirm tomorrow's tours.",
+      actions: [
+        { time: "2:00–2:45", do: "Action every WhatsApp. Move chats older than 24h", output: "Inbox clean" },
+        { time: "2:45–3:30", do: "Confirm every booked tour. Push for time-fix", output: "Tours confirmed" },
+      ],
+      metric: "Zero chats >24h. All tours confirmed.",
+    },
+    {
+      id: "o_s3", index: 3, name: "Closing Block",
+      startMin: t(15, 30), endMin: t(17, 0),
+      objective: "Hit 70 connections. Push the closer leads.",
+      actions: [
+        { time: "3:30–5:00", do: "Heads-down dialing on warm + closer leads", output: "Total ≥70 connections" },
+      ],
+      metric: "70+ connections by 5 PM.",
+      shielded: true,
+    },
+    {
+      id: "o_s4", index: 4, name: "CRM Clean + EOD",
+      startMin: t(17, 20), endMin: t(19, 30),
+      objective: "Clean board. EOD submitted. 1 win named.",
+      actions: [
+        { time: "5:20–6:30", do: "Every lead has a next-step task. Log objections", output: "CRM ghost-free" },
+        { time: "6:30–7:30", do: "Submit EOD. Read 1 skill module", output: "EOD in" },
+      ],
+      metric: "CRM clean. EOD by 7:30. 1 module read.",
+    },
+  ],
+  commWindows: [
+    {
+      id: "o_w1", label: "Morning Self-Brief", atMin: t(10, 30), channel: "Internal",
+      template: `🎯 Today
+Calls: __/100  ·  Conn: __/70
+Tours booked: __/4  ·  Close: __/1
+1 thing I will fix: ____________`,
+    },
+    {
+      id: "o_w2", label: "Lunch Pulse", atMin: t(13, 0), channel: "Internal",
+      template: `📊 Lunch check
+Calls: {{c}} · Conn: {{cn}}
+Behind on: {{behind}}
+Plan for 2-5 PM: {{plan}}`,
+    },
+    {
+      id: "o_w3", label: "EOD Submission (1:1)", atMin: t(19, 0), channel: "WhatsApp 1:1",
+      template: `🌙 EOD — {{name}}
+Calls: {{c}}/100 · Conn: {{cn}}/70
+Tours booked: {{tb}}/4 · Closures: {{cl}}/1
+1 win today: {{win}}
+1 ask for tomorrow: {{ask}}`,
+    },
+  ],
+  eodFields: [
+    { id: "calls", label: "Calls dialed", kind: "number" },
+    { id: "conn", label: "Connections", kind: "number" },
+    { id: "tours_booked", label: "Tours booked", kind: "number" },
+    { id: "closures", label: "Closures", kind: "number" },
+    { id: "wa_clean", label: "Inbox <24h?", kind: "yesno" },
+    { id: "ghost_zero", label: "CRM ghost-free?", kind: "yesno" },
+    { id: "objections", label: "Top objection today (quote)", kind: "text" },
+    { id: "win", label: "1 win today", kind: "text" },
+    { id: "ask", label: "1 ask for Pod Lead", kind: "text" },
+    { id: "module", label: "Skill module reviewed", kind: "text" },
+  ],
+};
+
 export const PLAYBOOKS: Record<PlaybookKey, RolePlaybook> = {
   communication_shield: NITHYA,
   performance_enforcer: SNEHA_PE,
   training_architect: JIYA,
   talent_engine: THANVI,
+  pod_command: PRIYA_POD,
+  tour_conductor: ANANYA_TCM,
+  lead_router: SNEHAK_FLOWOPS,
+  people_pulse: MEGHA_HR,
+  operator_day: OPERATOR_DAY,
 };
 
 // Map Employee.id → PlaybookKey
@@ -597,6 +1161,16 @@ export const PLAYBOOK_BY_OWNER: Record<string, PlaybookKey> = {
   e13: "performance_enforcer",
   e14: "training_architect",
   e15: "talent_engine",
+  e2:  "pod_command",
+  e6:  "tour_conductor",
+  e4:  "lead_router",
+  e8:  "people_pulse",
+  // Operators share the operator day playbook
+  e3:  "operator_day",
+  e5:  "operator_day",
+  e7:  "operator_day",
+  e9:  "operator_day",
+  e11: "talent_engine", // Tanya runs the Talent Engine playbook too
 };
 
 export function playbookFor(employeeId: string): RolePlaybook | undefined {
