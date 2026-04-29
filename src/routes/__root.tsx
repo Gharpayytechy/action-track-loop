@@ -41,6 +41,8 @@ export const Route = createRootRoute({
       { name: "twitter:site", content: "@Lovable" },
       { name: "twitter:title", content: "Gharpayy Core AI — Execution Infrastructure" },
       { name: "twitter:description", content: "Central operating intelligence: attendance, performance, conversion and revenue, enforced in real time." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/cd4cf4fc-0be6-4e33-82a2-8a3a1e1c4d72/id-preview-24a8964b--06c5aae7-25c7-4c1a-ba96-2a01213743a2.lovable.app-1777481645627.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/cd4cf4fc-0be6-4e33-82a2-8a3a1e1c4d72/id-preview-24a8964b--06c5aae7-25c7-4c1a-ba96-2a01213743a2.lovable.app-1777481645627.png" },
     ],
     links: [
       {
