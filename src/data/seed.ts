@@ -10,7 +10,8 @@ export type Role =
   | "TCM"
   | "HR"
   | "Owner"
-  | "Coach";
+  | "Coach"
+  | "Recruiter";
 export type AppRole = "admin" | "manager" | "employee";
 
 export interface Employee {
@@ -54,6 +55,7 @@ export const EMPLOYEES: Employee[] = [
   { id: "e8", name: "Megha Pillai", role: "HR", appRole: "manager", experience: "Core", attendance: 99, performance: 86, consistency: 91, revenueImpact: 0, taskCompletion: 95, conversion: 0, callsToday: 0, callTarget: 0, leadsActive: 0, closedDeals: 0, lostDeals: 0, flags: [], status: "Active", streakDays: 35, team: "People Ops", shift: "09:30 - 18:30", avatarSeed: "Megha", zone: "All", managerId: "e1", bio: "Knows everyone's name, shift, and coffee order.", joinedYearsAgo: 3, birthdayMMDD: "04-02" },
   { id: "e9", name: "Devansh Patel", role: "Sales Agent", appRole: "employee", experience: "New", attendance: 60, performance: 38, consistency: 30, revenueImpact: 25000, taskCompletion: 42, conversion: 5, callsToday: 6, callTarget: 30, leadsActive: 4, closedDeals: 0, lostDeals: 7, flags: ["Late login", "Low response speed", "Poor follow-up"], status: "Offline", streakDays: 0, team: "Andheri Hub", shift: "10:00 - 19:00", avatarSeed: "Devansh", zone: "Andheri", managerId: "e2", bio: "Reset week — coach plan active.", joinedYearsAgo: 0, birthdayMMDD: "08-25" },
   { id: "e10", name: "Nisha Kapoor", role: "Owner", appRole: "employee", experience: "Core", attendance: 100, performance: 92, consistency: 100, revenueImpact: 0, taskCompletion: 90, conversion: 0, callsToday: 0, callTarget: 0, leadsActive: 0, closedDeals: 0, lostDeals: 0, flags: [], status: "Active", streakDays: 60, team: "Property Partners", shift: "Anytime", avatarSeed: "Nisha", zone: "Bandra", managerId: null, bio: "Owns 3 properties on the Gharpayy network.", joinedYearsAgo: 2, birthdayMMDD: "02-17" },
+  { id: "e11", name: "Tanya Bhatt", role: "Recruiter", appRole: "manager", experience: "Core", attendance: 97, performance: 89, consistency: 93, revenueImpact: 0, taskCompletion: 92, conversion: 34, callsToday: 24, callTarget: 30, leadsActive: 18, closedDeals: 4, lostDeals: 2, flags: [], status: "Active", streakDays: 19, team: "Talent Ops", shift: "10:00 - 19:00", avatarSeed: "Tanya", zone: "Mumbai", managerId: "e8", bio: "Hires faster than the floor can absorb.", joinedYearsAgo: 2, birthdayMMDD: "06-08" },
 ];
 
 export function tierFor(perf: number): Tier {
@@ -339,3 +341,181 @@ export const SEED_ANOMALIES: Anomaly[] = [
   { id: "a2", employeeId: "e5", kind: "no_selfie", detail: "Clock-in without selfie verification", ts: now - 5 * H },
   { id: "a3", employeeId: "e3", kind: "long_break", detail: "Break ran 52 min (policy 30 min)", ts: now - 4 * H },
 ];
+
+// ---------- 1:1 Notes ----------
+export type OneOnOneSentiment = "green" | "amber" | "red";
+
+export interface OneOnOneActionItem {
+  id: string;
+  title: string;
+  ownerId: string;
+  done: boolean;
+  dueAt?: number;
+}
+
+export interface OneOnOne {
+  id: string;
+  managerId: string;
+  reportId: string;
+  scheduledAt: number;
+  durationMin: number;
+  status: "scheduled" | "completed" | "skipped";
+  sentiment?: OneOnOneSentiment;
+  agenda: string;       // private to manager pre-meeting
+  notes: string;        // shared post-meeting
+  privateNotes?: string; // manager only
+  actionItems: OneOnOneActionItem[];
+  createdAt: number;
+  updatedAt: number;
+}
+
+export const SEED_ONE_ON_ONES: OneOnOne[] = [
+  {
+    id: "o1", managerId: "e2", reportId: "e5", scheduledAt: now + 7 * H, durationMin: 30, status: "scheduled",
+    agenda: "1) Why are we 18 calls behind?\n2) Lead intent diagnosis\n3) One thing I can unblock for you",
+    notes: "",
+    actionItems: [],
+    createdAt: now - D, updatedAt: now - 2 * H,
+  },
+  {
+    id: "o2", managerId: "e2", reportId: "e3", scheduledAt: now - 2 * D, durationMin: 30, status: "completed", sentiment: "green",
+    agenda: "Pipeline review · Bandra hot leads · Tour conversion",
+    notes: "Rohan's pipeline is healthy. He needs the new objection handling deck. Confidence is up — give him a stretch lead this week.",
+    privateNotes: "Promotable in Q3 if conversion holds 22%+.",
+    actionItems: [
+      { id: "ai1", title: "Share objection handling deck", ownerId: "e2", done: true },
+      { id: "ai2", title: "Assign 1 stretch lead", ownerId: "e2", done: false, dueAt: now + 2 * D },
+    ],
+    createdAt: now - 4 * D, updatedAt: now - 2 * D,
+  },
+  {
+    id: "o3", managerId: "e2", reportId: "e7", scheduledAt: now - 5 * D, durationMin: 30, status: "completed", sentiment: "green",
+    agenda: "Field strategy · Owner relationships",
+    notes: "Karan is operating at A-tier. Wants to learn closing playbook. Pair with Priya on next 3 closes.",
+    actionItems: [
+      { id: "ai3", title: "Schedule shadowing — 3 closes", ownerId: "e2", done: false },
+    ],
+    createdAt: now - 7 * D, updatedAt: now - 5 * D,
+  },
+  {
+    id: "o4", managerId: "e8", reportId: "e11", scheduledAt: now + 2 * D, durationMin: 45, status: "scheduled",
+    agenda: "Q3 hiring plan · Pipeline health · Recruiter tooling",
+    notes: "",
+    actionItems: [],
+    createdAt: now - D, updatedAt: now - D,
+  },
+  {
+    id: "o5", managerId: "e1", reportId: "e2", scheduledAt: now - D, durationMin: 45, status: "completed", sentiment: "amber",
+    agenda: "Bandra hub performance · Vikram coaching plan",
+    notes: "Vikram needs a hard deadline. If conversion doesn't hit 12% by end of month, move to Andheri B-team. Priya owns the call.",
+    privateNotes: "Watch Priya's bandwidth — she's coaching 4 reports actively.",
+    actionItems: [
+      { id: "ai4", title: "Set Vikram's 30-day plan in writing", ownerId: "e2", done: true },
+      { id: "ai5", title: "Decision review on Vikram — Day 30", ownerId: "e1", done: false, dueAt: now + 14 * D },
+    ],
+    createdAt: now - 2 * D, updatedAt: now - D,
+  },
+];
+
+// ---------- Recruiting Pipeline ----------
+export type CandidateStage = "applied" | "screen" | "interview" | "offer" | "hired" | "rejected";
+export type CandidateSource = "Referral" | "LinkedIn" | "Naukri" | "Walk-in" | "Inbound" | "Agency";
+
+export interface CandidateNote {
+  id: string;
+  authorId: string;
+  body: string;
+  ts: number;
+}
+
+export interface Candidate {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  roleApplied: Role;
+  stage: CandidateStage;
+  source: CandidateSource;
+  rating: 1 | 2 | 3 | 4 | 5;
+  recruiterId: string;
+  expectedSalary: number; // INR per month
+  experience: string;
+  city: string;
+  appliedAt: number;
+  nextStepAt?: number;
+  nextStepLabel?: string;
+  notes: CandidateNote[];
+  rejectReason?: string;
+}
+
+export const SEED_CANDIDATES: Candidate[] = [
+  {
+    id: "cand1", name: "Riya Malhotra", email: "riya.m@example.com", phone: "+91 98200 11122",
+    roleApplied: "Sales Agent", stage: "interview", source: "LinkedIn", rating: 4, recruiterId: "e11",
+    expectedSalary: 32000, experience: "2 yrs · BYJU'S", city: "Mumbai",
+    appliedAt: now - 6 * D, nextStepAt: now + D, nextStepLabel: "Round 2 with Priya",
+    notes: [
+      { id: "cn1", authorId: "e11", body: "Strong objection handling. Asked sharp questions about commission structure.", ts: now - 2 * D },
+    ],
+  },
+  {
+    id: "cand2", name: "Aditya Khanna", email: "adi.khanna@example.com", phone: "+91 99300 44455",
+    roleApplied: "Sales Agent", stage: "screen", source: "Referral", rating: 3, recruiterId: "e11",
+    expectedSalary: 28000, experience: "1.5 yrs · NoBroker", city: "Mumbai",
+    appliedAt: now - 3 * D, nextStepAt: now + 2 * H, nextStepLabel: "Phone screen",
+    notes: [{ id: "cn2", authorId: "e11", body: "Referred by Karan. Available immediately.", ts: now - 3 * D }],
+  },
+  {
+    id: "cand3", name: "Pooja Desai", email: "pooja.d@example.com", phone: "+91 98765 22211",
+    roleApplied: "TCM", stage: "offer", source: "LinkedIn", rating: 5, recruiterId: "e11",
+    expectedSalary: 42000, experience: "3 yrs · OYO Tour Ops", city: "Mumbai",
+    appliedAt: now - 14 * D, nextStepAt: now + 6 * H, nextStepLabel: "Verbal offer call",
+    notes: [
+      { id: "cn3", authorId: "e8", body: "Cleared all rounds. HR fit excellent.", ts: now - 2 * D },
+      { id: "cn4", authorId: "e11", body: "Counter-offer risk: current employer may match. Move fast.", ts: now - D },
+    ],
+  },
+  {
+    id: "cand4", name: "Sahil Verma", email: "sahil.v@example.com", phone: "+91 90909 11223",
+    roleApplied: "Flow Ops", stage: "applied", source: "Naukri", rating: 3, recruiterId: "e11",
+    expectedSalary: 35000, experience: "2 yrs · Swiggy Ops", city: "Mumbai",
+    appliedAt: now - 12 * H, notes: [],
+  },
+  {
+    id: "cand5", name: "Ishita Reddy", email: "ishita.r@example.com", phone: "+91 91111 33445",
+    roleApplied: "Sales Agent", stage: "applied", source: "Walk-in", rating: 2, recruiterId: "e11",
+    expectedSalary: 26000, experience: "Fresher", city: "Mumbai",
+    appliedAt: now - 4 * H, notes: [{ id: "cn5", authorId: "e11", body: "Confident, but very green. Maybe trial week.", ts: now - 3 * H }],
+  },
+  {
+    id: "cand6", name: "Manav Joshi", email: "manav.j@example.com", phone: "+91 98888 77665",
+    roleApplied: "Sales Agent", stage: "hired", source: "Referral", rating: 5, recruiterId: "e11",
+    expectedSalary: 30000, experience: "2 yrs · Magicbricks", city: "Mumbai",
+    appliedAt: now - 30 * D, notes: [{ id: "cn6", authorId: "e11", body: "Joined last Monday. Already at 65% of ramp target.", ts: now - 7 * D }],
+  },
+  {
+    id: "cand7", name: "Neha Iyer", email: "neha.i@example.com", phone: "+91 97777 11000",
+    roleApplied: "HR", stage: "rejected", source: "LinkedIn", rating: 2, recruiterId: "e11",
+    expectedSalary: 55000, experience: "4 yrs · Generalist", city: "Pune",
+    appliedAt: now - 20 * D, rejectReason: "Comp expectation 40% above band.",
+    notes: [],
+  },
+  {
+    id: "cand8", name: "Yash Agarwal", email: "yash.a@example.com", phone: "+91 96000 11122",
+    roleApplied: "Sales Lead", stage: "interview", source: "Agency", rating: 4, recruiterId: "e11",
+    expectedSalary: 95000, experience: "5 yrs · Sales mgmt", city: "Mumbai",
+    appliedAt: now - 9 * D, nextStepAt: now + 3 * D, nextStepLabel: "Final round with Aarav",
+    notes: [{ id: "cn7", authorId: "e1", body: "Sharp on numbers. Need to test his coaching instinct.", ts: now - 2 * D }],
+  },
+];
+
+export const CAND_STAGE_LABEL: Record<CandidateStage, string> = {
+  applied: "Applied",
+  screen: "Screening",
+  interview: "Interview",
+  offer: "Offer",
+  hired: "Hired",
+  rejected: "Rejected",
+};
+
+export const CAND_STAGE_ORDER: CandidateStage[] = ["applied", "screen", "interview", "offer", "hired", "rejected"];

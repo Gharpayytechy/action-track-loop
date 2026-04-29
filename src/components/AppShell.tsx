@@ -22,6 +22,8 @@ import {
   ShieldCheck,
   Menu,
   X,
+  MessageSquareText,
+  UserPlus,
 } from "lucide-react";
 import { useAttendanceState } from "@/hooks/useAttendance";
 import { liveStatusFor } from "@/lib/attendance-store";
@@ -43,7 +45,7 @@ import {
 
 type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; tiers: Tier[] };
 
-const ALL: Tier[] = ["leadership", "hr", "leader", "teammate"];
+const ALL: Tier[] = ["leadership", "hr", "leader", "recruiter", "teammate"];
 
 const NAV: NavItem[] = [
   { to: "/",            label: "Arena Home",   icon: LayoutDashboard, tiers: ALL },
@@ -55,11 +57,14 @@ const NAV: NavItem[] = [
   { to: "/kudos",       label: "Kudos",        icon: Heart,           tiers: ALL },
   { to: "/inbox",       label: "Inbox",        icon: Inbox,           tiers: ALL },
   { to: "/attendance",  label: "Attendance",   icon: Clock4,          tiers: ALL },
-  // Leader & up
+  // Leader & up (and recruiter — they coach candidates too)
+  { to: "/one-on-ones", label: "1:1 Notes",    icon: MessageSquareText, tiers: ["leadership","hr","leader","recruiter"] },
   { to: "/people",      label: "People",       icon: Users,           tiers: ["leadership","hr","leader"] },
   { to: "/roster",      label: "Live Roster",  icon: ClipboardList,   tiers: ["leadership","hr","leader"] },
   { to: "/war-room",    label: "War Room",     icon: Activity,        tiers: ["leadership","leader"] },
   { to: "/command",     label: "Coach AI",     icon: MessageSquare,   tiers: ["leadership","hr","leader"] },
+  // Recruiting — recruiter, HR, leadership
+  { to: "/recruiting",  label: "Recruiting",   icon: UserPlus,        tiers: ["leadership","hr","recruiter"] },
   // HR & Leadership only
   { to: "/hrms",        label: "HRMS",         icon: ShieldCheck,     tiers: ["leadership","hr"] },
 ];
@@ -89,7 +94,9 @@ export function AppShell() {
     tier === "leadership" || tier === "leader"
       ? [MOBILE_NAV_BASE[0], MOBILE_NAV_BASE[1], { to: "/war-room", label: "War", icon: Activity }, MOBILE_NAV_BASE[3], MOBILE_NAV_BASE[4]]
       : tier === "hr"
-      ? [MOBILE_NAV_BASE[0], { to: "/people", label: "People", icon: Users }, { to: "/leaves", label: "Leaves", icon: PlaneTakeoff }, MOBILE_NAV_BASE[3], MOBILE_NAV_BASE[4]]
+      ? [MOBILE_NAV_BASE[0], { to: "/people", label: "People", icon: Users }, { to: "/recruiting", label: "Hiring", icon: UserPlus }, MOBILE_NAV_BASE[3], MOBILE_NAV_BASE[4]]
+      : tier === "recruiter"
+      ? [MOBILE_NAV_BASE[0], { to: "/recruiting", label: "Pipeline", icon: UserPlus }, { to: "/one-on-ones", label: "1:1s", icon: MessageSquareText }, MOBILE_NAV_BASE[3], MOBILE_NAV_BASE[4]]
       : MOBILE_NAV_BASE;
 
   useEffect(() => { bootArena(); }, []);
