@@ -517,7 +517,7 @@ function LeadershipHome({ actor }: { actor: Employee }) {
         <div className="rounded-xl bg-card border border-border p-4">
           <div className="flex items-center justify-between"><span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Calls Made</span><Phone className="h-4 w-4 text-info" /></div>
           <div className="mt-2 font-display text-2xl font-semibold">{s.totalCalls}</div>
-          <div className="mt-1 text-[11px] text-muted-foreground">across sales floor</div>
+          <div className="mt-1 text-[11px] text-muted-foreground">across all pods</div>
         </div>
         <div className="rounded-xl bg-card border border-border p-4">
           <div className="flex items-center justify-between"><span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Active Leads</span><Target className="h-4 w-4 text-warning" /></div>

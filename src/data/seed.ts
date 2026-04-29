@@ -4,8 +4,8 @@
 export type Tier = "A" | "B" | "C" | "D";
 export type Role =
   | "Admin"
-  | "Sales Lead"
-  | "Sales Agent"
+  | "Floor Lead"
+  | "Operator"
   | "Flow Ops"
   | "TCM"
   | "HR"
@@ -46,19 +46,19 @@ export interface Employee {
 
 export const EMPLOYEES: Employee[] = [
   { id: "e1", name: "Aarav Mehta", role: "Admin", appRole: "admin", experience: "Core", attendance: 98, performance: 94, consistency: 92, revenueImpact: 480000, taskCompletion: 96, conversion: 32, callsToday: 0, callTarget: 0, leadsActive: 0, closedDeals: 0, lostDeals: 0, flags: [], status: "Active", streakDays: 28, team: "HQ", shift: "10:00 - 19:00", avatarSeed: "Aarav", zone: "All", managerId: null, bio: "Builds the system everyone runs on.", joinedYearsAgo: 4, birthdayMMDD: "03-14" },
-  { id: "e2", name: "Priya Sharma", role: "Sales Lead", appRole: "manager", experience: "Core", attendance: 95, performance: 88, consistency: 90, revenueImpact: 410000, taskCompletion: 91, conversion: 28, callsToday: 38, callTarget: 40, leadsActive: 22, closedDeals: 6, lostDeals: 3, flags: [], status: "Active", streakDays: 14, team: "Bandra Hub", shift: "10:00 - 19:00", avatarSeed: "Priya", zone: "Bandra", managerId: "e1", bio: "Coaches the floor, defends the pipeline.", joinedYearsAgo: 3, birthdayMMDD: "07-22" },
-  { id: "e3", name: "Rohan Iyer", role: "Sales Agent", appRole: "employee", experience: "Mid", attendance: 82, performance: 71, consistency: 68, revenueImpact: 220000, taskCompletion: 74, conversion: 18, callsToday: 22, callTarget: 40, leadsActive: 14, closedDeals: 3, lostDeals: 5, flags: ["Low response speed"], status: "Idle", streakDays: 2, team: "Bandra Hub", shift: "10:00 - 19:00", avatarSeed: "Rohan", zone: "Bandra", managerId: "e2", bio: "Closer in training. Knows every PG in Bandra.", joinedYearsAgo: 1, birthdayMMDD: "11-03" },
+  { id: "e2", name: "Priya Sharma", role: "Floor Lead", appRole: "manager", experience: "Core", attendance: 95, performance: 88, consistency: 90, revenueImpact: 410000, taskCompletion: 91, conversion: 28, callsToday: 38, callTarget: 40, leadsActive: 22, closedDeals: 6, lostDeals: 3, flags: [], status: "Active", streakDays: 14, team: "Bandra Hub", shift: "10:00 - 19:00", avatarSeed: "Priya", zone: "Bandra", managerId: "e1", bio: "Coaches the floor, defends the pipeline.", joinedYearsAgo: 3, birthdayMMDD: "07-22" },
+  { id: "e3", name: "Rohan Iyer", role: "Operator", appRole: "employee", experience: "Mid", attendance: 82, performance: 71, consistency: 68, revenueImpact: 220000, taskCompletion: 74, conversion: 18, callsToday: 22, callTarget: 40, leadsActive: 14, closedDeals: 3, lostDeals: 5, flags: ["Low response speed"], status: "Idle", streakDays: 2, team: "Bandra Hub", shift: "10:00 - 19:00", avatarSeed: "Rohan", zone: "Bandra", managerId: "e2", bio: "Closer in training. Knows every PG in Bandra.", joinedYearsAgo: 1, birthdayMMDD: "11-03" },
   { id: "e4", name: "Sneha Kulkarni", role: "Flow Ops", appRole: "manager", experience: "Core", attendance: 96, performance: 90, consistency: 88, revenueImpact: 180000, taskCompletion: 94, conversion: 41, callsToday: 0, callTarget: 0, leadsActive: 0, closedDeals: 0, lostDeals: 0, flags: [], status: "Active", streakDays: 21, team: "HQ Ops", shift: "09:30 - 18:30", avatarSeed: "Sneha", zone: "Mumbai", managerId: "e1", bio: "Air traffic controller for every lead in flight.", joinedYearsAgo: 2, birthdayMMDD: "01-09" },
-  { id: "e5", name: "Vikram Joshi", role: "Sales Agent", appRole: "employee", experience: "New", attendance: 70, performance: 52, consistency: 48, revenueImpact: 80000, taskCompletion: 58, conversion: 9, callsToday: 12, callTarget: 30, leadsActive: 8, closedDeals: 1, lostDeals: 6, flags: ["Late login", "Poor follow-up", "Low intent understanding"], status: "Late", streakDays: 0, team: "Andheri Hub", shift: "10:00 - 19:00", avatarSeed: "Vikram", zone: "Andheri", managerId: "e2", bio: "Hungry, learning fast. Big swings ahead.", joinedYearsAgo: 0, birthdayMMDD: "05-19" },
+  { id: "e5", name: "Vikram Joshi", role: "Operator", appRole: "employee", experience: "New", attendance: 70, performance: 52, consistency: 48, revenueImpact: 80000, taskCompletion: 58, conversion: 9, callsToday: 12, callTarget: 30, leadsActive: 8, closedDeals: 1, lostDeals: 6, flags: ["Late login", "Poor follow-up", "Low intent understanding"], status: "Late", streakDays: 0, team: "Andheri Hub", shift: "10:00 - 19:00", avatarSeed: "Vikram", zone: "Andheri", managerId: "e2", bio: "Hungry, learning fast. Big swings ahead.", joinedYearsAgo: 0, birthdayMMDD: "05-19" },
   { id: "e6", name: "Ananya Rao", role: "TCM", appRole: "employee", experience: "Mid", attendance: 92, performance: 84, consistency: 80, revenueImpact: 0, taskCompletion: 88, conversion: 0, callsToday: 0, callTarget: 0, leadsActive: 0, closedDeals: 0, lostDeals: 0, flags: [], status: "Active", streakDays: 11, team: "Tour Ops", shift: "11:00 - 20:00", avatarSeed: "Ananya", zone: "Bandra", managerId: "e4", bio: "Conducts visits people remember.", joinedYearsAgo: 1, birthdayMMDD: "09-30" },
-  { id: "e7", name: "Karan Singh", role: "Sales Agent", appRole: "employee", experience: "Mid", attendance: 88, performance: 76, consistency: 74, revenueImpact: 290000, taskCompletion: 81, conversion: 22, callsToday: 31, callTarget: 40, leadsActive: 16, closedDeals: 4, lostDeals: 4, flags: [], status: "Active", streakDays: 7, team: "Andheri Hub", shift: "10:00 - 19:00", avatarSeed: "Karan", zone: "Andheri", managerId: "e2", bio: "Field-first. Books tours nobody else can.", joinedYearsAgo: 2, birthdayMMDD: "12-12" },
+  { id: "e7", name: "Karan Singh", role: "Operator", appRole: "employee", experience: "Mid", attendance: 88, performance: 76, consistency: 74, revenueImpact: 290000, taskCompletion: 81, conversion: 22, callsToday: 31, callTarget: 40, leadsActive: 16, closedDeals: 4, lostDeals: 4, flags: [], status: "Active", streakDays: 7, team: "Andheri Hub", shift: "10:00 - 19:00", avatarSeed: "Karan", zone: "Andheri", managerId: "e2", bio: "Field-first. Books tours nobody else can.", joinedYearsAgo: 2, birthdayMMDD: "12-12" },
   { id: "e8", name: "Megha Pillai", role: "HR", appRole: "manager", experience: "Core", attendance: 99, performance: 86, consistency: 91, revenueImpact: 0, taskCompletion: 95, conversion: 0, callsToday: 0, callTarget: 0, leadsActive: 0, closedDeals: 0, lostDeals: 0, flags: [], status: "Active", streakDays: 35, team: "People Ops", shift: "09:30 - 18:30", avatarSeed: "Megha", zone: "All", managerId: "e1", bio: "Knows everyone's name, shift, and coffee order.", joinedYearsAgo: 3, birthdayMMDD: "04-02" },
-  { id: "e9", name: "Devansh Patel", role: "Sales Agent", appRole: "employee", experience: "New", attendance: 60, performance: 38, consistency: 30, revenueImpact: 25000, taskCompletion: 42, conversion: 5, callsToday: 6, callTarget: 30, leadsActive: 4, closedDeals: 0, lostDeals: 7, flags: ["Late login", "Low response speed", "Poor follow-up"], status: "Offline", streakDays: 0, team: "Andheri Hub", shift: "10:00 - 19:00", avatarSeed: "Devansh", zone: "Andheri", managerId: "e2", bio: "Reset week — coach plan active.", joinedYearsAgo: 0, birthdayMMDD: "08-25" },
+  { id: "e9", name: "Devansh Patel", role: "Operator", appRole: "employee", experience: "New", attendance: 60, performance: 38, consistency: 30, revenueImpact: 25000, taskCompletion: 42, conversion: 5, callsToday: 6, callTarget: 30, leadsActive: 4, closedDeals: 0, lostDeals: 7, flags: ["Late login", "Low response speed", "Poor follow-up"], status: "Offline", streakDays: 0, team: "Andheri Hub", shift: "10:00 - 19:00", avatarSeed: "Devansh", zone: "Andheri", managerId: "e2", bio: "Reset week — coach plan active.", joinedYearsAgo: 0, birthdayMMDD: "08-25" },
   { id: "e10", name: "Nisha Kapoor", role: "Owner", appRole: "employee", experience: "Core", attendance: 100, performance: 92, consistency: 100, revenueImpact: 0, taskCompletion: 90, conversion: 0, callsToday: 0, callTarget: 0, leadsActive: 0, closedDeals: 0, lostDeals: 0, flags: [], status: "Active", streakDays: 60, team: "Property Partners", shift: "Anytime", avatarSeed: "Nisha", zone: "Bandra", managerId: null, bio: "Owns 3 properties on the Gharpayy network.", joinedYearsAgo: 2, birthdayMMDD: "02-17" },
   { id: "e11", name: "Tanya Bhatt", role: "Recruiter", appRole: "manager", experience: "Core", attendance: 97, performance: 89, consistency: 93, revenueImpact: 0, taskCompletion: 92, conversion: 34, callsToday: 24, callTarget: 30, leadsActive: 18, closedDeals: 4, lostDeals: 2, flags: [], status: "Active", streakDays: 19, team: "Talent Ops", shift: "10:00 - 19:00", avatarSeed: "Tanya", zone: "Mumbai", managerId: "e8", bio: "Hires faster than the floor can absorb.", joinedYearsAgo: 2, birthdayMMDD: "06-08" },
   // ----- Operator Console identities (4 leadership SOPs) -----
-  { id: "e12", name: "Nithya Iyer",   role: "Sales Lead", appRole: "manager", experience: "Core", attendance: 99, performance: 93, consistency: 96, revenueImpact: 0,      taskCompletion: 97, conversion: 0,  callsToday: 0,  callTarget: 0,  leadsActive: 0,  closedDeals: 0, lostDeals: 0, flags: [], status: "Active", streakDays: 42, team: "In-Office Floor", shift: "10:30 - 20:00", avatarSeed: "Nithya",  zone: "HQ", managerId: "e1", bio: "Runs the Communication Shield. Floor goes quiet on her command.", joinedYearsAgo: 3, birthdayMMDD: "10-11" },
-  { id: "e13", name: "Sneha Reddy",   role: "Sales Lead", appRole: "manager", experience: "Core", attendance: 98, performance: 95, consistency: 94, revenueImpact: 620000, taskCompletion: 96, conversion: 38, callsToday: 0,  callTarget: 0,  leadsActive: 0,  closedDeals: 0, lostDeals: 0, flags: [], status: "Active", streakDays: 38, team: "Tour Ops", shift: "10:30 - 20:00", avatarSeed: "SnehaR", zone: "HQ", managerId: "e1", bio: "Performance Enforcer. Owns the 10:16:60 number every single day.", joinedYearsAgo: 3, birthdayMMDD: "02-28" },
+  { id: "e12", name: "Nithya Iyer",   role: "Floor Lead", appRole: "manager", experience: "Core", attendance: 99, performance: 93, consistency: 96, revenueImpact: 0,      taskCompletion: 97, conversion: 0,  callsToday: 0,  callTarget: 0,  leadsActive: 0,  closedDeals: 0, lostDeals: 0, flags: [], status: "Active", streakDays: 42, team: "In-Office Floor", shift: "10:30 - 20:00", avatarSeed: "Nithya",  zone: "HQ", managerId: "e1", bio: "Runs the Communication Shield. Floor goes quiet on her command.", joinedYearsAgo: 3, birthdayMMDD: "10-11" },
+  { id: "e13", name: "Sneha Reddy",   role: "Floor Lead", appRole: "manager", experience: "Core", attendance: 98, performance: 95, consistency: 94, revenueImpact: 620000, taskCompletion: 96, conversion: 38, callsToday: 0,  callTarget: 0,  leadsActive: 0,  closedDeals: 0, lostDeals: 0, flags: [], status: "Active", streakDays: 38, team: "Tour Ops", shift: "10:30 - 20:00", avatarSeed: "SnehaR", zone: "HQ", managerId: "e1", bio: "Performance Enforcer. Owns the 10:16:60 number every single day.", joinedYearsAgo: 3, birthdayMMDD: "02-28" },
   { id: "e14", name: "Jiya Khanna",   role: "Coach",      appRole: "manager", experience: "Core", attendance: 100, performance: 91, consistency: 95, revenueImpact: 0,    taskCompletion: 94, conversion: 0,  callsToday: 0,  callTarget: 0,  leadsActive: 0,  closedDeals: 0, lostDeals: 0, flags: [], status: "Active", streakDays: 51, team: "Training", shift: "10:30 - 20:00", avatarSeed: "Jiya",   zone: "HQ", managerId: "e1", bio: "Training Architect. Raw hire to arena-ready in 48 hours.", joinedYearsAgo: 2, birthdayMMDD: "11-21" },
   { id: "e15", name: "Thanvi Kapoor", role: "Recruiter",  appRole: "manager", experience: "Core", attendance: 98, performance: 90, consistency: 92, revenueImpact: 0,     taskCompletion: 95, conversion: 36, callsToday: 0,  callTarget: 0,  leadsActive: 0,  closedDeals: 0, lostDeals: 0, flags: [], status: "Active", streakDays: 33, team: "Talent Ops", shift: "10:30 - 20:00", avatarSeed: "Thanvi", zone: "HQ", managerId: "e8", bio: "Talent Engine. Long-term operators only — quality is the standard.", joinedYearsAgo: 2, birthdayMMDD: "08-14" },
 ];
@@ -456,7 +456,7 @@ export interface Candidate {
 export const SEED_CANDIDATES: Candidate[] = [
   {
     id: "cand1", name: "Riya Malhotra", email: "riya.m@example.com", phone: "+91 98200 11122",
-    roleApplied: "Sales Agent", stage: "interview", source: "LinkedIn", rating: 4, recruiterId: "e11",
+    roleApplied: "Operator", stage: "interview", source: "LinkedIn", rating: 4, recruiterId: "e11",
     expectedSalary: 32000, experience: "2 yrs · BYJU'S", city: "Mumbai",
     appliedAt: now - 6 * D, nextStepAt: now + D, nextStepLabel: "Round 2 with Priya",
     notes: [
@@ -465,7 +465,7 @@ export const SEED_CANDIDATES: Candidate[] = [
   },
   {
     id: "cand2", name: "Aditya Khanna", email: "adi.khanna@example.com", phone: "+91 99300 44455",
-    roleApplied: "Sales Agent", stage: "screen", source: "Referral", rating: 3, recruiterId: "e11",
+    roleApplied: "Operator", stage: "screen", source: "Referral", rating: 3, recruiterId: "e11",
     expectedSalary: 28000, experience: "1.5 yrs · NoBroker", city: "Mumbai",
     appliedAt: now - 3 * D, nextStepAt: now + 2 * H, nextStepLabel: "Phone screen",
     notes: [{ id: "cn2", authorId: "e11", body: "Referred by Karan. Available immediately.", ts: now - 3 * D }],
@@ -488,13 +488,13 @@ export const SEED_CANDIDATES: Candidate[] = [
   },
   {
     id: "cand5", name: "Ishita Reddy", email: "ishita.r@example.com", phone: "+91 91111 33445",
-    roleApplied: "Sales Agent", stage: "applied", source: "Walk-in", rating: 2, recruiterId: "e11",
+    roleApplied: "Operator", stage: "applied", source: "Walk-in", rating: 2, recruiterId: "e11",
     expectedSalary: 26000, experience: "Fresher", city: "Mumbai",
     appliedAt: now - 4 * H, notes: [{ id: "cn5", authorId: "e11", body: "Confident, but very green. Maybe trial week.", ts: now - 3 * H }],
   },
   {
     id: "cand6", name: "Manav Joshi", email: "manav.j@example.com", phone: "+91 98888 77665",
-    roleApplied: "Sales Agent", stage: "hired", source: "Referral", rating: 5, recruiterId: "e11",
+    roleApplied: "Operator", stage: "hired", source: "Referral", rating: 5, recruiterId: "e11",
     expectedSalary: 30000, experience: "2 yrs · Magicbricks", city: "Mumbai",
     appliedAt: now - 30 * D, notes: [{ id: "cn6", authorId: "e11", body: "Joined last Monday. Already at 65% of ramp target.", ts: now - 7 * D }],
   },
@@ -507,8 +507,8 @@ export const SEED_CANDIDATES: Candidate[] = [
   },
   {
     id: "cand8", name: "Yash Agarwal", email: "yash.a@example.com", phone: "+91 96000 11122",
-    roleApplied: "Sales Lead", stage: "interview", source: "Agency", rating: 4, recruiterId: "e11",
-    expectedSalary: 95000, experience: "5 yrs · Sales mgmt", city: "Mumbai",
+    roleApplied: "Floor Lead", stage: "interview", source: "Agency", rating: 4, recruiterId: "e11",
+    expectedSalary: 95000, experience: "5 yrs · Floor mgmt", city: "Mumbai",
     appliedAt: now - 9 * D, nextStepAt: now + 3 * D, nextStepLabel: "Final round with Aarav",
     notes: [{ id: "cn7", authorId: "e1", body: "Sharp on numbers. Need to test his coaching instinct.", ts: now - 2 * D }],
   },

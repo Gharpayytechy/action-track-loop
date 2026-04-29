@@ -45,7 +45,7 @@ export const Route = createFileRoute("/recruiting")({
 });
 
 const SOURCES: CandidateSource[] = ["Referral", "LinkedIn", "Naukri", "Walk-in", "Inbound", "Agency"];
-const ROLES: Role[] = ["Sales Agent", "Sales Lead", "TCM", "Flow Ops", "HR", "Coach", "Recruiter"];
+const ROLES: Role[] = ["Operator", "Floor Lead", "TCM", "Flow Ops", "HR", "Coach", "Recruiter"];
 
 function RecruitingPage() {
   return (
@@ -201,7 +201,7 @@ function ComposerModal({ onClose, actorId }: { onClose: () => void; actorId: str
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [roleApplied, setRoleApplied] = useState<Role>("Sales Agent");
+  const [roleApplied, setRoleApplied] = useState<Role>("Operator");
   const [source, setSource] = useState<CandidateSource>("LinkedIn");
   const [expectedSalary, setExpectedSalary] = useState("30000");
   const [experience, setExperience] = useState("");
