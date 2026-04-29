@@ -1,7 +1,16 @@
 // Role playbooks — operationalized from the 4 leadership SOPs.
 // Each playbook drives the /console screen: sprints, KPIs, comm windows, EOD.
 
-export type PlaybookKey = "communication_shield" | "performance_enforcer" | "training_architect" | "talent_engine";
+export type PlaybookKey =
+  | "communication_shield"
+  | "performance_enforcer"
+  | "training_architect"
+  | "talent_engine"
+  | "pod_command"
+  | "tour_conductor"
+  | "lead_router"
+  | "people_pulse"
+  | "operator_day";
 
 export interface KpiTarget {
   id: string;
