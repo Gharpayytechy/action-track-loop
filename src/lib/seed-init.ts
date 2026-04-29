@@ -5,6 +5,8 @@ import { ensureKudosSeed } from "./kudos-store";
 import { ensureTaskSeed } from "./task-store";
 import { ensureLeaveSeed } from "./leave-store";
 import { ensureCalSeed } from "./calendar-store";
+import { ensureOneOnOneSeed } from "./oneonone-store";
+import { ensureRecruitingSeed } from "./recruiting-store";
 
 let booted = false;
 
@@ -18,4 +20,6 @@ export function bootArena() {
   ensureTaskSeed();
   ensureLeaveSeed();
   ensureCalSeed();
+  ensureOneOnOneSeed();
+  ensureRecruitingSeed();
 }
