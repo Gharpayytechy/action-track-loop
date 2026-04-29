@@ -2,12 +2,13 @@
 import type { AppRole, Employee, Role } from "@/data/seed";
 
 // ---------- Tier (the real 4-hierarchy model) ----------
-export type Tier = "leadership" | "hr" | "leader" | "teammate";
+export type Tier = "leadership" | "hr" | "leader" | "recruiter" | "teammate";
 
 export const TIER_LABEL: Record<Tier, string> = {
   leadership: "Leadership",
   hr: "HR",
   leader: "Leader",
+  recruiter: "Recruiter",
   teammate: "Teammate",
 };
 
@@ -15,18 +16,21 @@ export const TIER_TAGLINE: Record<Tier, string> = {
   leadership: "Sees the whole arena. Owns revenue & direction.",
   hr: "Owns people, pulse and policy.",
   leader: "Owns a pod. Coaches, approves, ships.",
+  recruiter: "Owns the funnel. Sources, screens, seals offers.",
   teammate: "Owns the day. Executes, learns, climbs.",
 };
 
 const LEADERSHIP_ROLES: Role[] = ["Admin", "Owner"];
 const HR_ROLES: Role[] = ["HR"];
 const LEADER_ROLES: Role[] = ["Sales Lead", "Coach"];
+const RECRUITER_ROLES: Role[] = ["Recruiter"];
 // Teammates: Sales Agent, Flow Ops, TCM, and anyone unmatched.
 
 export function tierOf(emp: Pick<Employee, "role" | "appRole">): Tier {
   if (LEADERSHIP_ROLES.includes(emp.role)) return "leadership";
   if (HR_ROLES.includes(emp.role)) return "hr";
   if (LEADER_ROLES.includes(emp.role)) return "leader";
+  if (RECRUITER_ROLES.includes(emp.role)) return "recruiter";
   // appRole=admin override (in case seed changes)
   if (emp.appRole === "admin") return "leadership";
   return "teammate";
