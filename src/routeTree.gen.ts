@@ -15,7 +15,9 @@ import { Route as TasksRouteImport } from './routes/tasks'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ScoreRouteImport } from './routes/score'
 import { Route as RosterRouteImport } from './routes/roster'
+import { Route as RecruitingRouteImport } from './routes/recruiting'
 import { Route as PeopleRouteImport } from './routes/people'
+import { Route as OneOnOnesRouteImport } from './routes/one-on-ones'
 import { Route as LeavesRouteImport } from './routes/leaves'
 import { Route as KudosRouteImport } from './routes/kudos'
 import { Route as InboxRouteImport } from './routes/inbox'
@@ -56,9 +58,19 @@ const RosterRoute = RosterRouteImport.update({
   path: '/roster',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RecruitingRoute = RecruitingRouteImport.update({
+  id: '/recruiting',
+  path: '/recruiting',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PeopleRoute = PeopleRouteImport.update({
   id: '/people',
   path: '/people',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OneOnOnesRoute = OneOnOnesRouteImport.update({
+  id: '/one-on-ones',
+  path: '/one-on-ones',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LeavesRoute = LeavesRouteImport.update({
@@ -117,7 +129,9 @@ export interface FileRoutesByFullPath {
   '/inbox': typeof InboxRoute
   '/kudos': typeof KudosRoute
   '/leaves': typeof LeavesRoute
+  '/one-on-ones': typeof OneOnOnesRoute
   '/people': typeof PeopleRoute
+  '/recruiting': typeof RecruitingRoute
   '/roster': typeof RosterRoute
   '/score': typeof ScoreRoute
   '/settings': typeof SettingsRoute
@@ -135,7 +149,9 @@ export interface FileRoutesByTo {
   '/inbox': typeof InboxRoute
   '/kudos': typeof KudosRoute
   '/leaves': typeof LeavesRoute
+  '/one-on-ones': typeof OneOnOnesRoute
   '/people': typeof PeopleRoute
+  '/recruiting': typeof RecruitingRoute
   '/roster': typeof RosterRoute
   '/score': typeof ScoreRoute
   '/settings': typeof SettingsRoute
@@ -154,7 +170,9 @@ export interface FileRoutesById {
   '/inbox': typeof InboxRoute
   '/kudos': typeof KudosRoute
   '/leaves': typeof LeavesRoute
+  '/one-on-ones': typeof OneOnOnesRoute
   '/people': typeof PeopleRoute
+  '/recruiting': typeof RecruitingRoute
   '/roster': typeof RosterRoute
   '/score': typeof ScoreRoute
   '/settings': typeof SettingsRoute
@@ -174,7 +192,9 @@ export interface FileRouteTypes {
     | '/inbox'
     | '/kudos'
     | '/leaves'
+    | '/one-on-ones'
     | '/people'
+    | '/recruiting'
     | '/roster'
     | '/score'
     | '/settings'
@@ -192,7 +212,9 @@ export interface FileRouteTypes {
     | '/inbox'
     | '/kudos'
     | '/leaves'
+    | '/one-on-ones'
     | '/people'
+    | '/recruiting'
     | '/roster'
     | '/score'
     | '/settings'
@@ -210,7 +232,9 @@ export interface FileRouteTypes {
     | '/inbox'
     | '/kudos'
     | '/leaves'
+    | '/one-on-ones'
     | '/people'
+    | '/recruiting'
     | '/roster'
     | '/score'
     | '/settings'
@@ -229,7 +253,9 @@ export interface RootRouteChildren {
   InboxRoute: typeof InboxRoute
   KudosRoute: typeof KudosRoute
   LeavesRoute: typeof LeavesRoute
+  OneOnOnesRoute: typeof OneOnOnesRoute
   PeopleRoute: typeof PeopleRoute
+  RecruitingRoute: typeof RecruitingRoute
   RosterRoute: typeof RosterRoute
   ScoreRoute: typeof ScoreRoute
   SettingsRoute: typeof SettingsRoute
@@ -282,11 +308,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RosterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/recruiting': {
+      id: '/recruiting'
+      path: '/recruiting'
+      fullPath: '/recruiting'
+      preLoaderRoute: typeof RecruitingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/people': {
       id: '/people'
       path: '/people'
       fullPath: '/people'
       preLoaderRoute: typeof PeopleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/one-on-ones': {
+      id: '/one-on-ones'
+      path: '/one-on-ones'
+      fullPath: '/one-on-ones'
+      preLoaderRoute: typeof OneOnOnesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/leaves': {
@@ -365,7 +405,9 @@ const rootRouteChildren: RootRouteChildren = {
   InboxRoute: InboxRoute,
   KudosRoute: KudosRoute,
   LeavesRoute: LeavesRoute,
+  OneOnOnesRoute: OneOnOnesRoute,
   PeopleRoute: PeopleRoute,
+  RecruitingRoute: RecruitingRoute,
   RosterRoute: RosterRoute,
   ScoreRoute: ScoreRoute,
   SettingsRoute: SettingsRoute,
