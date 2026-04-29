@@ -24,7 +24,11 @@ import {
   X,
   MessageSquareText,
   UserPlus,
+  Zap,
+  Shield,
 } from "lucide-react";
+import { playbookFor } from "@/data/playbooks";
+import { shieldNow } from "@/lib/console-store";
 import { useAttendanceState } from "@/hooks/useAttendance";
 import { liveStatusFor } from "@/lib/attendance-store";
 import { unreadCount } from "@/lib/notification-store";
@@ -49,6 +53,7 @@ const ALL: Tier[] = ["leadership", "hr", "leader", "recruiter", "teammate"];
 
 const NAV: NavItem[] = [
   { to: "/",            label: "Arena Home",   icon: LayoutDashboard, tiers: ALL },
+  { to: "/console",     label: "Operator Console", icon: Zap,         tiers: ["leadership","hr","leader","recruiter"] },
   { to: "/score",       label: "My Score",     icon: Trophy,          tiers: ALL },
   { to: "/tasks",       label: "Tasks",        icon: CheckSquare,     tiers: ALL },
   { to: "/achievements",label: "Achievements", icon: Award,           tiers: ALL },
@@ -81,6 +86,8 @@ export function AppShell() {
   const location = useLocation();
   const navigate = useNavigate();
   const { actor, setActor, employees } = useAttendanceState();
+  const hasPlaybook = !!playbookFor(actor.id);
+  const shield = hasPlaybook ? shieldNow(actor.id) : { active: false, label: "" };
   const status = liveStatusFor(actor.id);
   const [bellOpen, setBellOpen] = useState(false);
   const [calOpen, setCalOpen] = useState(false);
@@ -220,6 +227,11 @@ export function AppShell() {
             <span className="truncate">Search…</span>
             <kbd className="ml-auto hidden md:inline text-[10px] font-mono bg-background px-1.5 py-0.5 rounded border border-border">⌘K</kbd>
           </button>
+          {shield.active && (
+            <Link to="/console" className="hidden md:inline-flex items-center gap-1.5 h-9 px-3 rounded-md bg-primary/15 border border-primary/30 text-primary text-xs font-mono uppercase tracking-widest hover:bg-primary/25" title={shield.label}>
+              <Shield className="h-3.5 w-3.5" /> Shield Mode
+            </Link>
+          )}
           <div className="ml-auto flex items-center gap-1 relative">
             <div className="relative hidden sm:block">
               <button

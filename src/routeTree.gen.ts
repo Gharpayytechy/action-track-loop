@@ -22,6 +22,7 @@ import { Route as LeavesRouteImport } from './routes/leaves'
 import { Route as KudosRouteImport } from './routes/kudos'
 import { Route as InboxRouteImport } from './routes/inbox'
 import { Route as HrmsRouteImport } from './routes/hrms'
+import { Route as ConsoleRouteImport } from './routes/console'
 import { Route as CommandRouteImport } from './routes/command'
 import { Route as CalendarRouteImport } from './routes/calendar'
 import { Route as AttendanceRouteImport } from './routes/attendance'
@@ -93,6 +94,11 @@ const HrmsRoute = HrmsRouteImport.update({
   path: '/hrms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ConsoleRoute = ConsoleRouteImport.update({
+  id: '/console',
+  path: '/console',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CommandRoute = CommandRouteImport.update({
   id: '/command',
   path: '/command',
@@ -125,6 +131,7 @@ export interface FileRoutesByFullPath {
   '/attendance': typeof AttendanceRoute
   '/calendar': typeof CalendarRoute
   '/command': typeof CommandRoute
+  '/console': typeof ConsoleRoute
   '/hrms': typeof HrmsRoute
   '/inbox': typeof InboxRoute
   '/kudos': typeof KudosRoute
@@ -145,6 +152,7 @@ export interface FileRoutesByTo {
   '/attendance': typeof AttendanceRoute
   '/calendar': typeof CalendarRoute
   '/command': typeof CommandRoute
+  '/console': typeof ConsoleRoute
   '/hrms': typeof HrmsRoute
   '/inbox': typeof InboxRoute
   '/kudos': typeof KudosRoute
@@ -166,6 +174,7 @@ export interface FileRoutesById {
   '/attendance': typeof AttendanceRoute
   '/calendar': typeof CalendarRoute
   '/command': typeof CommandRoute
+  '/console': typeof ConsoleRoute
   '/hrms': typeof HrmsRoute
   '/inbox': typeof InboxRoute
   '/kudos': typeof KudosRoute
@@ -188,6 +197,7 @@ export interface FileRouteTypes {
     | '/attendance'
     | '/calendar'
     | '/command'
+    | '/console'
     | '/hrms'
     | '/inbox'
     | '/kudos'
@@ -208,6 +218,7 @@ export interface FileRouteTypes {
     | '/attendance'
     | '/calendar'
     | '/command'
+    | '/console'
     | '/hrms'
     | '/inbox'
     | '/kudos'
@@ -228,6 +239,7 @@ export interface FileRouteTypes {
     | '/attendance'
     | '/calendar'
     | '/command'
+    | '/console'
     | '/hrms'
     | '/inbox'
     | '/kudos'
@@ -249,6 +261,7 @@ export interface RootRouteChildren {
   AttendanceRoute: typeof AttendanceRoute
   CalendarRoute: typeof CalendarRoute
   CommandRoute: typeof CommandRoute
+  ConsoleRoute: typeof ConsoleRoute
   HrmsRoute: typeof HrmsRoute
   InboxRoute: typeof InboxRoute
   KudosRoute: typeof KudosRoute
@@ -357,6 +370,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HrmsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/console': {
+      id: '/console'
+      path: '/console'
+      fullPath: '/console'
+      preLoaderRoute: typeof ConsoleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/command': {
       id: '/command'
       path: '/command'
@@ -401,6 +421,7 @@ const rootRouteChildren: RootRouteChildren = {
   AttendanceRoute: AttendanceRoute,
   CalendarRoute: CalendarRoute,
   CommandRoute: CommandRoute,
+  ConsoleRoute: ConsoleRoute,
   HrmsRoute: HrmsRoute,
   InboxRoute: InboxRoute,
   KudosRoute: KudosRoute,

@@ -7,6 +7,7 @@ import { ensureLeaveSeed } from "./leave-store";
 import { ensureCalSeed } from "./calendar-store";
 import { ensureOneOnOneSeed } from "./oneonone-store";
 import { ensureRecruitingSeed } from "./recruiting-store";
+import { ensureConsoleSeed } from "./console-store";
 
 let booted = false;
 
@@ -22,4 +23,5 @@ export function bootArena() {
   ensureCalSeed();
   ensureOneOnOneSeed();
   ensureRecruitingSeed();
+  ensureConsoleSeed();
 }
