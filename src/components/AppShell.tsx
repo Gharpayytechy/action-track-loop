@@ -86,6 +86,8 @@ export function AppShell() {
   const location = useLocation();
   const navigate = useNavigate();
   const { actor, setActor, employees } = useAttendanceState();
+  const hasPlaybook = !!playbookFor(actor.id);
+  const shield = hasPlaybook ? shieldNow(actor.id) : { active: false, label: "" };
   const status = liveStatusFor(actor.id);
   const [bellOpen, setBellOpen] = useState(false);
   const [calOpen, setCalOpen] = useState(false);
