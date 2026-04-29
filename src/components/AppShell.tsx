@@ -94,7 +94,9 @@ export function AppShell() {
     tier === "leadership" || tier === "leader"
       ? [MOBILE_NAV_BASE[0], MOBILE_NAV_BASE[1], { to: "/war-room", label: "War", icon: Activity }, MOBILE_NAV_BASE[3], MOBILE_NAV_BASE[4]]
       : tier === "hr"
-      ? [MOBILE_NAV_BASE[0], { to: "/people", label: "People", icon: Users }, { to: "/leaves", label: "Leaves", icon: PlaneTakeoff }, MOBILE_NAV_BASE[3], MOBILE_NAV_BASE[4]]
+      ? [MOBILE_NAV_BASE[0], { to: "/people", label: "People", icon: Users }, { to: "/recruiting", label: "Hiring", icon: UserPlus }, MOBILE_NAV_BASE[3], MOBILE_NAV_BASE[4]]
+      : tier === "recruiter"
+      ? [MOBILE_NAV_BASE[0], { to: "/recruiting", label: "Pipeline", icon: UserPlus }, { to: "/one-on-ones", label: "1:1s", icon: MessageSquareText }, MOBILE_NAV_BASE[3], MOBILE_NAV_BASE[4]]
       : MOBILE_NAV_BASE;
 
   useEffect(() => { bootArena(); }, []);
