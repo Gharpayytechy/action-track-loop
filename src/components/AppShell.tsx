@@ -227,6 +227,11 @@ export function AppShell() {
             <span className="truncate">Search…</span>
             <kbd className="ml-auto hidden md:inline text-[10px] font-mono bg-background px-1.5 py-0.5 rounded border border-border">⌘K</kbd>
           </button>
+          {shield.active && (
+            <Link to="/console" className="hidden md:inline-flex items-center gap-1.5 h-9 px-3 rounded-md bg-primary/15 border border-primary/30 text-primary text-xs font-mono uppercase tracking-widest hover:bg-primary/25" title={shield.label}>
+              <Shield className="h-3.5 w-3.5" /> Shield Mode
+            </Link>
+          )}
           <div className="ml-auto flex items-center gap-1 relative">
             <div className="relative hidden sm:block">
               <button
