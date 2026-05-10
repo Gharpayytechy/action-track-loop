@@ -35,8 +35,11 @@ const inr = (n: number) => "₹" + (n >= 100000 ? (n / 100000).toFixed(1) + "L" 
 
 function HomeHeader({ actor, sub }: { actor: Employee; sub: string }) {
   const tier = tierOf(actor);
-  const hour = new Date().getHours();
-  const greet = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+  const [greet, setGreet] = React.useState("Welcome back");
+  React.useEffect(() => {
+    const h = new Date().getHours();
+    setGreet(h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening");
+  }, []);
   return (
     <header className="mb-5">
       <div className="font-mono text-[10px] md:text-xs uppercase tracking-widest text-primary mb-2">
