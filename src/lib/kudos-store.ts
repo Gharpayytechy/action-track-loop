@@ -2,6 +2,8 @@ import { useMemo, useSyncExternalStore } from "react";
 import { makeStore } from "./store";
 import { SEED_KUDOS, type Kudo, type KudoTag } from "@/data/seed";
 import { pushNotification, nameOf } from "./notification-store";
+import { awardXP } from "./xp-engine";
+import { awardCoins } from "./coins";
 
 const store = makeStore<Kudo[]>("gp_kudos_v1", SEED_KUDOS);
 
@@ -42,6 +44,9 @@ export function giveKudo(fromId: string, toId: string, tag: KudoTag, message: st
     actionLabel: "Open",
     actionTo: "/kudos",
   });
+  awardXP(fromId, "KUDO_GIVEN", { note: `Kudo to ${nameOf(toId)}` });
+  awardXP(toId, "KUDO_RECEIVED", { note: `Kudo from ${nameOf(fromId)}` });
+  awardCoins(toId, 20, `Kudo from ${nameOf(fromId)}`);
   return next;
 }
 
