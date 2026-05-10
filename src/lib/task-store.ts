@@ -81,6 +81,7 @@ export function setStatus(id: string, status: TaskStatus, byId?: string) {
     }
     awardXP(current.assigneeId, onTime ? "TASK_CLOSED_EARLY" : "TASK_CLOSED", { note: current.title });
     bumpQuest(current.assigneeId, "tasks_closed");
+  } else if (status === "doing" && current.assignedById && current.assignedById !== current.assigneeId) {
     pushNotification({
       kind: "task",
       toId: current.assignedById,
