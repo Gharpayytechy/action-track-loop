@@ -26,7 +26,14 @@ import {
   UserPlus,
   Zap,
   Shield,
+  Target,
+  ShoppingBag,
+  Coins,
 } from "lucide-react";
+import { CadenceTimer } from "./CadenceTimer";
+import { XPToaster } from "./XPToaster";
+import { levelProgress, xpFor } from "@/lib/xp-engine";
+import { coinsFor } from "@/lib/coins";
 import { playbookFor } from "@/data/playbooks";
 import { shieldNow } from "@/lib/console-store";
 import { useAttendanceState } from "@/hooks/useAttendance";
@@ -60,6 +67,9 @@ const NAV: NavItem[] = [
   { to: "/calendar",    label: "Calendar",     icon: Calendar,        tiers: ALL },
   { to: "/leaves",      label: "Leaves",       icon: PlaneTakeoff,    tiers: ALL },
   { to: "/kudos",       label: "Kudos",        icon: Heart,           tiers: ALL },
+  { to: "/quests",      label: "Quests",       icon: Target,          tiers: ALL },
+  { to: "/leaderboard", label: "Leaderboard",  icon: Trophy,          tiers: ALL },
+  { to: "/shop",        label: "Reward Shop",  icon: ShoppingBag,     tiers: ALL },
   { to: "/inbox",       label: "Inbox",        icon: Inbox,           tiers: ALL },
   { to: "/attendance",  label: "Attendance",   icon: Clock4,          tiers: ALL },
   // Leader & up (and recruiter — they coach candidates too)
@@ -184,14 +194,15 @@ export function AppShell() {
           );
         })}
       </nav>
-      <div className="p-3 border-t border-sidebar-border">
+      <div className="p-3 border-t border-sidebar-border space-y-2">
+        <XPCoinWidget actorId={actor.id} />
         <button
           onClick={() => { setKudoOpen(true); setDrawerOpen(false); }}
           className="w-full inline-flex items-center justify-center gap-2 bg-primary/20 hover:bg-primary/30 text-primary-foreground/90 text-xs font-medium py-2 rounded-md border border-primary/30"
         >
           <Award className="h-3.5 w-3.5" /> Give a kudo
         </button>
-        <div className="flex items-center gap-2 px-2 py-2 mt-2 text-[10px] text-sidebar-foreground/60">
+        <div className="flex items-center gap-2 px-2 py-1 text-[10px] text-sidebar-foreground/60">
           <Sparkles className="h-3 w-3 text-primary" />
           <span className="font-mono uppercase tracking-widest">Demo · No auth</span>
         </div>
@@ -306,6 +317,25 @@ export function AppShell() {
 
       <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
       <GiveKudoModal open={kudoOpen} onClose={() => setKudoOpen(false)} />
+      <CadenceTimer />
+      <XPToaster />
+    </div>
+  );
+}
+
+function XPCoinWidget({ actorId }: { actorId: string }) {
+  const lp = levelProgress(xpFor(actorId));
+  const coins = coinsFor(actorId);
+  return (
+    <div className="rounded-md bg-sidebar-hover/40 border border-sidebar-border p-2.5">
+      <div className="flex items-center justify-between mb-1">
+        <span className="font-mono text-[9px] uppercase tracking-widest text-sidebar-foreground/70">L{lp.level} · {lp.title}</span>
+        <span className="inline-flex items-center gap-1 font-mono text-[10px] text-primary"><Coins className="h-3 w-3" />{coins.toLocaleString()}</span>
+      </div>
+      <div className="h-1.5 bg-sidebar-border/60 rounded-full overflow-hidden">
+        <div className="h-full bg-primary transition-all" style={{ width: `${lp.pct}%` }} />
+      </div>
+      <div className="text-[9px] font-mono uppercase tracking-widest text-sidebar-foreground/50 mt-1">{lp.xpToNext} XP to next</div>
     </div>
   );
 }
