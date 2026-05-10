@@ -9,11 +9,12 @@ export function XPToaster() {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
   useEffect(() => {
-    return onXPGain((g) => {
+    const off = onXPGain((g) => {
       const t: Toast = { id: crypto.randomUUID(), amount: g.amount, note: g.note, leveledUp: g.leveledUp, newLevel: g.newLevel };
       setToasts((cur) => [...cur, t]);
       window.setTimeout(() => setToasts((cur) => cur.filter((x) => x.id !== t.id)), g.leveledUp ? 4500 : 2200);
     });
+    return () => { off; };
   }, []);
 
   if (!toasts.length) return null;

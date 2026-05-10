@@ -82,7 +82,7 @@ export function redeem(actorId: string, item: ShopItem): { ok: boolean; reason?:
     ...s,
     balances: { ...s.balances, [actorId]: bal - item.cost },
     txns: [{ id: crypto.randomUUID(), actorId, delta: -item.cost, reason: `Redeemed: ${item.name}`, ts: Date.now() }, ...s.txns].slice(0, 500),
-    redemptions: [{ id: crypto.randomUUID(), actorId, itemId: item.id, cost: item.cost, status: item.needsApproval ? "pending" : "fulfilled", ts: Date.now() }, ...s.redemptions].slice(0, 200),
+    redemptions: [{ id: crypto.randomUUID(), actorId, itemId: item.id, cost: item.cost, status: (item.needsApproval ? "pending" : "fulfilled") as Redemption["status"], ts: Date.now() }, ...s.redemptions].slice(0, 200),
     unlockedThemes: item.category === "Theme"
       ? { ...s.unlockedThemes, [actorId]: [...themes, item.id] }
       : s.unlockedThemes,
