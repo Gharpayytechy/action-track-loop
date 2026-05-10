@@ -12,6 +12,8 @@ import {
   type TimeLog,
 } from "@/data/seed";
 import { pushNotification, nameOf } from "./notification-store";
+import { awardXP } from "./xp-engine";
+import { bumpQuest } from "./quests-store";
 
 const store = makeStore<AppTask[]>("gp_tasks_v2", SEED_TASKS);
 
