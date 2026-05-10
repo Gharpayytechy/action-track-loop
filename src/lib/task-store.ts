@@ -79,7 +79,8 @@ export function setStatus(id: string, status: TaskStatus, byId?: string) {
         actionTo: isOwner ? "/score" : "/tasks",
       });
     }
-  } else if (status === "doing" && current.assignedById && current.assignedById !== current.assigneeId) {
+    awardXP(current.assigneeId, onTime ? "TASK_CLOSED_EARLY" : "TASK_CLOSED", { note: current.title });
+    bumpQuest(current.assigneeId, "tasks_closed");
     pushNotification({
       kind: "task",
       toId: current.assignedById,
