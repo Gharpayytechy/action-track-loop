@@ -12,13 +12,16 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as WarRoomRouteImport } from './routes/war-room'
 import { Route as TeamRouteImport } from './routes/team'
 import { Route as TasksRouteImport } from './routes/tasks'
+import { Route as ShopRouteImport } from './routes/shop'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ScoreRouteImport } from './routes/score'
 import { Route as RosterRouteImport } from './routes/roster'
 import { Route as RecruitingRouteImport } from './routes/recruiting'
+import { Route as QuestsRouteImport } from './routes/quests'
 import { Route as PeopleRouteImport } from './routes/people'
 import { Route as OneOnOnesRouteImport } from './routes/one-on-ones'
 import { Route as LeavesRouteImport } from './routes/leaves'
+import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as KudosRouteImport } from './routes/kudos'
 import { Route as InboxRouteImport } from './routes/inbox'
 import { Route as HrmsRouteImport } from './routes/hrms'
@@ -44,6 +47,11 @@ const TasksRoute = TasksRouteImport.update({
   path: '/tasks',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShopRoute = ShopRouteImport.update({
+  id: '/shop',
+  path: '/shop',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -64,6 +72,11 @@ const RecruitingRoute = RecruitingRouteImport.update({
   path: '/recruiting',
   getParentRoute: () => rootRouteImport,
 } as any)
+const QuestsRoute = QuestsRouteImport.update({
+  id: '/quests',
+  path: '/quests',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PeopleRoute = PeopleRouteImport.update({
   id: '/people',
   path: '/people',
@@ -77,6 +90,11 @@ const OneOnOnesRoute = OneOnOnesRouteImport.update({
 const LeavesRoute = LeavesRouteImport.update({
   id: '/leaves',
   path: '/leaves',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LeaderboardRoute = LeaderboardRouteImport.update({
+  id: '/leaderboard',
+  path: '/leaderboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const KudosRoute = KudosRouteImport.update({
@@ -135,13 +153,16 @@ export interface FileRoutesByFullPath {
   '/hrms': typeof HrmsRoute
   '/inbox': typeof InboxRoute
   '/kudos': typeof KudosRoute
+  '/leaderboard': typeof LeaderboardRoute
   '/leaves': typeof LeavesRoute
   '/one-on-ones': typeof OneOnOnesRoute
   '/people': typeof PeopleRoute
+  '/quests': typeof QuestsRoute
   '/recruiting': typeof RecruitingRoute
   '/roster': typeof RosterRoute
   '/score': typeof ScoreRoute
   '/settings': typeof SettingsRoute
+  '/shop': typeof ShopRoute
   '/tasks': typeof TasksRoute
   '/team': typeof TeamRoute
   '/war-room': typeof WarRoomRoute
@@ -156,13 +177,16 @@ export interface FileRoutesByTo {
   '/hrms': typeof HrmsRoute
   '/inbox': typeof InboxRoute
   '/kudos': typeof KudosRoute
+  '/leaderboard': typeof LeaderboardRoute
   '/leaves': typeof LeavesRoute
   '/one-on-ones': typeof OneOnOnesRoute
   '/people': typeof PeopleRoute
+  '/quests': typeof QuestsRoute
   '/recruiting': typeof RecruitingRoute
   '/roster': typeof RosterRoute
   '/score': typeof ScoreRoute
   '/settings': typeof SettingsRoute
+  '/shop': typeof ShopRoute
   '/tasks': typeof TasksRoute
   '/team': typeof TeamRoute
   '/war-room': typeof WarRoomRoute
@@ -178,13 +202,16 @@ export interface FileRoutesById {
   '/hrms': typeof HrmsRoute
   '/inbox': typeof InboxRoute
   '/kudos': typeof KudosRoute
+  '/leaderboard': typeof LeaderboardRoute
   '/leaves': typeof LeavesRoute
   '/one-on-ones': typeof OneOnOnesRoute
   '/people': typeof PeopleRoute
+  '/quests': typeof QuestsRoute
   '/recruiting': typeof RecruitingRoute
   '/roster': typeof RosterRoute
   '/score': typeof ScoreRoute
   '/settings': typeof SettingsRoute
+  '/shop': typeof ShopRoute
   '/tasks': typeof TasksRoute
   '/team': typeof TeamRoute
   '/war-room': typeof WarRoomRoute
@@ -201,13 +228,16 @@ export interface FileRouteTypes {
     | '/hrms'
     | '/inbox'
     | '/kudos'
+    | '/leaderboard'
     | '/leaves'
     | '/one-on-ones'
     | '/people'
+    | '/quests'
     | '/recruiting'
     | '/roster'
     | '/score'
     | '/settings'
+    | '/shop'
     | '/tasks'
     | '/team'
     | '/war-room'
@@ -222,13 +252,16 @@ export interface FileRouteTypes {
     | '/hrms'
     | '/inbox'
     | '/kudos'
+    | '/leaderboard'
     | '/leaves'
     | '/one-on-ones'
     | '/people'
+    | '/quests'
     | '/recruiting'
     | '/roster'
     | '/score'
     | '/settings'
+    | '/shop'
     | '/tasks'
     | '/team'
     | '/war-room'
@@ -243,13 +276,16 @@ export interface FileRouteTypes {
     | '/hrms'
     | '/inbox'
     | '/kudos'
+    | '/leaderboard'
     | '/leaves'
     | '/one-on-ones'
     | '/people'
+    | '/quests'
     | '/recruiting'
     | '/roster'
     | '/score'
     | '/settings'
+    | '/shop'
     | '/tasks'
     | '/team'
     | '/war-room'
@@ -265,13 +301,16 @@ export interface RootRouteChildren {
   HrmsRoute: typeof HrmsRoute
   InboxRoute: typeof InboxRoute
   KudosRoute: typeof KudosRoute
+  LeaderboardRoute: typeof LeaderboardRoute
   LeavesRoute: typeof LeavesRoute
   OneOnOnesRoute: typeof OneOnOnesRoute
   PeopleRoute: typeof PeopleRoute
+  QuestsRoute: typeof QuestsRoute
   RecruitingRoute: typeof RecruitingRoute
   RosterRoute: typeof RosterRoute
   ScoreRoute: typeof ScoreRoute
   SettingsRoute: typeof SettingsRoute
+  ShopRoute: typeof ShopRoute
   TasksRoute: typeof TasksRoute
   TeamRoute: typeof TeamRoute
   WarRoomRoute: typeof WarRoomRoute
@@ -298,6 +337,13 @@ declare module '@tanstack/react-router' {
       path: '/tasks'
       fullPath: '/tasks'
       preLoaderRoute: typeof TasksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shop': {
+      id: '/shop'
+      path: '/shop'
+      fullPath: '/shop'
+      preLoaderRoute: typeof ShopRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/settings': {
@@ -328,6 +374,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RecruitingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/quests': {
+      id: '/quests'
+      path: '/quests'
+      fullPath: '/quests'
+      preLoaderRoute: typeof QuestsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/people': {
       id: '/people'
       path: '/people'
@@ -347,6 +400,13 @@ declare module '@tanstack/react-router' {
       path: '/leaves'
       fullPath: '/leaves'
       preLoaderRoute: typeof LeavesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/leaderboard': {
+      id: '/leaderboard'
+      path: '/leaderboard'
+      fullPath: '/leaderboard'
+      preLoaderRoute: typeof LeaderboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/kudos': {
@@ -425,13 +485,16 @@ const rootRouteChildren: RootRouteChildren = {
   HrmsRoute: HrmsRoute,
   InboxRoute: InboxRoute,
   KudosRoute: KudosRoute,
+  LeaderboardRoute: LeaderboardRoute,
   LeavesRoute: LeavesRoute,
   OneOnOnesRoute: OneOnOnesRoute,
   PeopleRoute: PeopleRoute,
+  QuestsRoute: QuestsRoute,
   RecruitingRoute: RecruitingRoute,
   RosterRoute: RosterRoute,
   ScoreRoute: ScoreRoute,
   SettingsRoute: SettingsRoute,
+  ShopRoute: ShopRoute,
   TasksRoute: TasksRoute,
   TeamRoute: TeamRoute,
   WarRoomRoute: WarRoomRoute,

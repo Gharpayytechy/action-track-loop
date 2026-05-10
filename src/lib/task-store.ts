@@ -12,6 +12,8 @@ import {
   type TimeLog,
 } from "@/data/seed";
 import { pushNotification, nameOf } from "./notification-store";
+import { awardXP } from "./xp-engine";
+import { bumpQuest } from "./quests-store";
 
 const store = makeStore<AppTask[]>("gp_tasks_v2", SEED_TASKS);
 
@@ -77,6 +79,8 @@ export function setStatus(id: string, status: TaskStatus, byId?: string) {
         actionTo: isOwner ? "/score" : "/tasks",
       });
     }
+    awardXP(current.assigneeId, onTime ? "TASK_CLOSED_EARLY" : "TASK_CLOSED", { note: current.title });
+    bumpQuest(current.assigneeId, "tasks_closed");
   } else if (status === "doing" && current.assignedById && current.assignedById !== current.assigneeId) {
     pushNotification({
       kind: "task",
