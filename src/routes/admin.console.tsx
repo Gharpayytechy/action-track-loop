@@ -309,8 +309,8 @@ function AdminConsole() {
                 const key = `${r.actorId}:${r.date}`;
                 const isOpen = expanded === key;
                 return (
-                  <>
-                    <tr key={key} className="border-t border-border hover:bg-secondary/30">
+                  <Fragment key={key}>
+                    <tr className="border-t border-border hover:bg-secondary/30">
                       <td className="px-3 py-2">
                         <button onClick={() => setExpanded(isOpen ? null : key)} className="h-6 w-6 inline-flex items-center justify-center rounded hover:bg-secondary">
                           {isOpen ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
@@ -346,7 +346,7 @@ function AdminConsole() {
                       </td>
                     </tr>
                     {isOpen && <ExpandedRow r={r} />}
-                  </>
+                  </Fragment>
                 );
               })}
             </tbody>
