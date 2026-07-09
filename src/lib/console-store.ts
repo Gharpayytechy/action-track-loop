@@ -76,6 +76,20 @@ export function useConsoleDay(actorId: string): DayState {
   };
 }
 
+// Subscribe to the full state (all days, all actors). Used by admin panel.
+export function useAllConsoleState(): ConsoleState {
+  return useSyncExternalStore(
+    (cb) => store.subscribe(cb),
+    () => store.read(),
+    store.getServerSnapshot,
+  );
+}
+
+export function deleteConsoleDay(actorId: string, date: string) {
+  const state = store.read();
+  store.write({ days: state.days.filter((d) => !(d.actorId === actorId && d.date === date)) });
+}
+
 // ---- Mutations ----
 export function bumpKpi(actorId: string, kpiId: string, delta: number) {
   ensureDay(actorId);
