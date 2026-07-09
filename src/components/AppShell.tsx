@@ -82,6 +82,7 @@ const NAV: NavItem[] = [
   { to: "/recruiting",  label: "Recruiting",   icon: UserPlus,        tiers: ["leadership","hr","recruiter"] },
   // HR & Leadership only
   { to: "/hrms",        label: "HRMS",         icon: ShieldCheck,     tiers: ["leadership","hr"] },
+  { to: "/admin/console", label: "Console Admin", icon: ShieldCheck,   tiers: ["leadership","hr"] },
 ];
 
 const MOBILE_NAV_BASE = [
