@@ -25,6 +25,7 @@ import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as KudosRouteImport } from './routes/kudos'
 import { Route as InboxRouteImport } from './routes/inbox'
 import { Route as HrmsRouteImport } from './routes/hrms'
+import { Route as DailyRouteImport } from './routes/daily'
 import { Route as ConsoleRouteImport } from './routes/console'
 import { Route as CommandRouteImport } from './routes/command'
 import { Route as CalendarRouteImport } from './routes/calendar'
@@ -113,6 +114,11 @@ const HrmsRoute = HrmsRouteImport.update({
   path: '/hrms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DailyRoute = DailyRouteImport.update({
+  id: '/daily',
+  path: '/daily',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ConsoleRoute = ConsoleRouteImport.update({
   id: '/console',
   path: '/console',
@@ -156,6 +162,7 @@ export interface FileRoutesByFullPath {
   '/calendar': typeof CalendarRoute
   '/command': typeof CommandRoute
   '/console': typeof ConsoleRoute
+  '/daily': typeof DailyRoute
   '/hrms': typeof HrmsRoute
   '/inbox': typeof InboxRoute
   '/kudos': typeof KudosRoute
@@ -181,6 +188,7 @@ export interface FileRoutesByTo {
   '/calendar': typeof CalendarRoute
   '/command': typeof CommandRoute
   '/console': typeof ConsoleRoute
+  '/daily': typeof DailyRoute
   '/hrms': typeof HrmsRoute
   '/inbox': typeof InboxRoute
   '/kudos': typeof KudosRoute
@@ -207,6 +215,7 @@ export interface FileRoutesById {
   '/calendar': typeof CalendarRoute
   '/command': typeof CommandRoute
   '/console': typeof ConsoleRoute
+  '/daily': typeof DailyRoute
   '/hrms': typeof HrmsRoute
   '/inbox': typeof InboxRoute
   '/kudos': typeof KudosRoute
@@ -234,6 +243,7 @@ export interface FileRouteTypes {
     | '/calendar'
     | '/command'
     | '/console'
+    | '/daily'
     | '/hrms'
     | '/inbox'
     | '/kudos'
@@ -259,6 +269,7 @@ export interface FileRouteTypes {
     | '/calendar'
     | '/command'
     | '/console'
+    | '/daily'
     | '/hrms'
     | '/inbox'
     | '/kudos'
@@ -284,6 +295,7 @@ export interface FileRouteTypes {
     | '/calendar'
     | '/command'
     | '/console'
+    | '/daily'
     | '/hrms'
     | '/inbox'
     | '/kudos'
@@ -310,6 +322,7 @@ export interface RootRouteChildren {
   CalendarRoute: typeof CalendarRoute
   CommandRoute: typeof CommandRoute
   ConsoleRoute: typeof ConsoleRoute
+  DailyRoute: typeof DailyRoute
   HrmsRoute: typeof HrmsRoute
   InboxRoute: typeof InboxRoute
   KudosRoute: typeof KudosRoute
@@ -443,6 +456,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HrmsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/daily': {
+      id: '/daily'
+      path: '/daily'
+      fullPath: '/daily'
+      preLoaderRoute: typeof DailyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/console': {
       id: '/console'
       path: '/console'
@@ -502,6 +522,7 @@ const rootRouteChildren: RootRouteChildren = {
   CalendarRoute: CalendarRoute,
   CommandRoute: CommandRoute,
   ConsoleRoute: ConsoleRoute,
+  DailyRoute: DailyRoute,
   HrmsRoute: HrmsRoute,
   InboxRoute: InboxRoute,
   KudosRoute: KudosRoute,
@@ -523,12 +544,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
