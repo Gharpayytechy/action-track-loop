@@ -63,6 +63,7 @@ const NAV: NavItem[] = [
   { to: "/",            label: "Arena Home",   icon: LayoutDashboard, tiers: ALL },
   { to: "/daily",       label: "Daily Flow",   icon: Sun,             tiers: ALL },
   { to: "/console",     label: "Operator Console", icon: Zap,         tiers: ["leadership","hr","leader","recruiter"] },
+  { to: "/live",        label: "Live Ops",     icon: Activity,        tiers: ["leadership","hr","leader"] },
   { to: "/score",       label: "My Score",     icon: Trophy,          tiers: ALL },
   { to: "/tasks",       label: "Tasks",        icon: CheckSquare,     tiers: ALL },
   { to: "/achievements",label: "Achievements", icon: Award,           tiers: ALL },
