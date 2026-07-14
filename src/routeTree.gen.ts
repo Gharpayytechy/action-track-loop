@@ -20,6 +20,7 @@ import { Route as RecruitingRouteImport } from './routes/recruiting'
 import { Route as QuestsRouteImport } from './routes/quests'
 import { Route as PeopleRouteImport } from './routes/people'
 import { Route as OneOnOnesRouteImport } from './routes/one-on-ones'
+import { Route as LiveRouteImport } from './routes/live'
 import { Route as LeavesRouteImport } from './routes/leaves'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as KudosRouteImport } from './routes/kudos'
@@ -87,6 +88,11 @@ const PeopleRoute = PeopleRouteImport.update({
 const OneOnOnesRoute = OneOnOnesRouteImport.update({
   id: '/one-on-ones',
   path: '/one-on-ones',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LiveRoute = LiveRouteImport.update({
+  id: '/live',
+  path: '/live',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LeavesRoute = LeavesRouteImport.update({
@@ -168,6 +174,7 @@ export interface FileRoutesByFullPath {
   '/kudos': typeof KudosRoute
   '/leaderboard': typeof LeaderboardRoute
   '/leaves': typeof LeavesRoute
+  '/live': typeof LiveRoute
   '/one-on-ones': typeof OneOnOnesRoute
   '/people': typeof PeopleRoute
   '/quests': typeof QuestsRoute
@@ -194,6 +201,7 @@ export interface FileRoutesByTo {
   '/kudos': typeof KudosRoute
   '/leaderboard': typeof LeaderboardRoute
   '/leaves': typeof LeavesRoute
+  '/live': typeof LiveRoute
   '/one-on-ones': typeof OneOnOnesRoute
   '/people': typeof PeopleRoute
   '/quests': typeof QuestsRoute
@@ -221,6 +229,7 @@ export interface FileRoutesById {
   '/kudos': typeof KudosRoute
   '/leaderboard': typeof LeaderboardRoute
   '/leaves': typeof LeavesRoute
+  '/live': typeof LiveRoute
   '/one-on-ones': typeof OneOnOnesRoute
   '/people': typeof PeopleRoute
   '/quests': typeof QuestsRoute
@@ -249,6 +258,7 @@ export interface FileRouteTypes {
     | '/kudos'
     | '/leaderboard'
     | '/leaves'
+    | '/live'
     | '/one-on-ones'
     | '/people'
     | '/quests'
@@ -275,6 +285,7 @@ export interface FileRouteTypes {
     | '/kudos'
     | '/leaderboard'
     | '/leaves'
+    | '/live'
     | '/one-on-ones'
     | '/people'
     | '/quests'
@@ -301,6 +312,7 @@ export interface FileRouteTypes {
     | '/kudos'
     | '/leaderboard'
     | '/leaves'
+    | '/live'
     | '/one-on-ones'
     | '/people'
     | '/quests'
@@ -328,6 +340,7 @@ export interface RootRouteChildren {
   KudosRoute: typeof KudosRoute
   LeaderboardRoute: typeof LeaderboardRoute
   LeavesRoute: typeof LeavesRoute
+  LiveRoute: typeof LiveRoute
   OneOnOnesRoute: typeof OneOnOnesRoute
   PeopleRoute: typeof PeopleRoute
   QuestsRoute: typeof QuestsRoute
@@ -419,6 +432,13 @@ declare module '@tanstack/react-router' {
       path: '/one-on-ones'
       fullPath: '/one-on-ones'
       preLoaderRoute: typeof OneOnOnesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/live': {
+      id: '/live'
+      path: '/live'
+      fullPath: '/live'
+      preLoaderRoute: typeof LiveRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/leaves': {
@@ -528,6 +548,7 @@ const rootRouteChildren: RootRouteChildren = {
   KudosRoute: KudosRoute,
   LeaderboardRoute: LeaderboardRoute,
   LeavesRoute: LeavesRoute,
+  LiveRoute: LiveRoute,
   OneOnOnesRoute: OneOnOnesRoute,
   PeopleRoute: PeopleRoute,
   QuestsRoute: QuestsRoute,
@@ -544,12 +565,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

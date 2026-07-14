@@ -208,6 +208,139 @@ export type Database = {
           },
         ]
       }
+      daily_scores: {
+        Row: {
+          breakdown: Json
+          created_at: string
+          day_id: string
+          id: string
+          points: number
+          streaks: Json
+          user_id: string
+        }
+        Insert: {
+          breakdown?: Json
+          created_at?: string
+          day_id: string
+          id?: string
+          points?: number
+          streaks?: Json
+          user_id: string
+        }
+        Update: {
+          breakdown?: Json
+          created_at?: string
+          day_id?: string
+          id?: string
+          points?: number
+          streaks?: Json
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_scores_day_id_fkey"
+            columns: ["day_id"]
+            isOneToOne: true
+            referencedRelation: "day_records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      day_records: {
+        Row: {
+          ai_narrative: string | null
+          created_at: string
+          date: string
+          energy: number | null
+          energy_reason: string | null
+          expected_finish: string | null
+          id: string
+          kpi_goals: Json
+          kpi_totals: Json
+          mission_goal: string | null
+          mission_priorities: string[]
+          mission_risk: string | null
+          scorecard: Json | null
+          stage: Database["public"]["Enums"]["exec_stage"]
+          tomorrow_priority: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ai_narrative?: string | null
+          created_at?: string
+          date?: string
+          energy?: number | null
+          energy_reason?: string | null
+          expected_finish?: string | null
+          id?: string
+          kpi_goals?: Json
+          kpi_totals?: Json
+          mission_goal?: string | null
+          mission_priorities?: string[]
+          mission_risk?: string | null
+          scorecard?: Json | null
+          stage?: Database["public"]["Enums"]["exec_stage"]
+          tomorrow_priority?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ai_narrative?: string | null
+          created_at?: string
+          date?: string
+          energy?: number | null
+          energy_reason?: string | null
+          expected_finish?: string | null
+          id?: string
+          kpi_goals?: Json
+          kpi_totals?: Json
+          mission_goal?: string | null
+          mission_priorities?: string[]
+          mission_risk?: string | null
+          scorecard?: Json | null
+          stage?: Database["public"]["Enums"]["exec_stage"]
+          tomorrow_priority?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      exec_updates: {
+        Row: {
+          body: Json
+          checkpoint: Database["public"]["Enums"]["exec_checkpoint"]
+          created_at: string
+          day_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          body?: Json
+          checkpoint: Database["public"]["Enums"]["exec_checkpoint"]
+          created_at?: string
+          day_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          body?: Json
+          checkpoint?: Database["public"]["Enums"]["exec_checkpoint"]
+          created_at?: string
+          day_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exec_updates_day_id_fkey"
+            columns: ["day_id"]
+            isOneToOne: false
+            referencedRelation: "day_records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       holidays: {
         Row: {
           created_at: string
@@ -246,6 +379,44 @@ export type Database = {
           year?: number
         }
         Relationships: []
+      }
+      kpi_events: {
+        Row: {
+          created_at: string
+          day_id: string
+          delta: number
+          id: string
+          kind: Database["public"]["Enums"]["kpi_kind"]
+          note: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          day_id: string
+          delta?: number
+          id?: string
+          kind: Database["public"]["Enums"]["kpi_kind"]
+          note?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          day_id?: string
+          delta?: number
+          id?: string
+          kind?: Database["public"]["Enums"]["kpi_kind"]
+          note?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kpi_events_day_id_fkey"
+            columns: ["day_id"]
+            isOneToOne: false
+            referencedRelation: "day_records"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       leaves: {
         Row: {
@@ -318,6 +489,44 @@ export type Database = {
             columns: ["reviewed_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      manager_nudges: {
+        Row: {
+          acked_at: string | null
+          created_at: string
+          day_id: string | null
+          from_user_id: string
+          id: string
+          note: string
+          to_user_id: string
+        }
+        Insert: {
+          acked_at?: string | null
+          created_at?: string
+          day_id?: string | null
+          from_user_id: string
+          id?: string
+          note: string
+          to_user_id: string
+        }
+        Update: {
+          acked_at?: string | null
+          created_at?: string
+          day_id?: string | null
+          from_user_id?: string
+          id?: string
+          note?: string
+          to_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "manager_nudges_day_id_fkey"
+            columns: ["day_id"]
+            isOneToOne: false
+            referencedRelation: "day_records"
             referencedColumns: ["id"]
           },
         ]
@@ -504,6 +713,88 @@ export type Database = {
           },
         ]
       }
+      sla_breaches: {
+        Row: {
+          chat_hint: string | null
+          created_at: string
+          day_id: string
+          hours_stuck: number | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          chat_hint?: string | null
+          created_at?: string
+          day_id: string
+          hours_stuck?: number | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          chat_hint?: string | null
+          created_at?: string
+          day_id?: string
+          hours_stuck?: number | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sla_breaches_day_id_fkey"
+            columns: ["day_id"]
+            isOneToOne: false
+            referencedRelation: "day_records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stage_events: {
+        Row: {
+          created_at: string
+          day_id: string
+          entered_at: string
+          exited_at: string | null
+          geo_lat: number | null
+          geo_lng: number | null
+          id: string
+          selfie_path: string | null
+          stage: Database["public"]["Enums"]["exec_stage"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          day_id: string
+          entered_at?: string
+          exited_at?: string | null
+          geo_lat?: number | null
+          geo_lng?: number | null
+          id?: string
+          selfie_path?: string | null
+          stage: Database["public"]["Enums"]["exec_stage"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          day_id?: string
+          entered_at?: string
+          exited_at?: string | null
+          geo_lat?: number | null
+          geo_lng?: number | null
+          id?: string
+          selfie_path?: string | null
+          stage?: Database["public"]["Enums"]["exec_stage"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stage_events_day_id_fkey"
+            columns: ["day_id"]
+            isOneToOne: false
+            referencedRelation: "day_records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tasks: {
         Row: {
           assigned_by: string
@@ -597,6 +888,47 @@ export type Database = {
         }
         Relationships: []
       }
+      whatsapp_proofs: {
+        Row: {
+          checkpoint: Database["public"]["Enums"]["exec_checkpoint"]
+          created_at: string
+          day_id: string
+          id: string
+          image_path: string
+          ocr: Json | null
+          unread: number | null
+          user_id: string
+        }
+        Insert: {
+          checkpoint: Database["public"]["Enums"]["exec_checkpoint"]
+          created_at?: string
+          day_id: string
+          id?: string
+          image_path: string
+          ocr?: Json | null
+          unread?: number | null
+          user_id: string
+        }
+        Update: {
+          checkpoint?: Database["public"]["Enums"]["exec_checkpoint"]
+          created_at?: string
+          day_id?: string
+          id?: string
+          image_path?: string
+          ocr?: Json | null
+          unread?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_proofs_day_id_fkey"
+            columns: ["day_id"]
+            isOneToOne: false
+            referencedRelation: "day_records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -615,8 +947,32 @@ export type Database = {
     Enums: {
       app_role: "admin" | "manager" | "employee"
       day_status: "Early" | "On Time" | "Late" | "Absent"
+      exec_checkpoint: "baseline" | "initial" | "onit" | "impact"
+      exec_stage:
+        | "login"
+        | "mission"
+        | "baseline"
+        | "block1"
+        | "break1"
+        | "resume1"
+        | "block2"
+        | "break2"
+        | "resume2"
+        | "block3"
+        | "impact"
+        | "done"
       holiday_type: "national" | "regional" | "optional" | "restricted"
       job_role: "full-time" | "intern"
+      kpi_kind:
+        | "call"
+        | "connected"
+        | "tour_sched"
+        | "tour_done"
+        | "prebook"
+        | "movein"
+        | "super_lead"
+        | "reinstate"
+        | "chat"
       leave_status: "pending" | "approved" | "rejected" | "cancelled"
       leave_type: "casual" | "sick" | "earned" | "comp_off" | "lop" | "other"
       notice_type: "general" | "warning" | "urgent"
@@ -761,8 +1117,34 @@ export const Constants = {
     Enums: {
       app_role: ["admin", "manager", "employee"],
       day_status: ["Early", "On Time", "Late", "Absent"],
+      exec_checkpoint: ["baseline", "initial", "onit", "impact"],
+      exec_stage: [
+        "login",
+        "mission",
+        "baseline",
+        "block1",
+        "break1",
+        "resume1",
+        "block2",
+        "break2",
+        "resume2",
+        "block3",
+        "impact",
+        "done",
+      ],
       holiday_type: ["national", "regional", "optional", "restricted"],
       job_role: ["full-time", "intern"],
+      kpi_kind: [
+        "call",
+        "connected",
+        "tour_sched",
+        "tour_done",
+        "prebook",
+        "movein",
+        "super_lead",
+        "reinstate",
+        "chat",
+      ],
       leave_status: ["pending", "approved", "rejected", "cancelled"],
       leave_type: ["casual", "sick", "earned", "comp_off", "lop", "other"],
       notice_type: ["general", "warning", "urgent"],
