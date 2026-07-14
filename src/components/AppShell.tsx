@@ -29,6 +29,7 @@ import {
   Target,
   ShoppingBag,
   Coins,
+  Sun,
 } from "lucide-react";
 import { CadenceTimer } from "./CadenceTimer";
 import { XPToaster } from "./XPToaster";
