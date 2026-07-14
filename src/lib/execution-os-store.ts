@@ -142,13 +142,13 @@ function ensure(employeeId: string, date = todayKey()): DayRecord {
   if (!rec) {
     rec = {
       employeeId, date, stage: "login",
-      goals: { calls: 70, connected: 70, tour_sched: 10, prebook: 3, movein: 1 },
+      goals: { call: 70, connected: 70, tour_sched: 10, prebook: 3, movein: 1 },
       selfies: {}, whatsapp: {}, kpiEvents: [], slaBreaches: [], updates: {},
     };
     all.push(rec);
     writeAll(all);
   }
-  return rec;
+  return rec!;
 }
 
 function save(rec: DayRecord) {
@@ -291,7 +291,10 @@ export function computeScorecard(rec: DayRecord): Scorecard {
   const totals = getKpiTotals(rec);
   const g = rec.goals;
   const weightedGoal = (["calls","connected","tour_sched","prebook","movein"] as const)
-    .map((k) => ({ have: totals[k as KpiKind], want: g[k as KpiKind] || 0 }))
+    .map((k) => {
+      const key = (k === "calls" ? "call" : k) as KpiKind;
+      return { have: totals[key], want: g[key] || 0 };
+    })
     .filter((x) => x.want > 0);
   const goalPct = weightedGoal.length
     ? Math.round(
@@ -330,7 +333,7 @@ export function riskOf(rec: DayRecord): "green" | "amber" | "red" {
   if (rec.stage === "done") return "green";
   const now = Date.now();
   const totals = getKpiTotals(rec);
-  const goalPct = rec.goals.calls ? Math.round((totals.call / rec.goals.calls) * 100) : 100;
+  const goalPct = rec.goals.call ? Math.round((totals.call / rec.goals.call) * 100) : 100;
   const noMove = rec.kpiEvents.length > 0
     ? now - rec.kpiEvents[rec.kpiEvents.length - 1].ts > 60 * 60_000
     : rec.startedAt ? now - rec.startedAt > 60 * 60_000 : false;
