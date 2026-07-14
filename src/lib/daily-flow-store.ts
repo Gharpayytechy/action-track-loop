@@ -57,8 +57,10 @@ export const FLOW_META: Record<
 
 const KEY = "gp_daily_flow_v1";
 const listeners = new Set<() => void>();
-const emit = () => listeners.forEach((l) => l());
-export function subscribeFlow(fn: () => void) { listeners.add(fn); return () => listeners.delete(fn); }
+let version = 0;
+const emit = () => { version++; listeners.forEach((l) => l()); };
+export function subscribeFlow(fn: () => void) { listeners.add(fn); return () => { listeners.delete(fn); }; }
+export function getFlowVersion() { return version; }
 
 function read(): DailyFlow[] {
   if (typeof window === "undefined") return [];

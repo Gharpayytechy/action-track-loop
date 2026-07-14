@@ -15,6 +15,7 @@ import {
   isStepUnlocked,
   submitStep,
   subscribeFlow,
+  getFlowVersion,
 } from "@/lib/daily-flow-store";
 import { toast } from "sonner";
 import {
@@ -44,7 +45,7 @@ const ICONS: Record<FlowStepId, any> = {
 
 function DailyPage() {
   const { actor } = useAttendanceState();
-  useSyncExternalStore(subscribeFlow, () => Date.now().toString(), () => "ssr");
+  useSyncExternalStore(subscribeFlow, getFlowVersion, () => 0);
   const { flow, done, total, pct } = flowProgress(actor.id);
 
   const [openStep, setOpenStep] = useState<FlowStepId | null>(null);
