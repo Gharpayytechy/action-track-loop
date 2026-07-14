@@ -143,8 +143,8 @@ export async function submitStep(input: SubmitInput): Promise<FlowStep> {
   });
 
   // reward consistency
-  if (input.stepId === "start") awardXP(input.employeeId, "CLOCK_IN_ON_TIME" as any, 10, "Started the day on time");
-  if (input.stepId === "eod")   awardXP(input.employeeId, "EOD_SUBMITTED" as any, 25, "EOD impact update submitted");
+  if (input.stepId === "start") awardXP(input.employeeId, "CLOCK_IN_ON_TIME", { amount: 10, note: "Started the day on time" });
+  if (input.stepId === "eod")   awardXP(input.employeeId, "EOD_SUBMITTED",   { amount: 25, note: "EOD impact update submitted" });
   return step;
 }
 
