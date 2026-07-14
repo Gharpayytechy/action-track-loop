@@ -104,7 +104,7 @@ function OpCard({ emp, rec }: { emp: typeof EMPLOYEES[number]; rec: ReturnType<t
     return (
       <Card className="p-4 border-dashed opacity-70">
         <div className="flex items-center gap-3">
-          <Avatar seed={emp.avatarSeed} name={emp.name} size={40} />
+          <Avatar id={emp.id} name={emp.name} size={40} />
           <div className="flex-1 min-w-0">
             <div className="font-medium truncate">{emp.name}</div>
             <div className="text-xs text-muted-foreground">{emp.role} · not started</div>
@@ -137,7 +137,7 @@ function OpCard({ emp, rec }: { emp: typeof EMPLOYEES[number]; rec: ReturnType<t
         <div className="relative">
           {lastSelfie
             ? <img src={lastSelfie.data} alt="" className="h-11 w-11 rounded-full object-cover ring-2 ring-border" />
-            : <Avatar seed={emp.avatarSeed} name={emp.name} size={44} />}
+            : <Avatar id={emp.id} name={emp.name} size={44} />}
           <span className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full ring-2 ring-background ${riskColor}`} />
         </div>
         <div className="flex-1 min-w-0">
