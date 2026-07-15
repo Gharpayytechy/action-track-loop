@@ -692,5 +692,3 @@ function buildWeeklyLedger(employeeId: string, today: string, kpiKeys: string[])
   const hasAny = Object.values(thisWeek).some((v) => v > 0) || Object.values(lastWeek).some((v) => v > 0);
   return { thisWeek, lastWeek, hasAny };
 }
-  );
-}
