@@ -160,19 +160,27 @@ export function AppShell() {
       </div>
 
       <div className="px-3 py-3 border-b border-sidebar-border">
-        <div className="text-[10px] uppercase tracking-widest font-mono text-sidebar-foreground/60 mb-1.5 px-1">Acting as</div>
+        <div className="text-[10px] uppercase tracking-widest font-mono text-sidebar-foreground/60 mb-1.5 px-1 flex items-center justify-between">
+          <span>Acting as</span>
+          <span className="text-sidebar-foreground/40">{employees.length} roles</span>
+        </div>
         <Select value={actor.id} onValueChange={(v) => setActor(v)}>
           <SelectTrigger className="h-9 bg-sidebar-hover/40 border-sidebar-border text-white text-sm">
             <SelectValue />
           </SelectTrigger>
-          <SelectContent>
-            {employees.map((e) => (
-              <SelectItem key={e.id} value={e.id}>
-                <div className="flex flex-col">
-                  <span className="font-medium">{e.name}</span>
-                  <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-mono">{e.role} · {e.team}</span>
-                </div>
-              </SelectItem>
+          <SelectContent className="max-h-[70vh]">
+            {Array.from(new Set(employees.map((e) => e.role))).sort().map((role) => (
+              <div key={role}>
+                <div className="px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-muted-foreground bg-muted/50 sticky top-0">{role}</div>
+                {employees.filter((e) => e.role === role).map((e) => (
+                  <SelectItem key={e.id} value={e.id}>
+                    <div className="flex flex-col">
+                      <span className="font-medium">{e.name}</span>
+                      <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-mono">{e.team}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </div>
             ))}
           </SelectContent>
         </Select>
