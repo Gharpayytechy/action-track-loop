@@ -155,6 +155,7 @@ function DailyPage() {
   const { actor } = useAttendanceState();
   useSyncExternalStore(subscribeDyn, dynVersion, () => 0);
   useSyncExternalStore(subscribePlaybooks, playbooksVersion, () => 0);
+  useSyncExternalStore(subscribeDailyCfg, dailyCfgVersion, () => 0);
 
   const today = todayKey();
   const [viewDate, setViewDate] = useState<string>(today);
