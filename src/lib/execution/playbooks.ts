@@ -367,16 +367,22 @@ export function resolvePlaybookFor(userId: string, fallbackByRole?: (u: string) 
 // Suggested role → playbook mapping used when no explicit assignment
 export function defaultPlaybookForRole(role: string): string {
   const r = role.toLowerCase();
+  if (r.includes("sub-intern") || r.includes("sub intern")) return "pb_sub_intern";
   if (r.includes("intern")) return "pb_sub_intern";
-  if (r.includes("operator")) return "pb_operator";
+  if (r.includes("flow ops") || r.includes("flowops")) return "pb_flow_ops";
+  if (r.includes("floor") || r.includes("coach") && r.includes("lead")) return "pb_floor_lead";
+  if (r.includes("coach")) return "pb_coach";
   if (r.includes("tcm") || r.includes("tour")) return "pb_tcm";
   if (r.includes("sales") || r.includes("closer")) return "pb_sales";
-  if (r.includes("hr") || r.includes("recruit")) return "pb_hr";
-  if (r.includes("floor") || r.includes("coach")) return "pb_floor_lead";
-  if (r.includes("ops")) return "pb_ops_mgr";
+  if (r.includes("recruit")) return "pb_hr";
+  if (r.includes("hr")) return "pb_hr";
+  if (r.includes("ops manager")) return "pb_ops_mgr";
   if (r.includes("market")) return "pb_marketing";
   if (r.includes("finance")) return "pb_finance";
   if (r.includes("support")) return "pb_support";
-  if (r.includes("owner") || r.includes("admin") || r.includes("lead")) return "pb_leadership";
+  if (r.includes("owner")) return "pb_owner";
+  if (r.includes("admin")) return "pb_admin";
+  if (r.includes("leadership") || r.includes("lead")) return "pb_leadership";
+  if (r.includes("operator")) return "pb_operator";
   return "pb_generic";
 }
