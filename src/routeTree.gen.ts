@@ -34,6 +34,7 @@ import { Route as CalendarRouteImport } from './routes/calendar'
 import { Route as AttendanceRouteImport } from './routes/attendance'
 import { Route as AchievementsRouteImport } from './routes/achievements'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminPlaybooksRouteImport } from './routes/admin.playbooks'
 import { Route as AdminOpsRouteImport } from './routes/admin.ops'
 import { Route as AdminConsoleRouteImport } from './routes/admin.console'
 
@@ -162,6 +163,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminPlaybooksRoute = AdminPlaybooksRouteImport.update({
+  id: '/admin/playbooks',
+  path: '/admin/playbooks',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminOpsRoute = AdminOpsRouteImport.update({
   id: '/admin/ops',
   path: '/admin/ops',
@@ -201,6 +207,7 @@ export interface FileRoutesByFullPath {
   '/war-room': typeof WarRoomRoute
   '/admin/console': typeof AdminConsoleRoute
   '/admin/ops': typeof AdminOpsRoute
+  '/admin/playbooks': typeof AdminPlaybooksRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -230,6 +237,7 @@ export interface FileRoutesByTo {
   '/war-room': typeof WarRoomRoute
   '/admin/console': typeof AdminConsoleRoute
   '/admin/ops': typeof AdminOpsRoute
+  '/admin/playbooks': typeof AdminPlaybooksRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -260,6 +268,7 @@ export interface FileRoutesById {
   '/war-room': typeof WarRoomRoute
   '/admin/console': typeof AdminConsoleRoute
   '/admin/ops': typeof AdminOpsRoute
+  '/admin/playbooks': typeof AdminPlaybooksRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -291,6 +300,7 @@ export interface FileRouteTypes {
     | '/war-room'
     | '/admin/console'
     | '/admin/ops'
+    | '/admin/playbooks'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -320,6 +330,7 @@ export interface FileRouteTypes {
     | '/war-room'
     | '/admin/console'
     | '/admin/ops'
+    | '/admin/playbooks'
   id:
     | '__root__'
     | '/'
@@ -349,6 +360,7 @@ export interface FileRouteTypes {
     | '/war-room'
     | '/admin/console'
     | '/admin/ops'
+    | '/admin/playbooks'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -379,6 +391,7 @@ export interface RootRouteChildren {
   WarRoomRoute: typeof WarRoomRoute
   AdminConsoleRoute: typeof AdminConsoleRoute
   AdminOpsRoute: typeof AdminOpsRoute
+  AdminPlaybooksRoute: typeof AdminPlaybooksRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -558,6 +571,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/playbooks': {
+      id: '/admin/playbooks'
+      path: '/admin/playbooks'
+      fullPath: '/admin/playbooks'
+      preLoaderRoute: typeof AdminPlaybooksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/ops': {
       id: '/admin/ops'
       path: '/admin/ops'
@@ -603,6 +623,7 @@ const rootRouteChildren: RootRouteChildren = {
   WarRoomRoute: WarRoomRoute,
   AdminConsoleRoute: AdminConsoleRoute,
   AdminOpsRoute: AdminOpsRoute,
+  AdminPlaybooksRoute: AdminPlaybooksRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

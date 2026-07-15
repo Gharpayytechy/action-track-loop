@@ -298,7 +298,6 @@ function AssignTab() {
         const assigned = getAssignment(emp.id) || defaultPlaybookForRole(emp.role);
         const ov = getOverride(emp.id);
         const pb = playbooks.find((p) => p.id === assigned);
-        const [expanded, setExpanded] = [false, () => {}]; // placeholder
         return <AssignRow key={emp.id} emp={emp} playbooks={playbooks} assigned={assigned} pb={pb} ov={ov} />;
       })}
     </div>
