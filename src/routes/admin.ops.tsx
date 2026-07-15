@@ -499,23 +499,110 @@ function StackTab() {
 
 // -------------------- CONFIG TAB --------------------
 function ConfigTab() {
+  const kpiKeys = getKpiKeys();
+  const phases = getAllPhaseCopy();
+  const allFields = getAllFields();
+  const numericFields = allFields.filter((f) => ["number", "currency", "percent", "kpiChip"].includes(f.type));
+  const [newKpi, setNewKpi] = useState<string>("");
+
+  const addKpi = () => {
+    if (!newKpi) return;
+    if (kpiKeys.includes(newKpi)) { setNewKpi(""); return; }
+    setKpiKeys([...kpiKeys, newKpi]);
+    setNewKpi("");
+  };
+  const removeKpi = (k: string) => setKpiKeys(kpiKeys.filter((x) => x !== k));
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-      <Link to="/admin/playbooks" className="block"><Card className="p-4 hover:border-primary transition-colors">
-        <div className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Playbooks</div>
-        <h3 className="font-display font-semibold mt-1">Playbook Builder</h3>
-        <p className="text-xs text-muted-foreground mt-2">Create, edit, version and assign playbooks per role or per person.</p>
-      </Card></Link>
-      <Link to="/admin/playbooks" search={{ tab: "fields" }} className="block"><Card className="p-4 hover:border-primary transition-colors">
-        <div className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Fields</div>
-        <h3 className="font-display font-semibold mt-1">Field Library</h3>
-        <p className="text-xs text-muted-foreground mt-2">40+ built-in fields · add custom fields with validation, unit, target.</p>
-      </Card></Link>
-      <Link to="/admin/playbooks" search={{ tab: "assign" }} className="block"><Card className="p-4 hover:border-primary transition-colors">
-        <div className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Assign</div>
-        <h3 className="font-display font-semibold mt-1">Per-user overrides</h3>
-        <p className="text-xs text-muted-foreground mt-2">Add, hide, or require fields for any single person. Custom targets.</p>
-      </Card></Link>
+    <div className="space-y-4">
+      {/* KPI keys shown on Daily Flow */}
+      <Card className="p-4 space-y-3">
+        <div className="flex items-start justify-between gap-2 flex-wrap">
+          <div>
+            <h3 className="font-display font-semibold">KPIs shown to employees</h3>
+            <p className="text-xs text-muted-foreground mt-1">
+              These metrics appear on each person's Daily Flow after they submit their first stage.
+            </p>
+          </div>
+          <Button variant="ghost" size="sm" onClick={resetDailyCfg}>
+            <RotateCcw className="h-3.5 w-3.5 mr-1" /> Reset to defaults
+          </Button>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {kpiKeys.map((k) => {
+            const f = allFields.find((x) => x.id === k);
+            return (
+              <span key={k} className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md border text-xs bg-muted/40">
+                <span className="font-medium">{f?.label || k}</span>
+                <span className="text-muted-foreground font-mono text-[10px]">{k}</span>
+                <button onClick={() => removeKpi(k)} className="text-muted-foreground hover:text-destructive">
+                  <Trash2 className="h-3 w-3" />
+                </button>
+              </span>
+            );
+          })}
+          {kpiKeys.length === 0 && <span className="text-xs text-muted-foreground">No KPIs configured. Add one below.</span>}
+        </div>
+        <div className="flex items-center gap-2">
+          <select className="h-9 rounded border bg-background px-2 text-sm min-w-56" value={newKpi} onChange={(e) => setNewKpi(e.target.value)}>
+            <option value="">Select a field to add</option>
+            {numericFields.filter((f) => !kpiKeys.includes(f.id)).map((f) => (
+              <option key={f.id} value={f.id}>{f.label} ({f.id})</option>
+            ))}
+          </select>
+          <Button size="sm" onClick={addKpi} disabled={!newKpi}>
+            <Plus className="h-3.5 w-3.5 mr-1" /> Add KPI
+          </Button>
+        </div>
+      </Card>
+
+      {/* Phase commentary */}
+      <Card className="p-4 space-y-3">
+        <div>
+          <h3 className="font-display font-semibold">Phase commentary</h3>
+          <p className="text-xs text-muted-foreground mt-1">
+            Edit the title and helper text shown for each phase of the daily flow. Changes apply to every employee.
+          </p>
+        </div>
+        <div className="space-y-3">
+          {phases.map((p) => (
+            <div key={p.id} className="p-3 border rounded-md space-y-2">
+              <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Phase · {p.id}</div>
+              <Input
+                value={p.title}
+                onChange={(e) => setPhaseCopy(p.id, { title: e.target.value })}
+                className="h-9 text-sm"
+                placeholder="Phase title"
+              />
+              <textarea
+                value={p.hint}
+                onChange={(e) => setPhaseCopy(p.id, { hint: e.target.value })}
+                className="w-full min-h-16 rounded border bg-background px-2 py-1.5 text-sm resize-y"
+                placeholder="Helper text shown under the phase title"
+              />
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      {/* Deep links to other config surfaces */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <Link to="/admin/playbooks" className="block"><Card className="p-4 hover:border-primary transition-colors">
+          <div className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Playbooks</div>
+          <h3 className="font-display font-semibold mt-1">Playbook Builder</h3>
+          <p className="text-xs text-muted-foreground mt-2">Create, edit, version and assign playbooks per role or per person.</p>
+        </Card></Link>
+        <Link to="/admin/playbooks" search={{ tab: "fields" }} className="block"><Card className="p-4 hover:border-primary transition-colors">
+          <div className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Fields</div>
+          <h3 className="font-display font-semibold mt-1">Field Library</h3>
+          <p className="text-xs text-muted-foreground mt-2">Add, archive, or edit any field including targets and units.</p>
+        </Card></Link>
+        <Link to="/admin/playbooks" search={{ tab: "assign" }} className="block"><Card className="p-4 hover:border-primary transition-colors">
+          <div className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Assign</div>
+          <h3 className="font-display font-semibold mt-1">Per-user overrides</h3>
+          <p className="text-xs text-muted-foreground mt-2">Add, hide, or require fields for any single person. Custom targets.</p>
+        </Card></Link>
+      </div>
     </div>
   );
 }
