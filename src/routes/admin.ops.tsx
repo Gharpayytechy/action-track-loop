@@ -271,6 +271,10 @@ function InsightsTab() {
 
       <ActivelyFillingCard />
 
+      <WeeklyLedgerCard />
+
+
+
 
       {[...byPlaybook.entries()].map(([pbId, recs]) => {
         const pb = playbooks.find((p) => p.id === pbId);
@@ -659,6 +663,110 @@ function ActivelyFillingCard() {
           </div>
         ))}
       </div>
+    </Card>
+  );
+}
+
+// ---- Weekly ledger (bank-statement view for admins) ----
+function weekBoundsAdmin(anchorISO: string, offsetWeeks: number): { from: string; to: string } {
+  const d = new Date(anchorISO + "T00:00:00");
+  const day = (d.getDay() + 6) % 7;
+  const monday = new Date(d);
+  monday.setDate(d.getDate() - day - offsetWeeks * 7);
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  return { from: monday.toISOString().slice(0, 10), to: sunday.toISOString().slice(0, 10) };
+}
+
+function WeeklyLedgerCard() {
+  const kpiKeys = getKpiKeys();
+  const today = new Date().toISOString().slice(0, 10);
+  const tw = weekBoundsAdmin(today, 0);
+  const lw = weekBoundsAdmin(today, 1);
+
+  const sumRange = (empId: string, from: string, to: string) => {
+    const out: Record<string, number> = Object.fromEntries(kpiKeys.map((k) => [k, 0]));
+    const start = new Date(from + "T00:00:00");
+    const end = new Date(to + "T00:00:00");
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+      const iso = d.toISOString().slice(0, 10);
+      const rec = getDay(empId, iso);
+      if (!rec) continue;
+      for (const sub of Object.values(rec.submissions)) {
+        for (const k of kpiKeys) {
+          const v = Number(sub.values[k]);
+          if (!isNaN(v)) out[k] += v;
+        }
+      }
+    }
+    return out;
+  };
+
+  const rows = EMPLOYEES.map((e) => {
+    const t = sumRange(e.id, tw.from, tw.to);
+    const l = sumRange(e.id, lw.from, lw.to);
+    const tTotal = Object.values(t).reduce((a, b) => a + b, 0);
+    const lTotal = Object.values(l).reduce((a, b) => a + b, 0);
+    return { emp: e, thisWeek: t, lastWeek: l, tTotal, lTotal };
+  }).filter((r) => r.tTotal > 0 || r.lTotal > 0)
+    .sort((a, b) => b.tTotal - a.tTotal);
+
+  return (
+    <Card className="p-4 space-y-3">
+      <div className="flex items-center gap-2 flex-wrap">
+        <h3 className="font-display font-semibold">Weekly ledger</h3>
+        <Badge variant="outline" className="font-mono text-[10px]">This week vs last week</Badge>
+        <span className="ml-auto text-[10px] font-mono text-muted-foreground">
+          {tw.from} → {tw.to} vs {lw.from} → {lw.to}
+        </span>
+      </div>
+      {rows.length === 0 ? (
+        <p className="text-xs text-muted-foreground">No KPI activity yet in the current or previous week.</p>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead className="text-muted-foreground border-b">
+              <tr>
+                <th className="text-left py-1.5 pr-2">Person</th>
+                {kpiKeys.map((k) => (
+                  <th key={k} className="text-right py-1.5 px-2 font-mono uppercase text-[10px] tracking-wider">{k}</th>
+                ))}
+                <th className="text-right py-1.5 pl-2 font-mono uppercase text-[10px] tracking-wider">Total Δ</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r) => {
+                const totalDelta = r.tTotal - r.lTotal;
+                const tone = totalDelta > 0 ? "text-emerald-600" : totalDelta < 0 ? "text-rose-600" : "text-muted-foreground";
+                return (
+                  <tr key={r.emp.id} className="border-b last:border-0">
+                    <td className="py-1.5 pr-2">
+                      <div className="font-medium">{r.emp.name}</div>
+                      <div className="text-[10px] font-mono text-muted-foreground">{r.emp.role}</div>
+                    </td>
+                    {kpiKeys.map((k) => {
+                      const t = r.thisWeek[k] || 0;
+                      const l = r.lastWeek[k] || 0;
+                      const d = t - l;
+                      const dtone = d > 0 ? "text-emerald-600" : d < 0 ? "text-rose-600" : "text-muted-foreground";
+                      return (
+                        <td key={k} className="text-right py-1.5 px-2 font-mono tabular-nums">
+                          <span className="font-semibold">{t}</span>
+                          <span className="text-muted-foreground"> / {l}</span>
+                          <span className={`ml-1 text-[10px] ${dtone}`}>{d > 0 ? "+" : ""}{d}</span>
+                        </td>
+                      );
+                    })}
+                    <td className={`text-right py-1.5 pl-2 font-mono font-semibold tabular-nums ${tone}`}>
+                      {totalDelta > 0 ? "+" : ""}{totalDelta}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
     </Card>
   );
 }

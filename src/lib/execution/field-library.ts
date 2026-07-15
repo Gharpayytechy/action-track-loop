@@ -44,7 +44,7 @@ export const DEFAULT_FIELDS: FieldDef[] = [
 
   // Sales / operator KPIs
   { id: "calls", label: "Calls made", type: "kpiChip", group: "Sales", unit: "calls", defaultTarget: 70 },
-  { id: "connected", label: "Connected calls", type: "kpiChip", group: "Sales", defaultTarget: 40 },
+  { id: "connected", label: "Calls connected", type: "kpiChip", group: "Sales", defaultTarget: 40 },
   { id: "tours_sched", label: "Tours scheduled", type: "kpiChip", group: "Sales", defaultTarget: 10 },
   { id: "tours_done", label: "Tours done", type: "kpiChip", group: "Sales", defaultTarget: 6 },
   { id: "prebook", label: "Prebooks", type: "kpiChip", group: "Sales", defaultTarget: 3 },
@@ -61,8 +61,13 @@ export const DEFAULT_FIELDS: FieldDef[] = [
 
   // Core cycle KPIs (shared across all 12-step playbooks)
   { id: "bbd", label: "Beds Booked (BBD)", type: "kpiChip", group: "Sales", unit: "beds", defaultTarget: 3, description: "Beds booked today — 3 is the daily goal" },
-  { id: "cold_calls", label: "Cold calls", type: "kpiChip", group: "Sales", defaultTarget: 30, description: "New outbound cold calls placed this cycle" },
-  { id: "connected_calls", label: "Connected calls", type: "kpiChip", group: "Sales", defaultTarget: 15, description: "Cold calls that actually connected" },
+  { id: "cold_calls", label: "Calls placed", type: "kpiChip", group: "Sales", defaultTarget: 30, description: "Outbound calls placed this cycle" },
+  { id: "connected_calls", label: "Calls connected", type: "kpiChip", group: "Sales", defaultTarget: 15, description: "Calls that actually connected" },
+  // Mission-stage targets (planned numbers set at the start of the day)
+  { id: "target_calls", label: "Target · Calls", type: "number", group: "Mission", defaultTarget: 70, description: "Calls planned for today" },
+  { id: "target_tours", label: "Target · Tours", type: "number", group: "Mission", defaultTarget: 10, description: "Tours planned for today" },
+  { id: "target_prebooks", label: "Target · Prebooks", type: "number", group: "Mission", defaultTarget: 3, description: "Prebooks planned for today" },
+  { id: "target_moveins", label: "Target · Move-ins", type: "number", group: "Mission", defaultTarget: 1, description: "Move-ins planned for today" },
   { id: "doors_sched", label: "Doors scheduled", type: "kpiChip", group: "Sales", defaultTarget: 5, description: "Door visits / tours scheduled from calls" },
   { id: "doors_initiated", label: "Doors initiated", type: "kpiChip", group: "Sales", defaultTarget: 3, description: "Doors actually initiated / knocked" },
   { id: "quotations", label: "Quotations sent", type: "kpiChip", group: "Sales", defaultTarget: 5, description: "Quotes shared with prospects — 5 per day goal" },

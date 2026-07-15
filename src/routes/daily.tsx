@@ -81,11 +81,12 @@ function buildPhases(stages: StageDef[]): Phase[] {
 const KPI_LABEL: Record<string, string> = {
   bbd: "BBD",
   quotations: "Quotes",
-  cold_calls: "Cold calls",
+  cold_calls: "Calls placed",
   connected_calls: "Connected",
   checks_drafted: "Checks",
   doors_initiated: "Doors",
   calls: "Calls",
+  connected: "Connected",
   tours_sched: "Tours planned",
   tours_done: "Tours done",
   prebook: "Prebooks",
@@ -214,6 +215,9 @@ function DailyPage() {
   const todayKpis = sumKpis(rec, kpiKeys);
   const yKpis = sumKpis(yRec, kpiKeys);
 
+  // Bank-statement style weekly ledger (this week vs last week)
+  const weekly = useMemo(() => buildWeeklyLedger(actor.id, today, kpiKeys), [actor.id, today, kpiKeys, rec.submissions]);
+
   const submittedCount = Object.keys(rec.submissions).length;
   const hasActivityToday = submittedCount > 0 || (rec.drafts && Object.keys(rec.drafts).length > 0);
 
@@ -301,6 +305,46 @@ function DailyPage() {
           )}
         </Card>
 
+        {/* Weekly ledger — bank-statement view: this week vs last week */}
+        {weekly.hasAny && (
+          <Card className="p-4 border-border/60">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Weekly ledger</div>
+              <Badge variant="outline" className="font-mono text-[10px]">This week vs last week</Badge>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead className="text-muted-foreground border-b border-border/40">
+                  <tr>
+                    <th className="text-left py-1.5 pr-2 font-mono uppercase text-[10px] tracking-wider">Metric</th>
+                    <th className="text-right py-1.5 px-2 font-mono uppercase text-[10px] tracking-wider">This week</th>
+                    <th className="text-right py-1.5 px-2 font-mono uppercase text-[10px] tracking-wider">Last week</th>
+                    <th className="text-right py-1.5 pl-2 font-mono uppercase text-[10px] tracking-wider">Change</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {kpiKeys.map((k) => {
+                    const t = weekly.thisWeek[k] || 0;
+                    const l = weekly.lastWeek[k] || 0;
+                    const d = t - l;
+                    const tone = d > 0 ? "text-emerald-600" : d < 0 ? "text-rose-600" : "text-muted-foreground";
+                    return (
+                      <tr key={k} className="border-b border-border/20 last:border-0">
+                        <td className="py-2 pr-2">{kpiLabel(k)}</td>
+                        <td className="text-right py-2 px-2 font-mono font-semibold tabular-nums">{t}</td>
+                        <td className="text-right py-2 px-2 font-mono text-muted-foreground tabular-nums">{l}</td>
+                        <td className={`text-right py-2 pl-2 font-mono tabular-nums ${tone}`}>
+                          {d > 0 ? "+" : ""}{d}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+        )}
+
         {/* Resume / next-action card */}
         {done < total && activePhase && activeStage && (
           <Card className="p-4 border-primary/30 bg-primary/[0.03]">
@@ -369,6 +413,11 @@ function DailyPage() {
                       {doneCount}/{totalT} tasks
                     </span>
                     {isNextUp && <span className="text-[10px] font-mono uppercase tracking-widest text-primary">· up next</span>}
+                    {st === "done" && (
+                      <span className="text-[10px] font-mono uppercase tracking-widest text-emerald-600 inline-flex items-center gap-1">
+                        <Check className="h-3 w-3" /> Win logged
+                      </span>
+                    )}
                     {draftCount > 0 && (
                       <span className="text-[10px] font-mono uppercase tracking-widest text-amber-600 inline-flex items-center gap-1">
                         <Save className="h-3 w-3" /> {draftCount} saved
@@ -601,4 +650,45 @@ function Stat({ label, value }: { label: string; value: string }) {
       <div className="font-display text-lg font-semibold tabular-nums">{value}</div>
     </div>
   );
+}
+
+// Weekly ledger helper — sums KPIs from Mon..Sun for this week and last week.
+function weekBounds(anchorISO: string, offsetWeeks: number): { from: string; to: string } {
+  const d = new Date(anchorISO + "T00:00:00");
+  const day = (d.getDay() + 6) % 7; // Mon = 0
+  const monday = new Date(d);
+  monday.setDate(d.getDate() - day - offsetWeeks * 7);
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  return { from: monday.toISOString().slice(0, 10), to: sunday.toISOString().slice(0, 10) };
+}
+
+function buildWeeklyLedger(employeeId: string, today: string, kpiKeys: string[]): {
+  thisWeek: Record<string, number>;
+  lastWeek: Record<string, number>;
+  hasAny: boolean;
+} {
+  const acc = (from: string, to: string): Record<string, number> => {
+    const out: Record<string, number> = Object.fromEntries(kpiKeys.map((k) => [k, 0]));
+    const start = new Date(from + "T00:00:00");
+    const end = new Date(to + "T00:00:00");
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+      const iso = d.toISOString().slice(0, 10);
+      const rec = getDay(employeeId, iso);
+      if (!rec) continue;
+      for (const sub of Object.values(rec.submissions)) {
+        for (const k of kpiKeys) {
+          const v = Number(sub.values[k]);
+          if (!isNaN(v)) out[k] += v;
+        }
+      }
+    }
+    return out;
+  };
+  const tw = weekBounds(today, 0);
+  const lw = weekBounds(today, 1);
+  const thisWeek = acc(tw.from, tw.to);
+  const lastWeek = acc(lw.from, lw.to);
+  const hasAny = Object.values(thisWeek).some((v) => v > 0) || Object.values(lastWeek).some((v) => v > 0);
+  return { thisWeek, lastWeek, hasAny };
 }
