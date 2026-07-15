@@ -13,11 +13,15 @@ import {
 } from "@/lib/execution/playbooks";
 import {
   getOrCreateDay, saveSubmission, saveDraft, subscribeDyn, dynVersion,
-  getPrevDayRecord, type DynDayRecord,
+  getPrevDayRecord, getDay, type DynDayRecord,
 } from "@/lib/execution/dyn-store";
+import { todayKey } from "@/lib/attendance-store";
+import { getField } from "@/lib/execution/field-library";
+import { WhatsAppCopyBlock } from "@/components/execution/WhatsAppCopyBlock";
+import { prettyStageLabel } from "@/components/execution/StageRenderer";
 import {
   Settings2, Sparkles, ChevronDown, Check, Clock, Circle, Save,
-  TrendingUp, TrendingDown, Minus, Flame, ArrowRight,
+  TrendingUp, TrendingDown, Minus, Flame, ArrowRight, CalendarDays, ArrowLeft,
 } from "lucide-react";
 import { fmtDuration, totalActiveMs } from "@/lib/execution/insights";
 
