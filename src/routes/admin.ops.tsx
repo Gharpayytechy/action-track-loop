@@ -31,7 +31,7 @@ export const Route = createFileRoute("/admin/ops")({
 function OpsDashboard() {
   useSyncExternalStore(subscribeDyn, dynVersion, () => 0);
   useSyncExternalStore(subscribePlaybooks, playbooksVersion, () => 0);
-  const [tab, setTab] = useState<"live" | "timeline" | "analytics" | "stack" | "config">("live");
+  const [tab, setTab] = useState<"live" | "timeline" | "insights" | "analytics" | "stack" | "config">("live");
 
   return (
     <div className="p-4 md:p-6 max-w-[1400px] mx-auto space-y-5">
@@ -41,9 +41,10 @@ function OpsDashboard() {
       </header>
 
       <Tabs value={tab} onValueChange={(v) => setTab(v as typeof tab)}>
-        <TabsList className="grid grid-cols-5 w-full max-w-3xl">
+        <TabsList className="grid grid-cols-3 md:grid-cols-6 w-full max-w-3xl">
           <TabsTrigger value="live"><Activity className="h-3.5 w-3.5 mr-1.5" />Live</TabsTrigger>
           <TabsTrigger value="timeline"><ListTree className="h-3.5 w-3.5 mr-1.5" />Timeline</TabsTrigger>
+          <TabsTrigger value="insights"><Lightbulb className="h-3.5 w-3.5 mr-1.5" />Insights</TabsTrigger>
           <TabsTrigger value="analytics"><LineChart className="h-3.5 w-3.5 mr-1.5" />Analytics</TabsTrigger>
           <TabsTrigger value="stack"><LayoutGrid className="h-3.5 w-3.5 mr-1.5" />Stack</TabsTrigger>
           <TabsTrigger value="config"><Settings2 className="h-3.5 w-3.5 mr-1.5" />Config</TabsTrigger>
@@ -51,6 +52,7 @@ function OpsDashboard() {
 
         <TabsContent value="live" className="mt-4"><LiveTab /></TabsContent>
         <TabsContent value="timeline" className="mt-4"><TimelineTab /></TabsContent>
+        <TabsContent value="insights" className="mt-4"><InsightsTab /></TabsContent>
         <TabsContent value="analytics" className="mt-4"><AnalyticsTab /></TabsContent>
         <TabsContent value="stack" className="mt-4"><StackTab /></TabsContent>
         <TabsContent value="config" className="mt-4"><ConfigTab /></TabsContent>
