@@ -376,17 +376,18 @@ function DailyPage() {
                     )}
                   </div>
                   <p className="text-xs text-muted-foreground mt-0.5 truncate">{phase.hint}</p>
-                  {/* Yesterday comment */}
-                  {yRec && (yDur > 0 || tDur > 0) && (
-                    <div className={`text-[11px] mt-1 inline-flex items-center gap-1 ${toneClass(pace.tone)}`}>
-                      {pace.tone === "up" ? <TrendingUp className="h-3 w-3" /> : pace.tone === "down" ? <TrendingDown className="h-3 w-3" /> : <Minus className="h-3 w-3" />}
-                      {st === "done"
-                        ? `Closed in ${fmtDuration(tDur)} · ${pace.text}`
-                        : yDur > 0
-                          ? `Yesterday you spent ${fmtDuration(yDur)} here — can you shave it?`
-                          : pace.text}
-                    </div>
-                  )}
+                </div>
+                <ChevronDown className={`h-4 w-4 text-muted-foreground shrink-0 transition-transform ${open ? "rotate-180" : ""}`} />
+              </button>
+
+              {open && yRec && tDur > 0 && (
+                <div className={`mx-4 mb-2 -mt-1 text-[11px] inline-flex items-center gap-1 ${toneClass(pace.tone)}`}>
+                  {pace.tone === "up" ? <TrendingUp className="h-3 w-3" /> : pace.tone === "down" ? <TrendingDown className="h-3 w-3" /> : <Minus className="h-3 w-3" />}
+                  {st === "done"
+                    ? `Completed in ${fmtDuration(tDur)}. ${pace.text}`
+                    : `Time in this phase so far: ${fmtDuration(tDur)}. ${pace.text}`}
+                </div>
+              )}
                 </div>
                 <ChevronDown className={`h-4 w-4 text-muted-foreground shrink-0 transition-transform ${open ? "rotate-180" : ""}`} />
               </button>
