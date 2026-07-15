@@ -81,11 +81,12 @@ function buildPhases(stages: StageDef[]): Phase[] {
 const KPI_LABEL: Record<string, string> = {
   bbd: "BBD",
   quotations: "Quotes",
-  cold_calls: "Cold calls",
+  cold_calls: "Calls placed",
   connected_calls: "Connected",
   checks_drafted: "Checks",
   doors_initiated: "Doors",
   calls: "Calls",
+  connected: "Connected",
   tours_sched: "Tours planned",
   tours_done: "Tours done",
   prebook: "Prebooks",
