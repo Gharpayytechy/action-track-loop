@@ -110,7 +110,7 @@ Tomorrow: {{tomorrow_priority}}`;
 const WA_CYCLE_PLAN = `*🧠 GHARPAYY · CYCLE PLAN*
 👤 {{name}} · {{role}} · {{time}}
 
-30 checks drafted: {{checks_drafted}}
+Prep list drafted: {{checks_drafted}}
 Doors planned: {{doors_sched}}
 Target this cycle → BBD {{bbd_target}} · Quotes {{quotations_target}}`;
 
@@ -141,7 +141,7 @@ Final BBD: {{bbd}} (goal 3)
 Final Quotes: {{quotations}} (goal 5)
 Calls placed: {{cold_calls}} · Connected: {{connected_calls}}
 Doors initiated: {{doors_initiated}}
-30-check drafts: {{checks_drafted}}
+Prep list: {{checks_drafted}}
 
 Wins: {{wins}}
 Learning: {{learning}}
@@ -180,7 +180,7 @@ function standard12(f: RoleFlavor): Playbook {
       // 2 — Mission plan (targets + BBD/Quotes baked in)
       { id: "mission", label: "2 · Today's Mission", proofs: [], fields: ["mission_1","mission_2","mission_3","goal","biggest_risk","expected_finish","target_calls","target_tours","target_prebooks","target_moveins","energy","bbd","quotations", ...(f.missionExtras || [])], requiredFields: ["mission_1","goal","biggest_risk","expected_finish"], waTemplate: WA_MISSION, weight: 10 },
       // 3 — Cycle 1 · Draft 30 checks & plan doors
-      { id: "c1_draft", label: "3 · Cycle 1 · Draft 30 checks + Doors plan", proofs: ["crm_ss"], fields: ["checks_drafted","doors_sched"], requiredFields: ["checks_drafted","doors_sched"], waTemplate: WA_CYCLE_PLAN, weight: 8 },
+      { id: "c1_draft", label: "3 · Cycle 1 · Prep list + Doors plan", proofs: ["crm_ss"], fields: ["checks_drafted","doors_sched"], requiredFields: ["checks_drafted","doors_sched"], waTemplate: WA_CYCLE_PLAN, weight: 8 },
       // 4 — Cycle 1 · Call block → doors
       { id: "c1_calls", label: "4 · Cycle 1 · Call block (placed + connected)", proofs: ["whatsapp"], fields: cycleCallFields, requiredFields: ["cold_calls","connected_calls"], waTemplate: WA_CYCLE_CALLS, weight: 8 },
       // 5 — Cycle 1 · Outcome (BBD + Quotes) + Initial WA
@@ -188,7 +188,7 @@ function standard12(f: RoleFlavor): Playbook {
       // 6 — Break 1
       { id: "break1", label: "6 · Break 1 · Recharge", time: "13:15", proofs: ["selfie"], fields: ["expected_finish"], waTemplate: WA_BREAK, weight: 3 },
       // 7 — Cycle 2 · Draft 30 checks
-      { id: "c2_draft", label: "7 · Cycle 2 · Draft 30 checks + Doors plan", proofs: ["crm_ss"], fields: ["checks_drafted","doors_sched"], requiredFields: ["checks_drafted","doors_sched"], waTemplate: WA_CYCLE_PLAN, weight: 8 },
+      { id: "c2_draft", label: "7 · Cycle 2 · Prep list + Doors plan", proofs: ["crm_ss"], fields: ["checks_drafted","doors_sched"], requiredFields: ["checks_drafted","doors_sched"], waTemplate: WA_CYCLE_PLAN, weight: 8 },
       // 8 — Cycle 2 · Call block
       { id: "c2_calls", label: "8 · Cycle 2 · Call block (placed + connected)", proofs: ["whatsapp"], fields: cycleCallFields, requiredFields: ["cold_calls","connected_calls"], waTemplate: WA_CYCLE_CALLS, weight: 8 },
       // 9 — Cycle 2 · Outcome + On-it WA
@@ -196,7 +196,7 @@ function standard12(f: RoleFlavor): Playbook {
       // 10 — Break 2
       { id: "break2", label: "10 · Break 2 · Recharge", time: "17:00", proofs: ["selfie"], fields: ["expected_finish"], waTemplate: WA_BREAK, weight: 3 },
       // 11 — Cycle 3 · Final push
-      { id: "c3_final", label: "11 · Cycle 3 · Final push (checks + calls + BBD + Quotes)", proofs: ["crm_ss","whatsapp"], fields: ["checks_drafted", ...cycleCallFields, "bbd","quotations","wins","blockers"], requiredFields: ["checks_drafted","bbd","quotations"], waTemplate: WA_CYCLE_OUTCOME, weight: 12 },
+      { id: "c3_final", label: "11 · Cycle 3 · Final push (prep + calls + BBD + Quotes)", proofs: ["crm_ss","whatsapp"], fields: ["checks_drafted", ...cycleCallFields, "bbd","quotations","wins","blockers"], requiredFields: ["checks_drafted","bbd","quotations"], waTemplate: WA_CYCLE_OUTCOME, weight: 12 },
       // 12 — Impact EOD
       { id: "impact", label: "12 · Impact · EOD", time: "20:00", proofs: ["selfie","whatsapp"], fields: ["wins","learning","mistake","tomorrow_priority","bbd","quotations","cold_calls","connected_calls","doors_initiated","checks_drafted", ...(f.eodExtras || [])], requiredFields: ["wins","learning","tomorrow_priority","bbd","quotations"], waTemplate: f.eodTemplate || WA_12_EOD, weight: 15 },
     ],
@@ -232,13 +232,13 @@ export const BUILT_IN_PLAYBOOKS: Playbook[] = [
     stages: [
       { id: "login",     label: "1 · Login & Selfie",                          time: "13:30",       proofs: ["selfie","geo"], fields: [], waTemplate: WA_LOGIN, weight: 5 },
       { id: "mission",   label: "2 · Today's Mission (BBD 3 · Quotes 5)",       time: "13:35",       proofs: [],               fields: ["mission_1","mission_2","goal","biggest_risk","expected_finish","target_calls","target_tours","target_prebooks","target_moveins","energy","bbd","quotations"], requiredFields: ["mission_1","goal","biggest_risk","expected_finish"], waTemplate: WA_MISSION, weight: 10 },
-      { id: "c1_draft",  label: "3 · Cycle 1 · Draft 30 checks + Doors plan",   time: "13:45–14:15", proofs: ["crm_ss"],       fields: ["checks_drafted","doors_sched"], requiredFields: ["checks_drafted","doors_sched"], waTemplate: WA_CYCLE_PLAN, weight: 8 },
+      { id: "c1_draft",  label: "3 · Cycle 1 · Prep list + Doors plan",   time: "13:45–14:15", proofs: ["crm_ss"],       fields: ["checks_drafted","doors_sched"], requiredFields: ["checks_drafted","doors_sched"], waTemplate: WA_CYCLE_PLAN, weight: 8 },
       { id: "c1_calls",  label: "4 · Cycle 1 · Call block (placed + connected)", time: "14:15–15:30", proofs: ["whatsapp"],     fields: ["cold_calls","connected_calls","doors_sched","doors_initiated","cycle_note"], requiredFields: ["cold_calls","connected_calls"], waTemplate: WA_CYCLE_CALLS, weight: 8 },
       { id: "c1_outcome",label: "5 · Cycle 1 · BBD + Quotes outcome",            time: "15:30–16:30", proofs: ["selfie"],       fields: ["bbd","quotations","wins","blockers","tomorrow_priority"], requiredFields: ["bbd","quotations"], waTemplate: WA_CYCLE_OUTCOME, weight: 10 },
       { id: "pre_break", label: "6 · Pre-break Initial Update",                  time: "16:30–17:00", proofs: ["selfie","whatsapp"], fields: ["wins","blockers","tomorrow_priority","cold_calls","connected_calls","bbd"], requiredFields: ["wins"], waTemplate: WA_INITIAL, weight: 8 },
       { id: "break1",    label: "7 · Break (only break)",                        time: "17:00–17:20", proofs: ["selfie"],       fields: ["expected_finish"], waTemplate: WA_BREAK, weight: 3 },
       { id: "resume",    label: "8 · Resume · Second half",                      time: "17:20",       proofs: ["selfie"],       fields: [], waTemplate: WA_LOGIN, weight: 3 },
-      { id: "c2_draft",  label: "9 · Cycle 2 · Draft 30 checks + Doors plan",   time: "17:20–18:15", proofs: ["crm_ss"],       fields: ["checks_drafted","doors_sched"], requiredFields: ["checks_drafted","doors_sched"], waTemplate: WA_CYCLE_PLAN, weight: 8 },
+      { id: "c2_draft",  label: "9 · Cycle 2 · Prep list + Doors plan",   time: "17:20–18:15", proofs: ["crm_ss"],       fields: ["checks_drafted","doors_sched"], requiredFields: ["checks_drafted","doors_sched"], waTemplate: WA_CYCLE_PLAN, weight: 8 },
       { id: "c2_calls",  label: "10 · Cycle 2 · Call block (placed + connected)", time: "18:15–19:15", proofs: ["whatsapp"],     fields: ["cold_calls","connected_calls","doors_sched","doors_initiated","cycle_note"], requiredFields: ["cold_calls","connected_calls"], waTemplate: WA_CYCLE_CALLS, weight: 8 },
       { id: "c2_outcome",label: "11 · Cycle 2 · BBD + Quotes + On-it WA",        time: "19:15–19:50", proofs: ["selfie","whatsapp"], fields: ["bbd","quotations","wins","blockers","tomorrow_priority"], requiredFields: ["bbd","quotations"], waTemplate: WA_CYCLE_OUTCOME, weight: 12 },
       { id: "impact",    label: "12 · Impact · Logout",                          time: "20:00",       proofs: ["selfie","whatsapp"], fields: ["wins","learning","mistake","tomorrow_priority","bbd","quotations","cold_calls","connected_calls","doors_initiated","checks_drafted"], requiredFields: ["wins","learning","tomorrow_priority","bbd","quotations"], waTemplate: WA_12_EOD, weight: 15 },
