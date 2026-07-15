@@ -24,6 +24,9 @@ import {
   TrendingUp, TrendingDown, Minus, Flame, ArrowRight, CalendarDays, ArrowLeft,
 } from "lucide-react";
 import { fmtDuration, totalActiveMs } from "@/lib/execution/insights";
+import {
+  getKpiKeys, getPhaseCopy, subscribeDailyCfg, dailyCfgVersion,
+} from "@/lib/execution/daily-config";
 
 export const Route = createFileRoute("/daily")({
   head: () => ({
