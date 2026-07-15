@@ -305,6 +305,46 @@ function DailyPage() {
           )}
         </Card>
 
+        {/* Weekly ledger — bank-statement view: this week vs last week */}
+        {weekly.hasAny && (
+          <Card className="p-4 border-border/60">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Weekly ledger</div>
+              <Badge variant="outline" className="font-mono text-[10px]">This week vs last week</Badge>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead className="text-muted-foreground border-b border-border/40">
+                  <tr>
+                    <th className="text-left py-1.5 pr-2 font-mono uppercase text-[10px] tracking-wider">Metric</th>
+                    <th className="text-right py-1.5 px-2 font-mono uppercase text-[10px] tracking-wider">This week</th>
+                    <th className="text-right py-1.5 px-2 font-mono uppercase text-[10px] tracking-wider">Last week</th>
+                    <th className="text-right py-1.5 pl-2 font-mono uppercase text-[10px] tracking-wider">Change</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {kpiKeys.map((k) => {
+                    const t = weekly.thisWeek[k] || 0;
+                    const l = weekly.lastWeek[k] || 0;
+                    const d = t - l;
+                    const tone = d > 0 ? "text-emerald-600" : d < 0 ? "text-rose-600" : "text-muted-foreground";
+                    return (
+                      <tr key={k} className="border-b border-border/20 last:border-0">
+                        <td className="py-2 pr-2">{kpiLabel(k)}</td>
+                        <td className="text-right py-2 px-2 font-mono font-semibold tabular-nums">{t}</td>
+                        <td className="text-right py-2 px-2 font-mono text-muted-foreground tabular-nums">{l}</td>
+                        <td className={`text-right py-2 pl-2 font-mono tabular-nums ${tone}`}>
+                          {d > 0 ? "+" : ""}{d}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+        )}
+
         {/* Resume / next-action card */}
         {done < total && activePhase && activeStage && (
           <Card className="p-4 border-primary/30 bg-primary/[0.03]">
@@ -373,6 +413,11 @@ function DailyPage() {
                       {doneCount}/{totalT} tasks
                     </span>
                     {isNextUp && <span className="text-[10px] font-mono uppercase tracking-widest text-primary">· up next</span>}
+                    {st === "done" && (
+                      <span className="text-[10px] font-mono uppercase tracking-widest text-emerald-600 inline-flex items-center gap-1">
+                        <Check className="h-3 w-3" /> Win logged
+                      </span>
+                    )}
                     {draftCount > 0 && (
                       <span className="text-[10px] font-mono uppercase tracking-widest text-amber-600 inline-flex items-center gap-1">
                         <Save className="h-3 w-3" /> {draftCount} saved
