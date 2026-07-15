@@ -139,6 +139,9 @@ function DailyPage() {
   useSyncExternalStore(subscribeDyn, dynVersion, () => 0);
   useSyncExternalStore(subscribePlaybooks, playbooksVersion, () => 0);
 
+  const today = todayKey();
+  const [viewDate, setViewDate] = useState<string>(today);
+
   const playbook = resolvePlaybookFor(actor.id, () => defaultPlaybookForRole(actor.role));
 
   if (!playbook) {
@@ -150,6 +153,19 @@ function DailyPage() {
           <Link to="/admin/playbooks"><Button>Open Playbook Manager</Button></Link>
         </Card>
       </div>
+    );
+  }
+
+  // History mode — read-only view of a past day
+  if (viewDate !== today) {
+    return (
+      <HistoryView
+        employeeId={actor.id}
+        employeeName={actor.name}
+        date={viewDate}
+        onChangeDate={setViewDate}
+        onBackToToday={() => setViewDate(today)}
+      />
     );
   }
 
