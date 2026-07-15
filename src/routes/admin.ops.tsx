@@ -14,7 +14,12 @@ import { WhatsAppCopyBlock } from "@/components/execution/WhatsAppCopyBlock";
 import { aggregate, RANGE_PRESETS, toCSV, downloadCSV, type GroupBy, type RecordCtx } from "@/lib/execution/aggregate";
 import { stageTimings, totalActiveMs, fmtDuration, stageMedians, saveTimeHints } from "@/lib/execution/insights";
 import { prettyStageLabel } from "@/components/execution/StageRenderer";
-import { Activity, Filter, Download, LayoutGrid, LineChart, ListTree, Settings2, ChevronRight, AlertTriangle, Clock, Lightbulb } from "lucide-react";
+import { Activity, Filter, Download, LayoutGrid, LineChart, ListTree, Settings2, ChevronRight, AlertTriangle, Clock, Lightbulb, Plus, Trash2, RotateCcw, Users } from "lucide-react";
+import {
+  getKpiKeys, setKpiKeys, getAllPhaseCopy, setPhaseCopy, resetDailyCfg,
+  subscribeDailyCfg, dailyCfgVersion,
+} from "@/lib/execution/daily-config";
+import { getAllFields } from "@/lib/execution/field-library";
 
 export const Route = createFileRoute("/admin/ops")({
   head: () => ({
