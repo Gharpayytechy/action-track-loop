@@ -19,12 +19,11 @@ export const DEFAULT_KPI_KEYS: string[] = [
 ];
 
 export const DEFAULT_PHASES: PhaseCopy[] = [
-  { id: "kickoff",   title: "Morning kickoff",     hint: "Log in, set today's targets, share the plan." },
-  { id: "morning",   title: "Morning work block",  hint: "Draft 30 checks, run the call sheet, close first-cycle quotes." },
-  { id: "afternoon", title: "Afternoon work block",hint: "Repeat the cycle with sharper intent, then take the second break." },
-  { id: "evening",   title: "Evening push",        hint: "Final push for bookings and quotations before wrap." },
-  { id: "wrap",      title: "Day wrap",            hint: "Reflect on the day, send the end-of-day update, and log out." },
-  { id: "more",      title: "Additional tasks",    hint: "Anything outside the standard cycle." },
+  { id: "morning", title: "Morning",  hint: "Log in, set the day's goals, and run the first work cycle." },
+  { id: "midday",  title: "Midday",   hint: "Pre-break update, short recharge, and resume for the second cycle." },
+  { id: "evening", title: "Evening",  hint: "Second cycle outcomes and the final push before wrap." },
+  { id: "eod",     title: "End of day", hint: "Reflect, send the EOD update, and log out." },
+  { id: "more",    title: "Additional tasks", hint: "Anything outside the standard flow." },
 ];
 
 const KEY = "gp_daily_config_v1";
