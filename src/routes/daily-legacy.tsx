@@ -24,7 +24,7 @@ import {
   Sparkles, TrendingUp, Star,
 } from "lucide-react";
 
-export const Route = createFileRoute("/daily")({
+export const Route = createFileRoute("/daily-legacy")({
   head: () => ({
     meta: [
       { title: "Execution OS — Gharpayy Arena" },

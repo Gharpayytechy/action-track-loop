@@ -26,7 +26,7 @@ import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as KudosRouteImport } from './routes/kudos'
 import { Route as InboxRouteImport } from './routes/inbox'
 import { Route as HrmsRouteImport } from './routes/hrms'
-import { Route as DailyRouteImport } from './routes/daily'
+import { Route as DailyLegacyRouteImport } from './routes/daily-legacy'
 import { Route as ConsoleRouteImport } from './routes/console'
 import { Route as CommandRouteImport } from './routes/command'
 import { Route as CalendarRouteImport } from './routes/calendar'
@@ -120,9 +120,9 @@ const HrmsRoute = HrmsRouteImport.update({
   path: '/hrms',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DailyRoute = DailyRouteImport.update({
-  id: '/daily',
-  path: '/daily',
+const DailyLegacyRoute = DailyLegacyRouteImport.update({
+  id: '/daily-legacy',
+  path: '/daily-legacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ConsoleRoute = ConsoleRouteImport.update({
@@ -168,7 +168,7 @@ export interface FileRoutesByFullPath {
   '/calendar': typeof CalendarRoute
   '/command': typeof CommandRoute
   '/console': typeof ConsoleRoute
-  '/daily': typeof DailyRoute
+  '/daily-legacy': typeof DailyLegacyRoute
   '/hrms': typeof HrmsRoute
   '/inbox': typeof InboxRoute
   '/kudos': typeof KudosRoute
@@ -195,7 +195,7 @@ export interface FileRoutesByTo {
   '/calendar': typeof CalendarRoute
   '/command': typeof CommandRoute
   '/console': typeof ConsoleRoute
-  '/daily': typeof DailyRoute
+  '/daily-legacy': typeof DailyLegacyRoute
   '/hrms': typeof HrmsRoute
   '/inbox': typeof InboxRoute
   '/kudos': typeof KudosRoute
@@ -223,7 +223,7 @@ export interface FileRoutesById {
   '/calendar': typeof CalendarRoute
   '/command': typeof CommandRoute
   '/console': typeof ConsoleRoute
-  '/daily': typeof DailyRoute
+  '/daily-legacy': typeof DailyLegacyRoute
   '/hrms': typeof HrmsRoute
   '/inbox': typeof InboxRoute
   '/kudos': typeof KudosRoute
@@ -252,7 +252,7 @@ export interface FileRouteTypes {
     | '/calendar'
     | '/command'
     | '/console'
-    | '/daily'
+    | '/daily-legacy'
     | '/hrms'
     | '/inbox'
     | '/kudos'
@@ -279,7 +279,7 @@ export interface FileRouteTypes {
     | '/calendar'
     | '/command'
     | '/console'
-    | '/daily'
+    | '/daily-legacy'
     | '/hrms'
     | '/inbox'
     | '/kudos'
@@ -306,7 +306,7 @@ export interface FileRouteTypes {
     | '/calendar'
     | '/command'
     | '/console'
-    | '/daily'
+    | '/daily-legacy'
     | '/hrms'
     | '/inbox'
     | '/kudos'
@@ -334,7 +334,7 @@ export interface RootRouteChildren {
   CalendarRoute: typeof CalendarRoute
   CommandRoute: typeof CommandRoute
   ConsoleRoute: typeof ConsoleRoute
-  DailyRoute: typeof DailyRoute
+  DailyLegacyRoute: typeof DailyLegacyRoute
   HrmsRoute: typeof HrmsRoute
   InboxRoute: typeof InboxRoute
   KudosRoute: typeof KudosRoute
@@ -476,11 +476,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HrmsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/daily': {
-      id: '/daily'
-      path: '/daily'
-      fullPath: '/daily'
-      preLoaderRoute: typeof DailyRouteImport
+    '/daily-legacy': {
+      id: '/daily-legacy'
+      path: '/daily-legacy'
+      fullPath: '/daily-legacy'
+      preLoaderRoute: typeof DailyLegacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/console': {
@@ -542,7 +542,7 @@ const rootRouteChildren: RootRouteChildren = {
   CalendarRoute: CalendarRoute,
   CommandRoute: CommandRoute,
   ConsoleRoute: ConsoleRoute,
-  DailyRoute: DailyRoute,
+  DailyLegacyRoute: DailyLegacyRoute,
   HrmsRoute: HrmsRoute,
   InboxRoute: InboxRoute,
   KudosRoute: KudosRoute,
