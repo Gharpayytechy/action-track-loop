@@ -232,8 +232,10 @@ function DailyPage() {
 
   return (
     <div className="p-4 md:p-8 space-y-6 max-w-3xl mx-auto">
+      <DateStrip employeeId={actor.id} viewDate={viewDate} onChange={setViewDate} today={today} />
       {/* Hero — greeting + yesterday-vs-today */}
       <header className="space-y-4">
+
         <div className="flex items-start justify-between gap-3 flex-wrap">
           <div className="min-w-0">
             <div className="text-xs uppercase tracking-widest text-muted-foreground font-mono flex items-center gap-2">
