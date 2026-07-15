@@ -16,7 +16,7 @@ function seededRand(seed: string) {
 
 function plausibleValue(fieldId: string, rand: () => number, perfMul: number): unknown {
   const p = perfMul;
-  const map: Record<string, number> = {
+  const map: Record<string, unknown> = {
     bbd: Math.round((2 + rand() * 2) * p),                // ~2–4
     quotations: Math.round((3 + rand() * 4) * p),         // ~3–7
     cold_calls: Math.round((20 + rand() * 25) * p),
