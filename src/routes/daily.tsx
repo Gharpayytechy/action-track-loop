@@ -388,9 +388,8 @@ function DailyPage() {
                     : `Time in this phase so far: ${fmtDuration(tDur)}. ${pace.text}`}
                 </div>
               )}
-                </div>
-                <ChevronDown className={`h-4 w-4 text-muted-foreground shrink-0 transition-transform ${open ? "rotate-180" : ""}`} />
-              </button>
+
+
 
               {open && (
                 <div className="px-4 pb-4 space-y-2 border-t border-border/40 pt-3">
