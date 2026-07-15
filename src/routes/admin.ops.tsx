@@ -12,7 +12,9 @@ import { getAllPlaybooks, resolvePlaybookFor, defaultPlaybookForRole, subscribeP
 import { getField } from "@/lib/execution/field-library";
 import { WhatsAppCopyBlock } from "@/components/execution/WhatsAppCopyBlock";
 import { aggregate, RANGE_PRESETS, toCSV, downloadCSV, type GroupBy, type RecordCtx } from "@/lib/execution/aggregate";
-import { Activity, Filter, Download, LayoutGrid, LineChart, ListTree, Settings2, ChevronRight, AlertTriangle } from "lucide-react";
+import { stageTimings, totalActiveMs, fmtDuration, stageMedians, saveTimeHints } from "@/lib/execution/insights";
+import { prettyStageLabel } from "@/components/execution/StageRenderer";
+import { Activity, Filter, Download, LayoutGrid, LineChart, ListTree, Settings2, ChevronRight, AlertTriangle, Clock, Lightbulb } from "lucide-react";
 
 export const Route = createFileRoute("/admin/ops")({
   head: () => ({
