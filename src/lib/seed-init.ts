@@ -11,6 +11,7 @@ import { ensureConsoleSeed } from "./console-store";
 import { ensureXPSeed, awardXP, xpFor } from "./xp-engine";
 import { ensureCoinsSeed, awardCoins, coinsFor } from "./coins";
 import { ensureQuestSeed } from "./quests-store";
+import { ensureDynSeed } from "./execution/dyn-seed";
 import { EMPLOYEES } from "@/data/seed";
 
 let booted = false;
