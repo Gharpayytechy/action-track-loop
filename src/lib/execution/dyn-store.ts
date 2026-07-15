@@ -4,7 +4,7 @@
 
 import { todayKey } from "@/lib/attendance-store";
 
-export type ProofBag = Partial<Record<"selfie" | "whatsapp" | "crm_ss" | "file", string>>; // data URLs
+export type ProofBag = Partial<Record<"selfie" | "whatsapp" | "whatsapp2" | "crm_ss" | "crm_ss2" | "file", string>>; // data URLs
 export interface GeoStamp { lat?: number; lng?: number; address?: string }
 
 export interface StageSubmission {
