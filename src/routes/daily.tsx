@@ -21,7 +21,7 @@ import { WhatsAppCopyBlock } from "@/components/execution/WhatsAppCopyBlock";
 import { prettyStageLabel } from "@/components/execution/StageRenderer";
 import {
   Settings2, Sparkles, ChevronDown, Check, Clock, Circle, Save,
-  TrendingUp, TrendingDown, Minus, Flame, ArrowRight, CalendarDays, ArrowLeft,
+  TrendingUp, TrendingDown, Minus, Flame, ArrowRight, CalendarDays, ArrowLeft, Info,
 } from "lucide-react";
 import { fmtDuration, totalActiveMs } from "@/lib/execution/insights";
 import {
@@ -160,6 +160,7 @@ function DailyPage() {
 
   const today = todayKey();
   const [viewDate, setViewDate] = useState<string>(today);
+  const [showHistory, setShowHistory] = useState<boolean>(false);
 
   const playbook = resolvePlaybookFor(actor.id, () => defaultPlaybookForRole(actor.role));
 
