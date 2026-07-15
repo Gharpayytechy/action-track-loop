@@ -95,11 +95,11 @@ const KPI_LABEL: Record<string, string> = {
 };
 function kpiLabel(k: string): string { return KPI_LABEL[k] || k.replace(/_/g, " "); }
 
-function sumKpis(rec?: DynDayRecord): Record<KpiKey, number> {
-  const out = Object.fromEntries(KPI_KEYS.map((k) => [k, 0])) as Record<KpiKey, number>;
+function sumKpis(rec: DynDayRecord | undefined, keys: string[]): Record<string, number> {
+  const out: Record<string, number> = Object.fromEntries(keys.map((k) => [k, 0]));
   if (!rec) return out;
   for (const sub of Object.values(rec.submissions)) {
-    for (const k of KPI_KEYS) {
+    for (const k of keys) {
       const v = Number(sub.values[k]);
       if (!isNaN(v)) out[k] += v;
     }
