@@ -59,6 +59,16 @@ export const DEFAULT_FIELDS: FieldDef[] = [
   { id: "wa_unread", label: "WA unread count", type: "number", group: "Comms" },
   { id: "sla_flags", label: "SLA flags raised", type: "number", group: "Comms" },
 
+  // Core cycle KPIs (shared across all 12-step playbooks)
+  { id: "bbd", label: "Beds Booked (BBD)", type: "kpiChip", group: "Sales", unit: "beds", defaultTarget: 3, description: "Beds booked today — 3 is the daily goal" },
+  { id: "cold_calls", label: "Cold calls", type: "kpiChip", group: "Sales", defaultTarget: 30, description: "New outbound cold calls placed this cycle" },
+  { id: "connected_calls", label: "Connected calls", type: "kpiChip", group: "Sales", defaultTarget: 15, description: "Cold calls that actually connected" },
+  { id: "doors_sched", label: "Doors scheduled", type: "kpiChip", group: "Sales", defaultTarget: 5, description: "Door visits / tours scheduled from calls" },
+  { id: "doors_initiated", label: "Doors initiated", type: "kpiChip", group: "Sales", defaultTarget: 3, description: "Doors actually initiated / knocked" },
+  { id: "quotations", label: "Quotations sent", type: "kpiChip", group: "Sales", defaultTarget: 5, description: "Quotes shared with prospects — 5 per day goal" },
+  { id: "checks_drafted", label: "30-check drafts done", type: "kpiChip", group: "Sales", defaultTarget: 30, description: "30 execution checks drafted this cycle before doors planning" },
+  { id: "cycle_note", label: "Cycle note", type: "longtext", group: "Reflection", placeholder: "Short recap of what this cycle produced" },
+
   // HR / Recruiting
   { id: "screens", label: "Screens", type: "kpiChip", group: "HR", defaultTarget: 6 },
   { id: "interviews", label: "Interviews", type: "kpiChip", group: "HR", defaultTarget: 3 },

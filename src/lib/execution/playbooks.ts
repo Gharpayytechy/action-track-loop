@@ -106,182 +106,137 @@ Wins: {{wins}}
 Blockers: {{blockers}}
 Tomorrow: {{tomorrow_priority}}`;
 
+// ---- Shared 12-step cycle templates ----
+const WA_CYCLE_PLAN = `*🧠 GHARPAYY · CYCLE PLAN*
+👤 {{name}} · {{role}} · {{time}}
+
+30 checks drafted: {{checks_drafted}}
+Doors planned: {{doors_sched}}
+Target this cycle → BBD {{bbd_target}} · Quotes {{quotations_target}}`;
+
+const WA_CYCLE_CALLS = `*📞 GHARPAYY · CALL BLOCK*
+👤 {{name}} · {{role}} · {{time}}
+
+Cold calls: {{cold_calls}} · Connected: {{connected_calls}}
+Doors scheduled: {{doors_sched}} · Doors initiated: {{doors_initiated}}
+Note: {{cycle_note}}`;
+
+const WA_CYCLE_OUTCOME = `*🎯 GHARPAYY · CYCLE OUTCOME*
+👤 {{name}} · {{role}} · {{time}}
+
+BBD this cycle: {{bbd}} / 3
+Quotations sent: {{quotations}} / 5
+Doors initiated: {{doors_initiated}}
+Wins: {{wins}}
+Blockers: {{blockers}}`;
+
+const WA_BREAK = `*☕ GHARPAYY · BREAK*
+👤 {{name}} · {{role}} · {{time}}
+On break — back on the floor at {{expected_finish}}`;
+
+const WA_12_EOD = `*🏁 GHARPAYY · 12-STEP IMPACT · EOD*
+👤 {{name}} · {{role}} · {{time}}
+
+Final BBD: {{bbd}} (goal 3)
+Final Quotes: {{quotations}} (goal 5)
+Cold calls: {{cold_calls}} · Connected: {{connected_calls}}
+Doors initiated: {{doors_initiated}}
+30-check drafts: {{checks_drafted}}
+
+Wins: {{wins}}
+Learning: {{learning}}
+Mistake to fix: {{mistake}}
+Tomorrow's #1: {{tomorrow_priority}}`;
+
 // ---- Playbook factory helpers ----
 function pb(p: Omit<Playbook, "createdAt" | "version" | "active" | "builtIn">): Playbook {
   return { ...p, version: 1, active: true, createdAt: Date.now(), builtIn: true };
 }
 
+// Standard 12-step cycle-based playbook used by every role.
+// Each cycle = draft 30 checks → cold+connected calls → BBD + quotes outcome.
+// Role-specific "flavor" adds extra fields on Mission + EOD only (BBD/quotes/calls stay universal).
+interface RoleFlavor {
+  id: string;              // pb_<slug>
+  name: string;
+  roleHint: string;
+  description: string;
+  missionExtras?: string[];
+  eodExtras?: string[];
+  eodTemplate?: string;    // optional role-specific EOD block (else WA_12_EOD)
+}
+
+function standard12(f: RoleFlavor): Playbook {
+  const cycleCallFields = ["cold_calls","connected_calls","doors_sched","doors_initiated","cycle_note"];
+  const cycleOutcomeFields = ["bbd","quotations","wins","blockers","tomorrow_priority"];
+  return pb({
+    id: f.id,
+    name: f.name,
+    roleHint: f.roleHint,
+    description: f.description + " · 12-step cycle flow (3 cycles × draft-30 → calls → BBD/quotes) + login, mission, breaks, impact.",
+    stages: [
+      // 1 — Login
+      { id: "login", label: "1 · Login & Selfie", time: "Start", proofs: ["selfie","geo"], fields: [], waTemplate: WA_LOGIN, weight: 5 },
+      // 2 — Mission plan (BBD=3, Quotes=5 baked in as targets)
+      { id: "mission", label: "2 · Today's Mission", proofs: [], fields: ["mission_1","mission_2","mission_3","goal","biggest_risk","expected_finish","energy","bbd","quotations", ...(f.missionExtras || [])], requiredFields: ["mission_1","goal"], waTemplate: WA_MISSION, weight: 10 },
+      // 3 — Cycle 1 · Draft 30 checks & plan doors
+      { id: "c1_draft", label: "3 · Cycle 1 · Draft 30 checks + Doors plan", proofs: ["crm_ss"], fields: ["checks_drafted","doors_sched"], requiredFields: ["checks_drafted","doors_sched"], waTemplate: WA_CYCLE_PLAN, weight: 8 },
+      // 4 — Cycle 1 · Cold + Connected calls → doors
+      { id: "c1_calls", label: "4 · Cycle 1 · Cold + Connected calls", proofs: ["whatsapp"], fields: cycleCallFields, requiredFields: ["cold_calls","connected_calls"], waTemplate: WA_CYCLE_CALLS, weight: 8 },
+      // 5 — Cycle 1 · Outcome (BBD + Quotes) + Initial WA
+      { id: "c1_outcome", label: "5 · Cycle 1 · BBD + Quotes outcome", proofs: ["selfie"], fields: cycleOutcomeFields, requiredFields: ["bbd","quotations"], waTemplate: WA_CYCLE_OUTCOME, weight: 10 },
+      // 6 — Break 1
+      { id: "break1", label: "6 · Break 1 · Recharge", time: "13:15", proofs: ["selfie"], fields: ["expected_finish"], waTemplate: WA_BREAK, weight: 3 },
+      // 7 — Cycle 2 · Draft 30 checks
+      { id: "c2_draft", label: "7 · Cycle 2 · Draft 30 checks + Doors plan", proofs: ["crm_ss"], fields: ["checks_drafted","doors_sched"], requiredFields: ["checks_drafted","doors_sched"], waTemplate: WA_CYCLE_PLAN, weight: 8 },
+      // 8 — Cycle 2 · Cold + Connected calls
+      { id: "c2_calls", label: "8 · Cycle 2 · Cold + Connected calls", proofs: ["whatsapp"], fields: cycleCallFields, requiredFields: ["cold_calls","connected_calls"], waTemplate: WA_CYCLE_CALLS, weight: 8 },
+      // 9 — Cycle 2 · Outcome + On-it WA
+      { id: "c2_outcome", label: "9 · Cycle 2 · BBD + Quotes outcome", proofs: ["selfie","whatsapp"], fields: cycleOutcomeFields, requiredFields: ["bbd","quotations"], waTemplate: WA_CYCLE_OUTCOME, weight: 10 },
+      // 10 — Break 2
+      { id: "break2", label: "10 · Break 2 · Recharge", time: "17:00", proofs: ["selfie"], fields: ["expected_finish"], waTemplate: WA_BREAK, weight: 3 },
+      // 11 — Cycle 3 · Final push (draft + calls + outcome combined)
+      { id: "c3_final", label: "11 · Cycle 3 · Final push (checks + calls + BBD + Quotes)", proofs: ["crm_ss","whatsapp"], fields: ["checks_drafted", ...cycleCallFields, "bbd","quotations","wins","blockers"], requiredFields: ["checks_drafted","bbd","quotations"], waTemplate: WA_CYCLE_OUTCOME, weight: 12 },
+      // 12 — Impact EOD
+      { id: "impact", label: "12 · Impact · EOD", time: "20:00", proofs: ["selfie","whatsapp"], fields: ["wins","learning","mistake","tomorrow_priority","bbd","quotations","cold_calls","connected_calls","doors_initiated","checks_drafted", ...(f.eodExtras || [])], requiredFields: ["wins","learning","tomorrow_priority","bbd","quotations"], waTemplate: f.eodTemplate || WA_12_EOD, weight: 15 },
+    ],
+  });
+}
+
 export const BUILT_IN_PLAYBOOKS: Playbook[] = [
-  // -------- Generic (universal fallback) --------
-  pb({
-    id: "pb_generic",
-    name: "Generic Employee",
-    roleHint: "Any",
-    description: "Universal 4-stage flow: login → mission → mid update → EOD. Works for any function.",
-    stages: [
-      { id: "login", label: "Login", time: "Start", proofs: ["selfie"], fields: [], waTemplate: WA_LOGIN, weight: 10 },
-      { id: "mission", label: "Today's Mission", proofs: [], fields: ["mission_1","mission_2","mission_3","goal","biggest_risk","expected_finish","energy"], requiredFields: ["mission_1","goal"], waTemplate: WA_MISSION, weight: 10 },
-      { id: "midday", label: "Mid-day Update", time: "13:00", proofs: ["selfie"], fields: ["wins","blockers","tomorrow_priority"], requiredFields: ["wins"], waTemplate: WA_INITIAL, weight: 20 },
-      { id: "eod", label: "EOD Update", time: "18:00", proofs: ["selfie"], fields: ["wins","learning","mistake","tomorrow_priority"], requiredFields: ["wins","tomorrow_priority"], waTemplate: WA_GENERIC_EOD, weight: 30 },
-    ],
-  }),
+  // Every role now runs the same 12-step BBD / cold+connected / quotes cycle,
+  // with role-specific extras on Mission + EOD only.
+  standard12({ id: "pb_generic",     name: "Generic Employee",         roleHint: "Any",           description: "Universal 12-step cycle: works for any function." }),
+  standard12({ id: "pb_operator",    name: "Operator · Full Execution", roleHint: "Operator",      description: "GHARPAYY operator execution.", missionExtras: ["calls","tours_sched","prebook","movein"], eodExtras: ["calls","tours_done","prebook","movein","super_lead"], eodTemplate: WA_IMPACT }),
+  standard12({ id: "pb_tcm",         name: "TCM · Tour Consultant",     roleHint: "TCM",           description: "Tour consultant.",              missionExtras: ["tours_sched"],                                eodExtras: ["tours_done","prebook","movein"] }),
+  standard12({ id: "pb_sales",       name: "Sales Closer",              roleHint: "Sales Closer",  description: "Sales closer pipeline → close.", missionExtras: ["deals"],                                     eodExtras: ["deals","revenue","calls"], eodTemplate: WA_SALES_EOD }),
+  standard12({ id: "pb_hr",          name: "HR / Recruiter",            roleHint: "HR",            description: "HR / recruiter pipeline.",       missionExtras: ["candidates_pipeline","screens","interviews"], eodExtras: ["screens","interviews","offers","joiners"], eodTemplate: WA_HR_EOD }),
+  standard12({ id: "pb_floor_lead",  name: "Floor Lead / Team Coach",   roleHint: "Floor Lead",    description: "Team coaching floor.",           missionExtras: ["team_goal_pct"],                              eodExtras: ["oneones_done","nudges_sent","escalations","team_goal_pct"], eodTemplate: WA_MGR_EOD }),
+  standard12({ id: "pb_ops_mgr",     name: "Ops Manager",               roleHint: "Ops Manager",   description: "Ops manager, sites & SLA.",      missionExtras: ["site_checks"],                                eodExtras: ["site_checks","escalations","sla_flags"] }),
+  standard12({ id: "pb_marketing",   name: "Marketing",                 roleHint: "Marketing",     description: "Marketing / growth.",            missionExtras: ["leads_generated","campaigns_shipped"],        eodExtras: ["leads_generated","campaigns_shipped","spend"] }),
+  standard12({ id: "pb_finance",     name: "Finance",                   roleHint: "Finance",       description: "Finance / collections.",         missionExtras: ["collections"],                                eodExtras: ["collections","invoices","reconciled"] }),
+  standard12({ id: "pb_support",     name: "Support",                   roleHint: "Support",       description: "Support / CSAT.",                missionExtras: ["tickets","frt_mins"],                         eodExtras: ["tickets","frt_mins","csat"] }),
+  standard12({ id: "pb_leadership",  name: "Leadership · War Room",     roleHint: "Leadership",    description: "Leadership war room.",           missionExtras: ["hard_decision"],                              eodExtras: ["hard_decision"] }),
 
-  // -------- Operator (matches existing hardcoded flow) --------
+  // -------- Sub-Intern (1:30 PM → 8:00 PM, one break 5:00–5:20) --------
   pb({
-    id: "pb_operator",
-    name: "Operator · Full Execution",
-    roleHint: "Operator",
-    description: "12-stage GHARPAYY execution: login → mission → baseline → 3 blocks with proof gates → impact.",
+    id: "pb_sub_intern",
+    name: "Sub-Intern · Half-day 12-step",
+    roleHint: "Sub-Intern",
+    description: "Half-day schedule: 13:30 start · single break 17:00–17:20 · 20:00 logout. Same 12-step BBD/calls/quotes discipline, compressed.",
     stages: [
-      { id: "login", label: "Mission Start", time: "10:35", proofs: ["selfie","geo"], fields: [], waTemplate: WA_LOGIN, weight: 10 },
-      { id: "mission", label: "Today's Mission", proofs: [], fields: ["mission_1","mission_2","mission_3","goal","biggest_risk","expected_finish","energy","calls","tours_sched","prebook","movein"], requiredFields: ["mission_1","mission_2","mission_3","goal"], waTemplate: WA_MISSION, weight: 10 },
-      { id: "baseline", label: "Baseline · WA + CRM", time: "10:40", proofs: ["whatsapp"], fields: ["wa_unread"], waTemplate: "", weight: 10 },
-      { id: "block1", label: "Block 1 · Execute", time: "10:40–13:15", proofs: [], fields: ["calls","connected","tours_sched","prebook","movein","chats"], waTemplate: "", weight: 0 },
-      { id: "break1", label: "Lunch · Initial Update", time: "13:15", proofs: ["selfie","whatsapp"], fields: ["wins","blockers","tomorrow_priority","calls","connected","tours_sched"], requiredFields: ["wins"], waTemplate: WA_INITIAL, weight: 15 },
-      { id: "resume1", label: "Resume · Second Half", time: "13:30", proofs: ["selfie"], fields: [], waTemplate: "", weight: 5 },
-      { id: "block2", label: "Block 2 · Execute", time: "13:30–17:00", proofs: [], fields: ["calls","connected","tours_done","prebook","movein","chats"], waTemplate: "", weight: 0 },
-      { id: "break2", label: "Snacks · On-It Update", time: "17:00", proofs: ["selfie","whatsapp"], fields: ["wins","blockers","tomorrow_priority","calls","tours_done","prebook"], requiredFields: ["wins"], waTemplate: WA_ONIT, weight: 15 },
-      { id: "resume2", label: "Resume · Final Push", time: "17:20", proofs: ["selfie"], fields: [], waTemplate: "", weight: 5 },
-      { id: "block3", label: "Block 3 · Final Push", time: "17:20–20:00", proofs: [], fields: ["calls","tours_done","prebook","movein","super_lead","reinstate"], waTemplate: "", weight: 0 },
-      { id: "impact", label: "Impact · EOD", time: "20:00", proofs: ["selfie","whatsapp"], fields: ["wins","learning","mistake","tomorrow_priority","calls","tours_done","prebook","movein","super_lead"], requiredFields: ["wins","learning","tomorrow_priority"], waTemplate: WA_IMPACT, weight: 30 },
-    ],
-  }),
-
-  // -------- TCM / Tour Consultant --------
-  pb({
-    id: "pb_tcm",
-    name: "TCM · Tour Consultant",
-    roleHint: "TCM",
-    description: "Tour-focused: plan → pre-tour proof → tours logged → conversions EOD.",
-    stages: [
-      { id: "login", label: "Login", time: "10:30", proofs: ["selfie","geo"], fields: [], waTemplate: WA_LOGIN, weight: 10 },
-      { id: "plan", label: "Tour Plan", proofs: [], fields: ["mission_1","mission_2","mission_3","tours_sched"], requiredFields: ["tours_sched"], waTemplate: WA_MISSION, weight: 10 },
-      { id: "pre", label: "Pre-tour · CRM SS", proofs: ["crm_ss"], fields: [], waTemplate: "", weight: 5 },
-      { id: "block1", label: "Block 1 · Tours", proofs: [], fields: ["tours_done","prebook"], waTemplate: "", weight: 0 },
-      { id: "mid", label: "Mid-day Recap", time: "14:00", proofs: ["selfie"], fields: ["tours_done","wins","blockers","tomorrow_priority"], waTemplate: WA_INITIAL, weight: 20 },
-      { id: "block2", label: "Block 2 · Tours", proofs: [], fields: ["tours_done","prebook","movein"], waTemplate: "", weight: 0 },
-      { id: "eod", label: "EOD · Conversions", proofs: ["selfie","whatsapp"], fields: ["tours_done","prebook","movein","wins","learning","tomorrow_priority"], requiredFields: ["tours_done","tomorrow_priority"], waTemplate: WA_IMPACT, weight: 30 },
-    ],
-  }),
-
-  // -------- Sales Closer --------
-  pb({
-    id: "pb_sales",
-    name: "Sales Closer",
-    roleHint: "Sales Closer",
-    description: "Pipeline → calls & demos → deals + revenue EOD.",
-    stages: [
-      { id: "login", label: "Login", proofs: ["selfie"], fields: [], waTemplate: WA_LOGIN, weight: 10 },
-      { id: "pipeline", label: "Pipeline Snapshot", proofs: ["crm_ss"], fields: ["mission_1","goal","deals"], requiredFields: ["mission_1"], waTemplate: WA_MISSION, weight: 10 },
-      { id: "block1", label: "Block 1 · Calls & Demos", proofs: [], fields: ["calls","connected","deals"], waTemplate: "", weight: 0 },
-      { id: "mid", label: "Mid Update", time: "14:00", proofs: ["selfie"], fields: ["calls","connected","deals","wins","blockers"], waTemplate: WA_INITIAL, weight: 20 },
-      { id: "block2", label: "Block 2 · Close", proofs: [], fields: ["deals","revenue"], waTemplate: "", weight: 0 },
-      { id: "eod", label: "EOD · Deals + Revenue", proofs: ["selfie","crm_ss"], fields: ["deals","revenue","calls","wins","learning","tomorrow_priority"], requiredFields: ["deals","tomorrow_priority"], waTemplate: WA_SALES_EOD, weight: 30 },
-    ],
-  }),
-
-  // -------- HR / Recruiter --------
-  pb({
-    id: "pb_hr",
-    name: "HR / Recruiter",
-    roleHint: "HR",
-    description: "Pipeline → screens & interviews → offers + joiners EOD.",
-    stages: [
-      { id: "login", label: "Login", proofs: ["selfie"], fields: [], waTemplate: WA_LOGIN, weight: 10 },
-      { id: "pipeline", label: "ATS Snapshot", proofs: ["crm_ss"], fields: ["candidates_pipeline","mission_1","mission_2"], requiredFields: ["mission_1"], waTemplate: WA_MISSION, weight: 10 },
-      { id: "block1", label: "Block 1 · Screens", proofs: [], fields: ["screens","interviews"], waTemplate: "", weight: 0 },
-      { id: "mid", label: "Mid Update", proofs: ["selfie"], fields: ["screens","interviews","wins","blockers"], waTemplate: WA_INITIAL, weight: 20 },
-      { id: "block2", label: "Block 2 · Interviews & Offers", proofs: [], fields: ["interviews","offers","joiners"], waTemplate: "", weight: 0 },
-      { id: "eod", label: "EOD · Offers + Joiners", proofs: ["selfie"], fields: ["screens","interviews","offers","joiners","wins","learning","tomorrow_priority"], requiredFields: ["tomorrow_priority"], waTemplate: WA_HR_EOD, weight: 30 },
-    ],
-  }),
-
-  // -------- Floor Lead --------
-  pb({
-    id: "pb_floor_lead",
-    name: "Floor Lead / Team Coach",
-    roleHint: "Floor Lead",
-    description: "Team readiness → 1:1s and nudges → team scorecard EOD.",
-    stages: [
-      { id: "login", label: "Login", proofs: ["selfie"], fields: [], waTemplate: WA_LOGIN, weight: 10 },
-      { id: "readiness", label: "Team Readiness", proofs: [], fields: ["mission_1","mission_2","team_goal_pct"], requiredFields: ["mission_1"], waTemplate: WA_MISSION, weight: 10 },
-      { id: "block1", label: "Block 1 · Coach", proofs: [], fields: ["oneones_done","nudges_sent","escalations"], waTemplate: "", weight: 0 },
-      { id: "mid", label: "Mid Update", proofs: ["selfie"], fields: ["oneones_done","nudges_sent","team_goal_pct","wins","blockers"], waTemplate: WA_INITIAL, weight: 20 },
-      { id: "block2", label: "Block 2 · Coach", proofs: [], fields: ["oneones_done","nudges_sent","escalations"], waTemplate: "", weight: 0 },
-      { id: "eod", label: "EOD · Team Scorecard", proofs: ["selfie"], fields: ["oneones_done","nudges_sent","escalations","team_goal_pct","wins","learning","tomorrow_priority"], requiredFields: ["team_goal_pct","tomorrow_priority"], waTemplate: WA_MGR_EOD, weight: 30 },
-    ],
-  }),
-
-  // -------- Ops Manager --------
-  pb({
-    id: "pb_ops_mgr",
-    name: "Ops Manager",
-    roleHint: "Ops Manager",
-    description: "Site checks, escalations, SLA.",
-    stages: [
-      { id: "login", label: "Login", proofs: ["selfie","geo"], fields: [], waTemplate: WA_LOGIN, weight: 10 },
-      { id: "mission", label: "Today's Focus", proofs: [], fields: ["mission_1","mission_2","mission_3","goal"], requiredFields: ["mission_1"], waTemplate: WA_MISSION, weight: 10 },
-      { id: "block1", label: "Block 1 · Field", proofs: [], fields: ["site_checks","escalations","sla_flags"], waTemplate: "", weight: 0 },
-      { id: "mid", label: "Mid Update", proofs: ["selfie","geo"], fields: ["site_checks","escalations","wins","blockers"], waTemplate: WA_INITIAL, weight: 20 },
-      { id: "eod", label: "EOD · Ops Snapshot", proofs: ["selfie"], fields: ["site_checks","escalations","sla_flags","wins","learning","tomorrow_priority"], requiredFields: ["tomorrow_priority"], waTemplate: WA_GENERIC_EOD, weight: 30 },
-    ],
-  }),
-
-  // -------- Marketing --------
-  pb({
-    id: "pb_marketing",
-    name: "Marketing",
-    roleHint: "Marketing",
-    description: "Leads, campaigns, spend.",
-    stages: [
-      { id: "login", label: "Login", proofs: ["selfie"], fields: [], waTemplate: WA_LOGIN, weight: 10 },
-      { id: "mission", label: "Today's Plan", proofs: [], fields: ["mission_1","mission_2","leads_generated","campaigns_shipped"], requiredFields: ["mission_1"], waTemplate: WA_MISSION, weight: 10 },
-      { id: "block1", label: "Block 1 · Ship", proofs: [], fields: ["leads_generated","campaigns_shipped","spend"], waTemplate: "", weight: 0 },
-      { id: "mid", label: "Mid Update", proofs: ["selfie"], fields: ["leads_generated","campaigns_shipped","wins","blockers"], waTemplate: WA_INITIAL, weight: 20 },
-      { id: "eod", label: "EOD · Growth Report", proofs: ["selfie"], fields: ["leads_generated","campaigns_shipped","spend","wins","learning","tomorrow_priority"], requiredFields: ["tomorrow_priority"], waTemplate: WA_GENERIC_EOD, weight: 30 },
-    ],
-  }),
-
-  // -------- Finance --------
-  pb({
-    id: "pb_finance",
-    name: "Finance",
-    roleHint: "Finance",
-    description: "Collections, invoices, reconciliations.",
-    stages: [
-      { id: "login", label: "Login", proofs: ["selfie"], fields: [], waTemplate: WA_LOGIN, weight: 10 },
-      { id: "mission", label: "Today's Focus", proofs: [], fields: ["mission_1","mission_2","mission_3","collections"], requiredFields: ["mission_1"], waTemplate: WA_MISSION, weight: 10 },
-      { id: "block1", label: "Block 1 · Work", proofs: [], fields: ["collections","invoices","reconciled"], waTemplate: "", weight: 0 },
-      { id: "mid", label: "Mid Update", proofs: ["selfie"], fields: ["collections","invoices","wins","blockers"], waTemplate: WA_INITIAL, weight: 20 },
-      { id: "eod", label: "EOD · Books", proofs: ["selfie"], fields: ["collections","invoices","reconciled","wins","learning","tomorrow_priority"], requiredFields: ["tomorrow_priority"], waTemplate: WA_GENERIC_EOD, weight: 30 },
-    ],
-  }),
-
-  // -------- Support --------
-  pb({
-    id: "pb_support",
-    name: "Support",
-    roleHint: "Support",
-    description: "Tickets, FRT, CSAT.",
-    stages: [
-      { id: "login", label: "Login", proofs: ["selfie"], fields: [], waTemplate: WA_LOGIN, weight: 10 },
-      { id: "mission", label: "Queue Snapshot", proofs: [], fields: ["mission_1","tickets","frt_mins"], requiredFields: ["mission_1"], waTemplate: WA_MISSION, weight: 10 },
-      { id: "block1", label: "Block 1 · Solve", proofs: [], fields: ["tickets","frt_mins","csat"], waTemplate: "", weight: 0 },
-      { id: "mid", label: "Mid Update", proofs: ["selfie"], fields: ["tickets","frt_mins","wins","blockers"], waTemplate: WA_INITIAL, weight: 20 },
-      { id: "eod", label: "EOD · Support Report", proofs: ["selfie"], fields: ["tickets","frt_mins","csat","wins","learning","tomorrow_priority"], requiredFields: ["tomorrow_priority"], waTemplate: WA_GENERIC_EOD, weight: 30 },
-    ],
-  }),
-
-  // -------- Leadership --------
-  pb({
-    id: "pb_leadership",
-    name: "Leadership · War Room",
-    roleHint: "Leadership",
-    description: "Company snapshot: war room review + EOD summary.",
-    stages: [
-      { id: "login", label: "Login", proofs: ["selfie"], fields: [], waTemplate: WA_LOGIN, weight: 10 },
-      { id: "warroom", label: "War Room Review", proofs: [], fields: ["mission_1","mission_2","mission_3","hard_decision"], requiredFields: ["mission_1"], waTemplate: WA_MISSION, weight: 20 },
-      { id: "eod", label: "EOD · Company Snapshot", proofs: ["selfie"], fields: ["wins","learning","hard_decision","tomorrow_priority"], requiredFields: ["tomorrow_priority"], waTemplate: WA_GENERIC_EOD, weight: 30 },
+      { id: "login",     label: "1 · Login & Selfie",                          time: "13:30",       proofs: ["selfie","geo"], fields: [], waTemplate: WA_LOGIN, weight: 5 },
+      { id: "mission",   label: "2 · Today's Mission (BBD 3 · Quotes 5)",       time: "13:35",       proofs: [],               fields: ["mission_1","mission_2","goal","biggest_risk","energy","bbd","quotations"], requiredFields: ["mission_1","goal"], waTemplate: WA_MISSION, weight: 10 },
+      { id: "c1_draft",  label: "3 · Cycle 1 · Draft 30 checks + Doors plan",   time: "13:45–14:15", proofs: ["crm_ss"],       fields: ["checks_drafted","doors_sched"], requiredFields: ["checks_drafted","doors_sched"], waTemplate: WA_CYCLE_PLAN, weight: 8 },
+      { id: "c1_calls",  label: "4 · Cycle 1 · Cold + Connected calls",         time: "14:15–15:30", proofs: ["whatsapp"],     fields: ["cold_calls","connected_calls","doors_sched","doors_initiated","cycle_note"], requiredFields: ["cold_calls","connected_calls"], waTemplate: WA_CYCLE_CALLS, weight: 8 },
+      { id: "c1_outcome",label: "5 · Cycle 1 · BBD + Quotes outcome",            time: "15:30–16:30", proofs: ["selfie"],       fields: ["bbd","quotations","wins","blockers","tomorrow_priority"], requiredFields: ["bbd","quotations"], waTemplate: WA_CYCLE_OUTCOME, weight: 10 },
+      { id: "pre_break", label: "6 · Pre-break Initial Update",                  time: "16:30–17:00", proofs: ["selfie","whatsapp"], fields: ["wins","blockers","tomorrow_priority","cold_calls","connected_calls","bbd"], requiredFields: ["wins"], waTemplate: WA_INITIAL, weight: 8 },
+      { id: "break1",    label: "7 · Break (only break)",                        time: "17:00–17:20", proofs: ["selfie"],       fields: ["expected_finish"], waTemplate: WA_BREAK, weight: 3 },
+      { id: "resume",    label: "8 · Resume · Second half",                      time: "17:20",       proofs: ["selfie"],       fields: [], waTemplate: WA_LOGIN, weight: 3 },
+      { id: "c2_draft",  label: "9 · Cycle 2 · Draft 30 checks + Doors plan",   time: "17:20–18:15", proofs: ["crm_ss"],       fields: ["checks_drafted","doors_sched"], requiredFields: ["checks_drafted","doors_sched"], waTemplate: WA_CYCLE_PLAN, weight: 8 },
+      { id: "c2_calls",  label: "10 · Cycle 2 · Cold + Connected calls",         time: "18:15–19:15", proofs: ["whatsapp"],     fields: ["cold_calls","connected_calls","doors_sched","doors_initiated","cycle_note"], requiredFields: ["cold_calls","connected_calls"], waTemplate: WA_CYCLE_CALLS, weight: 8 },
+      { id: "c2_outcome",label: "11 · Cycle 2 · BBD + Quotes + On-it WA",        time: "19:15–19:50", proofs: ["selfie","whatsapp"], fields: ["bbd","quotations","wins","blockers","tomorrow_priority"], requiredFields: ["bbd","quotations"], waTemplate: WA_CYCLE_OUTCOME, weight: 12 },
+      { id: "impact",    label: "12 · Impact · Logout",                          time: "20:00",       proofs: ["selfie","whatsapp"], fields: ["wins","learning","mistake","tomorrow_priority","bbd","quotations","cold_calls","connected_calls","doors_initiated","checks_drafted"], requiredFields: ["wins","learning","tomorrow_priority","bbd","quotations"], waTemplate: WA_12_EOD, weight: 15 },
     ],
   }),
 ];
@@ -407,6 +362,7 @@ export function resolvePlaybookFor(userId: string, fallbackByRole?: (u: string) 
 // Suggested role → playbook mapping used when no explicit assignment
 export function defaultPlaybookForRole(role: string): string {
   const r = role.toLowerCase();
+  if (r.includes("intern")) return "pb_sub_intern";
   if (r.includes("operator")) return "pb_operator";
   if (r.includes("tcm") || r.includes("tour")) return "pb_tcm";
   if (r.includes("sales") || r.includes("closer")) return "pb_sales";
