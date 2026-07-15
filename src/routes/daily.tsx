@@ -437,14 +437,13 @@ function DailyPage() {
         })}
 
         {rec.stageIdx >= stages.length && (
-          <Card className="p-6 text-center bg-emerald-500/5 border-emerald-500/40 animate-fade-in">
-            <div className="text-5xl mb-2">🏁</div>
-            <h2 className="font-display text-2xl font-semibold">Day complete</h2>
+          <Card className="p-6 text-center bg-emerald-500/5 border-emerald-500/40">
+            <h2 className="font-display text-2xl font-semibold">All phases complete</h2>
             <p className="text-sm text-muted-foreground mt-1">
-              {fmtDuration(activeMs)} on flow · {todayKpis.bbd} BBD · {todayKpis.quotations} quotes
-              {yRec && ` · ${fmtDeltaTime(activeMs, yActiveMs).text}`}
+              {fmtDuration(activeMs)} logged. {todayKpis.bbd || 0} BBD. {todayKpis.quotations || 0} quotations.
+              {yRec ? ` ${fmtDeltaTime(activeMs, yActiveMs).text}` : ""}
             </p>
-            <Link to="/admin/ops" className="mt-4 inline-block"><Button variant="outline">View in Ops Dashboard</Button></Link>
+            <Link to="/admin/ops" className="mt-4 inline-block"><Button variant="outline">Open Ops Dashboard</Button></Link>
           </Card>
         )}
       </div>
