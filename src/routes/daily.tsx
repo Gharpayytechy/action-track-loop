@@ -216,8 +216,6 @@ function DailyPage() {
   const todayKpis = sumKpis(rec, kpiKeys);
   const yKpis = sumKpis(yRec, kpiKeys);
 
-  // Bank-statement style weekly ledger (this week vs last week)
-  const weekly = useMemo(() => buildWeeklyLedger(actor.id, today, kpiKeys), [actor.id, today, kpiKeys, rec.submissions]);
 
   const submittedCount = Object.keys(rec.submissions).length;
   const hasActivityToday = submittedCount > 0 || (rec.drafts && Object.keys(rec.drafts).length > 0);
