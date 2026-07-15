@@ -372,9 +372,9 @@ export function StageRenderer(props: Props) {
       {isDone && submission && (
         <div className="px-4 pb-4 space-y-2">
           <div className="flex gap-2 flex-wrap">
-            {submission.proofs.selfie && <img src={submission.proofs.selfie} className="h-10 w-10 rounded-md object-cover ring-1 ring-border" />}
-            {submission.proofs.whatsapp && <img src={submission.proofs.whatsapp} className="h-10 w-10 rounded-md object-cover ring-1 ring-border" />}
-            {submission.proofs.crm_ss && <img src={submission.proofs.crm_ss} className="h-10 w-10 rounded-md object-cover ring-1 ring-border" />}
+            {(["selfie","whatsapp","whatsapp2","crm_ss","crm_ss2","file"] as const).map((k) => (
+              submission.proofs[k] ? <img key={k} src={submission.proofs[k]!} className="h-10 w-10 rounded-md object-cover ring-1 ring-border" /> : null
+            ))}
           </div>
           {submission.waMessage && <WhatsAppCopyBlock text={submission.waMessage} />}
         </div>
