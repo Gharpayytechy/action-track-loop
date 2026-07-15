@@ -362,6 +362,7 @@ export function resolvePlaybookFor(userId: string, fallbackByRole?: (u: string) 
 // Suggested role → playbook mapping used when no explicit assignment
 export function defaultPlaybookForRole(role: string): string {
   const r = role.toLowerCase();
+  if (r.includes("intern")) return "pb_sub_intern";
   if (r.includes("operator")) return "pb_operator";
   if (r.includes("tcm") || r.includes("tour")) return "pb_tcm";
   if (r.includes("sales") || r.includes("closer")) return "pb_sales";
