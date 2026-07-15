@@ -32,6 +32,7 @@ export function bootArena() {
   ensureXPSeed();
   ensureCoinsSeed();
   ensureQuestSeed();
+  ensureDynSeed();
 
   // Seed XP/coins so the leaderboard isn't empty on first visit.
   for (const emp of EMPLOYEES) {
