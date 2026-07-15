@@ -13,15 +13,19 @@ import {
 } from "@/lib/execution/playbooks";
 import {
   getOrCreateDay, saveSubmission, saveDraft, subscribeDyn, dynVersion,
+  getPrevDayRecord, type DynDayRecord,
 } from "@/lib/execution/dyn-store";
-import { Settings2, Sparkles, ChevronDown, Check, Clock, Circle, Save } from "lucide-react";
+import {
+  Settings2, Sparkles, ChevronDown, Check, Clock, Circle, Save,
+  TrendingUp, TrendingDown, Minus, Flame, ArrowRight,
+} from "lucide-react";
 import { fmtDuration, totalActiveMs } from "@/lib/execution/insights";
 
 export const Route = createFileRoute("/daily")({
   head: () => ({
     meta: [
       { title: "Daily Flow · Execution OS — Gharpayy" },
-      { name: "description", content: "A calm, guided day. One step at a time — proofs, updates, and WhatsApp-ready messages built in." },
+      { name: "description", content: "A calm, guided day. Beat yesterday, one block at a time — proofs, updates, and WhatsApp-ready messages built in." },
     ],
   }),
   component: DailyPage,
@@ -34,7 +38,7 @@ function greet() {
   return "Good evening";
 }
 
-// Group flat stage list into phases (main step + sub-steps)
+// ---- Phase grouping (business-friendly names, no "cycle" jargon) ----
 interface Phase {
   id: string;
   title: string;
@@ -52,14 +56,78 @@ function buildPhases(stages: StageDef[]): Phase[] {
   stages.forEach((stage, flatIdx) => {
     const id = stage.id;
     const entry = { stage, flatIdx };
-    if (id === "login" || id === "mission") push("open", "Open the day", "Land, align, and set the target", entry);
-    else if (id.startsWith("c1_") || id === "break1") push("cycle1", "Cycle 1", "Draft → calls → BBD & quotes → recharge", entry);
-    else if (id.startsWith("c2_") || id === "break2" || id === "pre_break" || id === "resume") push("cycle2", "Cycle 2", "Draft → calls → BBD & quotes → recharge", entry);
-    else if (id.startsWith("c3_")) push("cycle3", "Final push", "One last block for BBD and quotes", entry);
-    else if (id === "impact") push("wrap", "Wrap the day", "Learnings, WhatsApp EOD, and logout", entry);
-    else push("more", "More", "Additional steps", entry);
+    if (id === "login" || id === "mission") push("kickoff", "Morning kickoff", "Show up, lock the target, commit the plan", entry);
+    else if (id.startsWith("c1_") || id === "break1") push("morning", "Morning work block", "Prep 30 checks · run calls · close BBD & quotes · recharge", entry);
+    else if (id.startsWith("c2_") || id === "break2" || id === "pre_break" || id === "resume") push("afternoon", "Afternoon work block", "Second block — repeat with sharper intent, then recharge", entry);
+    else if (id.startsWith("c3_")) push("evening", "Evening push", "Last honest push for BBD and quotations", entry);
+    else if (id === "impact") push("wrap", "Day wrap", "Reflect, send EOD on WhatsApp, log out clean", entry);
+    else push("more", "Extra tasks", "Additional items", entry);
   });
   return order.map((k) => map.get(k)!);
+}
+
+// ---- KPI + timing helpers for yesterday-vs-today ----
+const KPI_KEYS = ["bbd", "quotations", "cold_calls", "connected_calls", "checks_drafted", "doors_initiated"] as const;
+type KpiKey = typeof KPI_KEYS[number];
+const KPI_LABEL: Record<KpiKey, string> = {
+  bbd: "BBD", quotations: "Quotes", cold_calls: "Cold calls",
+  connected_calls: "Connected", checks_drafted: "Checks", doors_initiated: "Doors",
+};
+
+function sumKpis(rec?: DynDayRecord): Record<KpiKey, number> {
+  const out = Object.fromEntries(KPI_KEYS.map((k) => [k, 0])) as Record<KpiKey, number>;
+  if (!rec) return out;
+  for (const sub of Object.values(rec.submissions)) {
+    for (const k of KPI_KEYS) {
+      const v = Number(sub.values[k]);
+      if (!isNaN(v)) out[k] += v;
+    }
+  }
+  return out;
+}
+
+function phaseDurationMs(rec: DynDayRecord | undefined, phase: Phase, allStages: StageDef[]): number {
+  if (!rec) return 0;
+  let total = 0;
+  for (const { stage, flatIdx } of phase.stages) {
+    const sub = rec.submissions[stage.id];
+    if (!sub?.ts) continue;
+    const prevStage = flatIdx > 0 ? allStages[flatIdx - 1] : undefined;
+    const prevTs = prevStage ? rec.submissions[prevStage.id]?.ts : rec.startedAt;
+    if (prevTs && sub.ts > prevTs) total += sub.ts - prevTs;
+  }
+  return total;
+}
+
+function deltaLabel(today: number, yesterday: number, higherIsBetter: boolean): { text: string; tone: "up" | "down" | "flat"; icon: typeof TrendingUp } {
+  if (!yesterday && !today) return { text: "—", tone: "flat", icon: Minus };
+  const diff = today - yesterday;
+  if (diff === 0) return { text: "same as yesterday", tone: "flat", icon: Minus };
+  const better = higherIsBetter ? diff > 0 : diff < 0;
+  const abs = Math.abs(diff);
+  return {
+    text: `${diff > 0 ? "+" : "−"}${abs} vs yesterday`,
+    tone: better ? "up" : "down",
+    icon: better ? TrendingUp : TrendingDown,
+  };
+}
+
+function fmtDeltaTime(todayMs: number, yesterdayMs: number): { text: string; tone: "up" | "down" | "flat" } {
+  if (!yesterdayMs) return { text: "no baseline", tone: "flat" };
+  if (!todayMs) return { text: `yesterday took ${fmtDuration(yesterdayMs)}`, tone: "flat" };
+  const diff = todayMs - yesterdayMs;
+  if (Math.abs(diff) < 60_000) return { text: "same pace as yesterday", tone: "flat" };
+  const faster = diff < 0;
+  return {
+    text: `${fmtDuration(Math.abs(diff))} ${faster ? "faster" : "slower"} than yesterday`,
+    tone: faster ? "up" : "down",
+  };
+}
+
+function toneClass(tone: "up" | "down" | "flat"): string {
+  if (tone === "up") return "text-emerald-600";
+  if (tone === "down") return "text-rose-600";
+  return "text-muted-foreground";
 }
 
 function DailyPage() {
@@ -82,6 +150,7 @@ function DailyPage() {
   }
 
   const rec = getOrCreateDay(actor.id, playbook.id);
+  const yRec = getPrevDayRecord(actor.id);
   const stages = playbook.stages;
   const phases = useMemo(() => buildPhases(stages), [stages]);
   const done = rec.stageIdx;
@@ -101,8 +170,11 @@ function DailyPage() {
   };
 
   const activeMs = totalActiveMs(rec);
+  const yActiveMs = yRec ? totalActiveMs(yRec) : 0;
 
-  // Determine phase status
+  const todayKpis = sumKpis(rec);
+  const yKpis = sumKpis(yRec);
+
   const phaseStatus = (phase: Phase): "done" | "active" | "locked" => {
     const flatIdxs = phase.stages.map((s) => s.flatIdx);
     const allDone = flatIdxs.every((i) => i < rec.stageIdx);
@@ -114,8 +186,9 @@ function DailyPage() {
   };
 
   const activePhaseId = phases.find((p) => phaseStatus(p) === "active")?.id ?? phases[0]?.id;
+  const activePhase = phases.find((p) => p.id === activePhaseId);
+  const activeStage = stages[rec.stageIdx];
 
-  // Per-phase expand state (open the active one by default)
   const [openIds, setOpenIds] = useState<Set<string>>(new Set([activePhaseId!]));
   const isOpen = (id: string) => openIds.has(id) || id === activePhaseId;
   const toggle = (id: string) => {
@@ -126,9 +199,20 @@ function DailyPage() {
     });
   };
 
+  // "2x" performance nudge — pick the single most meaningful KPI to beat
+  const topBeat = useMemo(() => {
+    let best: { key: KpiKey; y: number } | null = null;
+    for (const k of KPI_KEYS) if (yKpis[k] > (best?.y ?? -1)) best = { key: k, y: yKpis[k] };
+    return best;
+  }, [yKpis]);
+  const beatTarget = topBeat ? Math.max(topBeat.y + 1, Math.ceil(topBeat.y * 1.2)) : 0;
+
+  const timePace = fmtDeltaTime(activeMs, yActiveMs);
+  const resumeLabel = rec.drafts && activeStage && rec.drafts[activeStage.id] ? "Resume where you left off" : done === 0 ? "Start today's flow" : "Continue where you are";
+
   return (
     <div className="p-4 md:p-8 space-y-6 max-w-3xl mx-auto">
-      {/* Hero */}
+      {/* Hero — greeting + yesterday-vs-today */}
       <header className="space-y-4">
         <div className="flex items-start justify-between gap-3 flex-wrap">
           <div className="min-w-0">
@@ -140,11 +224,11 @@ function DailyPage() {
               {greet()}, {actor.name.split(" ")[0]}
             </h1>
             <p className="text-sm text-muted-foreground mt-1.5 max-w-2xl">
-              {done === 0
-                ? "A calm, phase-by-phase day. Open one section, fill what you can, autosave holds the rest."
-                : done >= total
-                ? "You closed every phase today. Take a bow. 🏁"
-                : `You're in ${phases.find((p) => p.id === activePhaseId)?.title ?? "the flow"} — autosave has you covered.`}
+              {done >= total
+                ? "You closed every block today. Big day. 🏁"
+                : yRec
+                  ? `Yesterday you shipped ${yKpis.bbd} BBD and ${yKpis.quotations} quotes in ${fmtDuration(yActiveMs)}. Today's job — beat it.`
+                  : "Fresh baseline day. Whatever you ship today becomes tomorrow's line to beat."}
             </p>
           </div>
           <Link to="/admin/playbooks" className="inline-flex items-center gap-1 text-xs h-9 px-3 rounded-md border hover:bg-secondary shrink-0">
@@ -152,61 +236,110 @@ function DailyPage() {
           </Link>
         </div>
 
-        {/* Phase-based progress */}
-        <Card className="p-4 bg-gradient-to-br from-primary/5 to-transparent border-primary/20">
-          <div className="flex items-center justify-between gap-4 flex-wrap">
-            <div>
-              <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Today's progress</div>
-              <div className="font-display text-2xl font-semibold mt-0.5">
-                {phases.filter((p) => phaseStatus(p) === "done").length}
-                <span className="text-muted-foreground text-lg font-normal"> of {phases.length} phases</span>
-              </div>
+        {/* Yesterday-vs-today scoreboard */}
+        <Card className="p-4 bg-gradient-to-br from-primary/5 via-transparent to-transparent border-primary/20">
+          <div className="flex items-center justify-between gap-3 flex-wrap mb-3">
+            <div className="flex items-center gap-2">
+              <Flame className="h-4 w-4 text-primary" />
+              <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Beat yesterday</div>
             </div>
-            <div className="text-right">
-              <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Time on flow</div>
-              <div className="font-mono text-lg font-medium">{activeMs ? fmtDuration(activeMs) : "—"}</div>
-            </div>
-            <Badge variant="outline" className="ml-auto font-mono">{pct}%</Badge>
+            <Badge variant="outline" className="font-mono text-[10px]">{pct}% of today's blocks done</Badge>
           </div>
-          <Progress value={pct} className="h-1.5 mt-3" />
-          <div className="flex justify-between mt-2 gap-2">
-            {phases.map((p) => {
-              const st = phaseStatus(p);
+
+          {/* KPI comparison strip */}
+          <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
+            {KPI_KEYS.map((k) => {
+              const t = todayKpis[k], y = yKpis[k];
+              const d = deltaLabel(t, y, true);
               return (
-                <div key={p.id} className="flex-1 min-w-0">
-                  <div className={`h-1 rounded-full ${st === "done" ? "bg-emerald-500" : st === "active" ? "bg-primary" : "bg-border"}`} />
-                  <div className={`mt-1 text-[10px] font-mono uppercase tracking-widest truncate ${st === "active" ? "text-foreground" : "text-muted-foreground"}`}>
-                    {p.title}
+                <div key={k} className="p-2 rounded-md bg-background/50 border border-border/40">
+                  <div className="text-[9px] font-mono uppercase tracking-wider text-muted-foreground">{KPI_LABEL[k]}</div>
+                  <div className="flex items-baseline gap-1 mt-0.5">
+                    <span className="font-display text-lg font-semibold tabular-nums">{t}</span>
+                    <span className="text-[10px] text-muted-foreground">/{y}</span>
+                  </div>
+                  <div className={`text-[9px] font-mono mt-0.5 inline-flex items-center gap-0.5 ${toneClass(d.tone)}`}>
+                    <d.icon className="h-2.5 w-2.5" /> {d.text}
                   </div>
                 </div>
               );
             })}
           </div>
+
+          {/* Progress + time pace */}
+          <Progress value={pct} className="h-1.5 mt-4" />
+          <div className="flex items-center justify-between gap-3 flex-wrap mt-2 text-[11px]">
+            <div className="text-muted-foreground">
+              <span className="font-mono">{fmtDuration(activeMs) || "0m"}</span> on flow today
+              {" · "}
+              <span className={toneClass(timePace.tone)}>{timePace.text}</span>
+            </div>
+            {topBeat && (
+              <div className="text-muted-foreground">
+                Stretch target: <span className="text-foreground font-medium">{beatTarget} {KPI_LABEL[topBeat.key]}</span>
+                <span className="ml-1 text-muted-foreground">(yesterday {topBeat.y})</span>
+              </div>
+            )}
+          </div>
         </Card>
+
+        {/* Resume / next action hero */}
+        {done < total && activePhase && activeStage && (
+          <Card className="p-4 border-primary/30 bg-primary/[0.03]">
+            <div className="flex items-center gap-3 flex-wrap">
+              <div className="min-w-0 flex-1">
+                <div className="text-[10px] font-mono uppercase tracking-widest text-primary">{resumeLabel}</div>
+                <div className="font-display font-semibold text-base mt-0.5 truncate">
+                  {activePhase.title} · {activeStage.label.replace(/^\s*\d+\s*[·.\-]\s*/, "")}
+                </div>
+                <div className="text-xs text-muted-foreground mt-0.5">{activePhase.hint}</div>
+              </div>
+              <Button
+                size="sm"
+                className="h-9"
+                onClick={() => {
+                  setOpenIds(new Set([activePhaseId!]));
+                  setTimeout(() => document.getElementById(`phase-${activePhaseId}`)?.scrollIntoView({ behavior: "smooth", block: "start" }), 60);
+                }}
+              >
+                Jump in <ArrowRight className="h-3.5 w-3.5 ml-1" />
+              </Button>
+            </div>
+          </Card>
+        )}
       </header>
 
-      {/* Phases */}
-      <div className="space-y-3">
-        {phases.map((phase) => {
+      {/* Phases — vertical connector for continuity */}
+      <div className="relative space-y-3">
+        <div className="absolute left-[27px] top-6 bottom-6 w-px bg-gradient-to-b from-primary/30 via-border to-border/40" aria-hidden />
+        {phases.map((phase, phaseIdx) => {
           const st = phaseStatus(phase);
           const open = isOpen(phase.id);
-          const total = phase.stages.length;
+          const totalT = phase.stages.length;
           const doneCount = phase.stages.filter((s) => s.flatIdx < rec.stageIdx).length;
           const draftCount = phase.stages.filter((s) => rec.drafts?.[s.stage.id]).length;
+          const yDur = phaseDurationMs(yRec, phase, stages);
+          const tDur = phaseDurationMs(rec, phase, stages);
+          const pace = fmtDeltaTime(tDur, yDur);
+          const isNextUp = st === "active";
           return (
-            <Card key={phase.id} className={`overflow-hidden transition-all ${
-              st === "active" ? "border-primary/40 shadow-md" :
-              st === "done" ? "border-emerald-500/30 bg-emerald-500/[0.02]" :
-              "border-border/60 opacity-90"
-            }`}>
+            <Card
+              key={phase.id}
+              id={`phase-${phase.id}`}
+              className={`overflow-hidden transition-all ml-0 ${
+                st === "active" ? "border-primary/40 shadow-md ring-1 ring-primary/10" :
+                st === "done" ? "border-emerald-500/30 bg-emerald-500/[0.02]" :
+                "border-border/60 opacity-95"
+              }`}
+            >
               <button
                 onClick={() => toggle(phase.id)}
                 className="w-full flex items-center gap-3 p-4 text-left hover:bg-muted/30 transition-colors"
               >
-                <div className={`h-9 w-9 rounded-lg grid place-items-center shrink-0 ${
+                <div className={`h-10 w-10 rounded-lg grid place-items-center shrink-0 relative z-10 ${
                   st === "done" ? "bg-emerald-500 text-white" :
-                  st === "active" ? "bg-primary text-primary-foreground" :
-                  "bg-muted text-muted-foreground"
+                  st === "active" ? "bg-primary text-primary-foreground shadow-sm" :
+                  "bg-background border border-border text-muted-foreground"
                 }`}>
                   {st === "done" ? <Check className="h-4 w-4" /> : st === "active" ? <Clock className="h-4 w-4" /> : <Circle className="h-4 w-4" />}
                 </div>
@@ -214,15 +347,27 @@ function DailyPage() {
                   <div className="flex items-baseline gap-2 flex-wrap">
                     <h3 className="font-display font-semibold text-base leading-tight">{phase.title}</h3>
                     <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-                      {doneCount}/{total} tasks
+                      {doneCount}/{totalT} tasks
                     </span>
+                    {isNextUp && <span className="text-[10px] font-mono uppercase tracking-widest text-primary">· up next</span>}
                     {draftCount > 0 && (
                       <span className="text-[10px] font-mono uppercase tracking-widest text-amber-600 inline-flex items-center gap-1">
-                        <Save className="h-3 w-3" /> {draftCount} in progress
+                        <Save className="h-3 w-3" /> {draftCount} saved
                       </span>
                     )}
                   </div>
                   <p className="text-xs text-muted-foreground mt-0.5 truncate">{phase.hint}</p>
+                  {/* Yesterday comment */}
+                  {yRec && (yDur > 0 || tDur > 0) && (
+                    <div className={`text-[11px] mt-1 inline-flex items-center gap-1 ${toneClass(pace.tone)}`}>
+                      {pace.tone === "up" ? <TrendingUp className="h-3 w-3" /> : pace.tone === "down" ? <TrendingDown className="h-3 w-3" /> : <Minus className="h-3 w-3" />}
+                      {st === "done"
+                        ? `Closed in ${fmtDuration(tDur)} · ${pace.text}`
+                        : yDur > 0
+                          ? `Yesterday you spent ${fmtDuration(yDur)} here — can you shave it?`
+                          : pace.text}
+                    </div>
+                  )}
                 </div>
                 <ChevronDown className={`h-4 w-4 text-muted-foreground shrink-0 transition-transform ${open ? "rotate-180" : ""}`} />
               </button>
@@ -276,7 +421,10 @@ function DailyPage() {
           <Card className="p-6 text-center bg-emerald-500/5 border-emerald-500/40 animate-fade-in">
             <div className="text-5xl mb-2">🏁</div>
             <h2 className="font-display text-2xl font-semibold">Day complete</h2>
-            <p className="text-sm text-muted-foreground mt-1">Every phase closed with proof · total time {fmtDuration(activeMs)}.</p>
+            <p className="text-sm text-muted-foreground mt-1">
+              {fmtDuration(activeMs)} on flow · {todayKpis.bbd} BBD · {todayKpis.quotations} quotes
+              {yRec && ` · ${fmtDeltaTime(activeMs, yActiveMs).text}`}
+            </p>
             <Link to="/admin/ops" className="mt-4 inline-block"><Button variant="outline">View in Ops Dashboard</Button></Link>
           </Card>
         )}

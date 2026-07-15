@@ -92,6 +92,12 @@ export function getDay(employeeId: string, date = todayKey()): DynDayRecord | un
   return readAll().find((r) => r.employeeId === employeeId && r.date === date);
 }
 
+export function getPrevDayRecord(employeeId: string, beforeDate = todayKey()): DynDayRecord | undefined {
+  return readAll()
+    .filter((r) => r.employeeId === employeeId && r.date < beforeDate)
+    .sort((a, b) => b.date.localeCompare(a.date))[0];
+}
+
 export function getAllRecords(): DynDayRecord[] { return readAll(); }
 
 export function getRecordsInRange(from: string, to: string): DynDayRecord[] {
