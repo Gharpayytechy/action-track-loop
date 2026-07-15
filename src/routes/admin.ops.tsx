@@ -36,6 +36,7 @@ export const Route = createFileRoute("/admin/ops")({
 function OpsDashboard() {
   useSyncExternalStore(subscribeDyn, dynVersion, () => 0);
   useSyncExternalStore(subscribePlaybooks, playbooksVersion, () => 0);
+  useSyncExternalStore(subscribeDailyCfg, dailyCfgVersion, () => 0);
   const [tab, setTab] = useState<"live" | "timeline" | "insights" | "analytics" | "stack" | "config">("live");
 
   return (
