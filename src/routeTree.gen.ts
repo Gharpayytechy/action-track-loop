@@ -26,6 +26,7 @@ import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as KudosRouteImport } from './routes/kudos'
 import { Route as InboxRouteImport } from './routes/inbox'
 import { Route as HrmsRouteImport } from './routes/hrms'
+import { Route as DailyLegacyRouteImport } from './routes/daily-legacy'
 import { Route as DailyRouteImport } from './routes/daily'
 import { Route as ConsoleRouteImport } from './routes/console'
 import { Route as CommandRouteImport } from './routes/command'
@@ -33,6 +34,8 @@ import { Route as CalendarRouteImport } from './routes/calendar'
 import { Route as AttendanceRouteImport } from './routes/attendance'
 import { Route as AchievementsRouteImport } from './routes/achievements'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminPlaybooksRouteImport } from './routes/admin.playbooks'
+import { Route as AdminOpsRouteImport } from './routes/admin.ops'
 import { Route as AdminConsoleRouteImport } from './routes/admin.console'
 
 const WarRoomRoute = WarRoomRouteImport.update({
@@ -120,6 +123,11 @@ const HrmsRoute = HrmsRouteImport.update({
   path: '/hrms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DailyLegacyRoute = DailyLegacyRouteImport.update({
+  id: '/daily-legacy',
+  path: '/daily-legacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DailyRoute = DailyRouteImport.update({
   id: '/daily',
   path: '/daily',
@@ -155,6 +163,16 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminPlaybooksRoute = AdminPlaybooksRouteImport.update({
+  id: '/admin/playbooks',
+  path: '/admin/playbooks',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminOpsRoute = AdminOpsRouteImport.update({
+  id: '/admin/ops',
+  path: '/admin/ops',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminConsoleRoute = AdminConsoleRouteImport.update({
   id: '/admin/console',
   path: '/admin/console',
@@ -169,6 +187,7 @@ export interface FileRoutesByFullPath {
   '/command': typeof CommandRoute
   '/console': typeof ConsoleRoute
   '/daily': typeof DailyRoute
+  '/daily-legacy': typeof DailyLegacyRoute
   '/hrms': typeof HrmsRoute
   '/inbox': typeof InboxRoute
   '/kudos': typeof KudosRoute
@@ -187,6 +206,8 @@ export interface FileRoutesByFullPath {
   '/team': typeof TeamRoute
   '/war-room': typeof WarRoomRoute
   '/admin/console': typeof AdminConsoleRoute
+  '/admin/ops': typeof AdminOpsRoute
+  '/admin/playbooks': typeof AdminPlaybooksRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -196,6 +217,7 @@ export interface FileRoutesByTo {
   '/command': typeof CommandRoute
   '/console': typeof ConsoleRoute
   '/daily': typeof DailyRoute
+  '/daily-legacy': typeof DailyLegacyRoute
   '/hrms': typeof HrmsRoute
   '/inbox': typeof InboxRoute
   '/kudos': typeof KudosRoute
@@ -214,6 +236,8 @@ export interface FileRoutesByTo {
   '/team': typeof TeamRoute
   '/war-room': typeof WarRoomRoute
   '/admin/console': typeof AdminConsoleRoute
+  '/admin/ops': typeof AdminOpsRoute
+  '/admin/playbooks': typeof AdminPlaybooksRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -224,6 +248,7 @@ export interface FileRoutesById {
   '/command': typeof CommandRoute
   '/console': typeof ConsoleRoute
   '/daily': typeof DailyRoute
+  '/daily-legacy': typeof DailyLegacyRoute
   '/hrms': typeof HrmsRoute
   '/inbox': typeof InboxRoute
   '/kudos': typeof KudosRoute
@@ -242,6 +267,8 @@ export interface FileRoutesById {
   '/team': typeof TeamRoute
   '/war-room': typeof WarRoomRoute
   '/admin/console': typeof AdminConsoleRoute
+  '/admin/ops': typeof AdminOpsRoute
+  '/admin/playbooks': typeof AdminPlaybooksRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -253,6 +280,7 @@ export interface FileRouteTypes {
     | '/command'
     | '/console'
     | '/daily'
+    | '/daily-legacy'
     | '/hrms'
     | '/inbox'
     | '/kudos'
@@ -271,6 +299,8 @@ export interface FileRouteTypes {
     | '/team'
     | '/war-room'
     | '/admin/console'
+    | '/admin/ops'
+    | '/admin/playbooks'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -280,6 +310,7 @@ export interface FileRouteTypes {
     | '/command'
     | '/console'
     | '/daily'
+    | '/daily-legacy'
     | '/hrms'
     | '/inbox'
     | '/kudos'
@@ -298,6 +329,8 @@ export interface FileRouteTypes {
     | '/team'
     | '/war-room'
     | '/admin/console'
+    | '/admin/ops'
+    | '/admin/playbooks'
   id:
     | '__root__'
     | '/'
@@ -307,6 +340,7 @@ export interface FileRouteTypes {
     | '/command'
     | '/console'
     | '/daily'
+    | '/daily-legacy'
     | '/hrms'
     | '/inbox'
     | '/kudos'
@@ -325,6 +359,8 @@ export interface FileRouteTypes {
     | '/team'
     | '/war-room'
     | '/admin/console'
+    | '/admin/ops'
+    | '/admin/playbooks'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -335,6 +371,7 @@ export interface RootRouteChildren {
   CommandRoute: typeof CommandRoute
   ConsoleRoute: typeof ConsoleRoute
   DailyRoute: typeof DailyRoute
+  DailyLegacyRoute: typeof DailyLegacyRoute
   HrmsRoute: typeof HrmsRoute
   InboxRoute: typeof InboxRoute
   KudosRoute: typeof KudosRoute
@@ -353,6 +390,8 @@ export interface RootRouteChildren {
   TeamRoute: typeof TeamRoute
   WarRoomRoute: typeof WarRoomRoute
   AdminConsoleRoute: typeof AdminConsoleRoute
+  AdminOpsRoute: typeof AdminOpsRoute
+  AdminPlaybooksRoute: typeof AdminPlaybooksRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -476,6 +515,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HrmsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/daily-legacy': {
+      id: '/daily-legacy'
+      path: '/daily-legacy'
+      fullPath: '/daily-legacy'
+      preLoaderRoute: typeof DailyLegacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/daily': {
       id: '/daily'
       path: '/daily'
@@ -525,6 +571,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/playbooks': {
+      id: '/admin/playbooks'
+      path: '/admin/playbooks'
+      fullPath: '/admin/playbooks'
+      preLoaderRoute: typeof AdminPlaybooksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/ops': {
+      id: '/admin/ops'
+      path: '/admin/ops'
+      fullPath: '/admin/ops'
+      preLoaderRoute: typeof AdminOpsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/console': {
       id: '/admin/console'
       path: '/admin/console'
@@ -543,6 +603,7 @@ const rootRouteChildren: RootRouteChildren = {
   CommandRoute: CommandRoute,
   ConsoleRoute: ConsoleRoute,
   DailyRoute: DailyRoute,
+  DailyLegacyRoute: DailyLegacyRoute,
   HrmsRoute: HrmsRoute,
   InboxRoute: InboxRoute,
   KudosRoute: KudosRoute,
@@ -561,16 +622,9 @@ const rootRouteChildren: RootRouteChildren = {
   TeamRoute: TeamRoute,
   WarRoomRoute: WarRoomRoute,
   AdminConsoleRoute: AdminConsoleRoute,
+  AdminOpsRoute: AdminOpsRoute,
+  AdminPlaybooksRoute: AdminPlaybooksRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

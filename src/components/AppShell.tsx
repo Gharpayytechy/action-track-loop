@@ -64,6 +64,8 @@ const NAV: NavItem[] = [
   { to: "/daily",       label: "Daily Flow",   icon: Sun,             tiers: ALL },
   { to: "/console",     label: "Operator Console", icon: Zap,         tiers: ["leadership","hr","leader","recruiter"] },
   { to: "/live",        label: "Live Ops",     icon: Activity,        tiers: ["leadership","hr","leader"] },
+  { to: "/admin/ops",   label: "Ops Dashboard",icon: Activity,        tiers: ["leadership","hr","leader"] },
+  { to: "/admin/playbooks", label: "Playbook Manager", icon: Settings, tiers: ["leadership","hr"] },
   { to: "/score",       label: "My Score",     icon: Trophy,          tiers: ALL },
   { to: "/tasks",       label: "Tasks",        icon: CheckSquare,     tiers: ALL },
   { to: "/achievements",label: "Achievements", icon: Award,           tiers: ALL },
