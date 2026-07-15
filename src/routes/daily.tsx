@@ -134,13 +134,13 @@ function deltaLabel(today: number, yesterday: number, higherIsBetter: boolean): 
 }
 
 function fmtDeltaTime(todayMs: number, yesterdayMs: number): { text: string; tone: "up" | "down" | "flat" } {
-  if (!yesterdayMs) return { text: "no baseline", tone: "flat" };
-  if (!todayMs) return { text: `yesterday took ${fmtDuration(yesterdayMs)}`, tone: "flat" };
+  if (!yesterdayMs) return { text: "No comparison available.", tone: "flat" };
+  if (!todayMs) return { text: `Previous day took ${fmtDuration(yesterdayMs)}.`, tone: "flat" };
   const diff = todayMs - yesterdayMs;
-  if (Math.abs(diff) < 60_000) return { text: "same pace as yesterday", tone: "flat" };
+  if (Math.abs(diff) < 60_000) return { text: "Pace matches the previous day.", tone: "flat" };
   const faster = diff < 0;
   return {
-    text: `${fmtDuration(Math.abs(diff))} ${faster ? "faster" : "slower"} than yesterday`,
+    text: `${fmtDuration(Math.abs(diff))} ${faster ? "ahead of" : "behind"} the previous day.`,
     tone: faster ? "up" : "down",
   };
 }
