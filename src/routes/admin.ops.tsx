@@ -609,3 +609,56 @@ function ConfigTab() {
     </div>
   );
 }
+// ---- Actively-filling live card ----
+function ActivelyFillingCard() {
+  const today = new Date().toISOString().slice(0, 10);
+  const now = Date.now();
+  const rows = EMPLOYEES.map((e) => {
+    const rec = getDay(e.id, today);
+    if (!rec) return null;
+    const subs = Object.values(rec.submissions);
+    const draftIds = rec.drafts ? Object.keys(rec.drafts) : [];
+    const lastTs = Math.max(rec.startedAt || 0, ...subs.map((s) => s.ts), ...(rec.drafts ? Object.values(rec.drafts).map((d) => d.updatedAt) : []));
+    const minutesSince = lastTs ? Math.round((now - lastTs) / 60_000) : Infinity;
+    const status: "filling" | "recent" | "idle" =
+      minutesSince <= 5 ? "filling" : minutesSince <= 60 ? "recent" : "idle";
+    return { emp: e, subs: subs.length, drafts: draftIds.length, minutesSince, status, lastTs };
+  }).filter(Boolean) as Array<{ emp: typeof EMPLOYEES[number]; subs: number; drafts: number; minutesSince: number; status: "filling" | "recent" | "idle"; lastTs: number }>;
+
+  const active = rows.filter((r) => r.status !== "idle").sort((a, b) => a.minutesSince - b.minutesSince);
+
+  if (active.length === 0) {
+    return (
+      <Card className="p-4">
+        <div className="flex items-center gap-2 mb-1">
+          <Users className="h-4 w-4 text-muted-foreground" />
+          <h3 className="font-display font-semibold">Currently filling</h3>
+        </div>
+        <p className="text-xs text-muted-foreground">No one has activity in the last hour.</p>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="p-4">
+      <div className="flex items-center gap-2 mb-3">
+        <Users className="h-4 w-4 text-primary" />
+        <h3 className="font-display font-semibold">Currently filling</h3>
+        <Badge variant="outline" className="font-mono text-[10px] ml-auto">{active.length} active</Badge>
+      </div>
+      <div className="space-y-1.5">
+        {active.map((r) => (
+          <div key={r.emp.id} className="flex items-center gap-3 text-sm">
+            <span className={`h-2 w-2 rounded-full ${r.status === "filling" ? "bg-emerald-500 animate-pulse" : "bg-amber-500"}`} />
+            <span className="font-medium truncate flex-1">{r.emp.name}</span>
+            <span className="text-xs text-muted-foreground truncate hidden md:inline">{r.emp.role}</span>
+            <span className="text-[11px] font-mono text-muted-foreground">{r.subs} submitted{r.drafts > 0 ? `, ${r.drafts} draft` : ""}</span>
+            <span className="text-[11px] font-mono text-muted-foreground w-16 text-right">
+              {r.status === "filling" ? "now" : `${r.minutesSince}m ago`}
+            </span>
+          </div>
+        ))}
+      </div>
+    </Card>
+  );
+}
