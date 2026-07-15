@@ -117,7 +117,7 @@ Target this cycle → BBD {{bbd_target}} · Quotes {{quotations_target}}`;
 const WA_CYCLE_CALLS = `*📞 GHARPAYY · CALL BLOCK*
 👤 {{name}} · {{role}} · {{time}}
 
-Cold calls: {{cold_calls}} · Connected: {{connected_calls}}
+Calls placed: {{cold_calls}} · Connected: {{connected_calls}}
 Doors scheduled: {{doors_sched}} · Doors initiated: {{doors_initiated}}
 Note: {{cycle_note}}`;
 
@@ -132,14 +132,14 @@ Blockers: {{blockers}}`;
 
 const WA_BREAK = `*☕ GHARPAYY · BREAK*
 👤 {{name}} · {{role}} · {{time}}
-On break — back on the floor at {{expected_finish}}`;
+On break, back on the floor at {{expected_finish}}`;
 
 const WA_12_EOD = `*🏁 GHARPAYY · 12-STEP IMPACT · EOD*
 👤 {{name}} · {{role}} · {{time}}
 
 Final BBD: {{bbd}} (goal 3)
 Final Quotes: {{quotations}} (goal 5)
-Cold calls: {{cold_calls}} · Connected: {{connected_calls}}
+Calls placed: {{cold_calls}} · Connected: {{connected_calls}}
 Doors initiated: {{doors_initiated}}
 30-check drafts: {{checks_drafted}}
 
