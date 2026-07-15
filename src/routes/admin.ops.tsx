@@ -269,6 +269,9 @@ function InsightsTab() {
         <StatCard label="Avg / person" value={uniquePeople ? fmtDuration(Math.round(totalTime / uniquePeople)) : "—"} />
       </div>
 
+      <ActivelyFillingCard />
+
+
       {[...byPlaybook.entries()].map(([pbId, recs]) => {
         const pb = playbooks.find((p) => p.id === pbId);
         if (!pb) return null;
