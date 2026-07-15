@@ -83,12 +83,44 @@ export function StageRenderer(props: Props) {
   const Icon = stageIcon(stage.id, label);
 
   const requiredSet = new Set(stage.requiredFields || []);
-  const canSubmit = fields.every((f) => !requiredSet.has(f!.id) || (values[f!.id] !== undefined && values[f!.id] !== ""))
-    && stage.proofs.every((p) => p === "geo" ? true : !!proofs[p === "whatsapp" ? "whatsapp" : p === "crm_ss" ? "crm_ss" : p === "file" ? "file" : "selfie"]);
+  const wantsWhatsApp = stage.proofs.includes("whatsapp");
+  const wantsCrm = stage.proofs.includes("crm_ss");
+  const wantsFile = stage.proofs.includes("file");
+  const wantsSelfie = stage.proofs.includes("selfie");
+
+  // Two-screenshot rule: for any proof kind (whatsapp / crm_ss) both shots are required.
+  const canSubmit =
+    fields.every((f) => !requiredSet.has(f!.id) || (values[f!.id] !== undefined && values[f!.id] !== ""))
+    && (!wantsSelfie || !!proofs.selfie)
+    && (!wantsWhatsApp || (!!proofs.whatsapp && !!proofs.whatsapp2))
+    && (!wantsCrm || (!!proofs.crm_ss && !!proofs.crm_ss2))
+    && (!wantsFile || !!proofs.file);
 
   const openStart = isActive ? (prevSubmitTs || startedAt) : undefined;
   const [openedAt] = useState(() => Date.now());
   const elapsedFill = isDone && submission?.ts && prevSubmitTs ? submission.ts - prevSubmitTs : 0;
+
+  // Live per-card timer (60s soft target). Ticks while active + not done.
+  const [nowTick, setNowTick] = useState(() => Date.now());
+  useEffect(() => {
+    if (!isActive || isDone) return;
+    const t = window.setInterval(() => setNowTick(Date.now()), 1000);
+    return () => window.clearInterval(t);
+  }, [isActive, isDone]);
+  const elapsedSecs = isActive && !isDone ? Math.max(0, Math.floor((nowTick - openedAt) / 1000)) : 0;
+  const timerTone =
+    elapsedSecs >= CARD_TARGET_SECS ? "text-rose-600" :
+    elapsedSecs >= CARD_WARN_SECS ? "text-amber-600" :
+    "text-muted-foreground";
+
+  // Yesterday's values for this stage, shown via the (i) info popover.
+  const [infoOpen, setInfoOpen] = useState(false);
+  const yesterdayValues = useMemo(() => {
+    if (!isActive || isDone) return null;
+    const y = getPrevDayRecord(employeeId);
+    const sub = y?.submissions[stage.id];
+    return sub ? { values: sub.values as Record<string, unknown>, ts: sub.ts } : null;
+  }, [employeeId, stage.id, isActive, isDone]);
 
   // Debounced draft autosave — hold work if user leaves mid-fill
   const draftTimer = useRef<number | null>(null);
@@ -103,7 +135,7 @@ export function StageRenderer(props: Props) {
   }, [values, proofs, isActive, isDone, onDraft]);
 
   const doSubmit = () => {
-    if (!canSubmit) { toast.error("Complete required fields and proofs"); return; }
+    if (!canSubmit) { toast.error("Complete required fields and both screenshots"); return; }
     const mergedForTemplate: Record<string, unknown> = {
       ...previousValues, ...values,
       name: employeeName, role: employeeRole,
