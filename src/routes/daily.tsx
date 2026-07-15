@@ -13,11 +13,15 @@ import {
 } from "@/lib/execution/playbooks";
 import {
   getOrCreateDay, saveSubmission, saveDraft, subscribeDyn, dynVersion,
-  getPrevDayRecord, type DynDayRecord,
+  getPrevDayRecord, getDay, type DynDayRecord,
 } from "@/lib/execution/dyn-store";
+import { todayKey } from "@/lib/attendance-store";
+import { getField } from "@/lib/execution/field-library";
+import { WhatsAppCopyBlock } from "@/components/execution/WhatsAppCopyBlock";
+import { prettyStageLabel } from "@/components/execution/StageRenderer";
 import {
   Settings2, Sparkles, ChevronDown, Check, Clock, Circle, Save,
-  TrendingUp, TrendingDown, Minus, Flame, ArrowRight,
+  TrendingUp, TrendingDown, Minus, Flame, ArrowRight, CalendarDays, ArrowLeft,
 } from "lucide-react";
 import { fmtDuration, totalActiveMs } from "@/lib/execution/insights";
 
@@ -135,6 +139,9 @@ function DailyPage() {
   useSyncExternalStore(subscribeDyn, dynVersion, () => 0);
   useSyncExternalStore(subscribePlaybooks, playbooksVersion, () => 0);
 
+  const today = todayKey();
+  const [viewDate, setViewDate] = useState<string>(today);
+
   const playbook = resolvePlaybookFor(actor.id, () => defaultPlaybookForRole(actor.role));
 
   if (!playbook) {
@@ -146,6 +153,19 @@ function DailyPage() {
           <Link to="/admin/playbooks"><Button>Open Playbook Manager</Button></Link>
         </Card>
       </div>
+    );
+  }
+
+  // History mode — read-only view of a past day
+  if (viewDate !== today) {
+    return (
+      <HistoryView
+        employeeId={actor.id}
+        employeeName={actor.name}
+        date={viewDate}
+        onChangeDate={setViewDate}
+        onBackToToday={() => setViewDate(today)}
+      />
     );
   }
 
@@ -212,8 +232,10 @@ function DailyPage() {
 
   return (
     <div className="p-4 md:p-8 space-y-6 max-w-3xl mx-auto">
+      <DateStrip employeeId={actor.id} viewDate={viewDate} onChange={setViewDate} today={today} />
       {/* Hero — greeting + yesterday-vs-today */}
       <header className="space-y-4">
+
         <div className="flex items-start justify-between gap-3 flex-wrap">
           <div className="min-w-0">
             <div className="text-xs uppercase tracking-widest text-muted-foreground font-mono flex items-center gap-2">
@@ -429,6 +451,158 @@ function DailyPage() {
           </Card>
         )}
       </div>
+    </div>
+  );
+}
+
+// ---------- Date strip: browse recent days ----------
+function shortDate(d: string): string {
+  const dt = new Date(d + "T00:00:00");
+  return dt.toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" });
+}
+
+function DateStrip({ employeeId, viewDate, onChange, today }: { employeeId: string; viewDate: string; onChange: (d: string) => void; today: string }) {
+  const days = useMemo(() => {
+    const arr: string[] = [];
+    const t = new Date(today + "T00:00:00");
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(t); d.setDate(t.getDate() - i);
+      arr.push(d.toISOString().slice(0, 10));
+    }
+    return arr;
+  }, [today]);
+  const hasData = (d: string) => !!getDay(employeeId, d);
+  return (
+    <Card className="p-2 flex items-center gap-2 overflow-x-auto">
+      <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground px-2 flex items-center gap-1 shrink-0">
+        <CalendarDays className="h-3 w-3" /> Browse
+      </div>
+      {days.map((d) => {
+        const isToday = d === today;
+        const active = d === viewDate;
+        const dot = hasData(d);
+        return (
+          <button
+            key={d}
+            onClick={() => onChange(d)}
+            className={`shrink-0 px-3 py-1.5 rounded-md text-xs border transition-colors ${
+              active ? "bg-primary text-primary-foreground border-primary" : "bg-background hover:bg-secondary border-border"
+            }`}
+          >
+            <div className="flex items-center gap-1.5">
+              <span>{isToday ? "Today" : shortDate(d)}</span>
+              {dot && !active && <span className="h-1.5 w-1.5 rounded-full bg-primary" />}
+            </div>
+          </button>
+        );
+      })}
+      <input
+        type="date"
+        value={viewDate}
+        max={today}
+        onChange={(e) => onChange(e.target.value)}
+        className="ml-auto h-8 rounded border bg-background px-2 text-xs shrink-0"
+      />
+    </Card>
+  );
+}
+
+// ---------- Read-only history view for a past day ----------
+function HistoryView({
+  employeeId, employeeName, date, onChangeDate, onBackToToday,
+}: {
+  employeeId: string; employeeName: string; date: string;
+  onChangeDate: (d: string) => void; onBackToToday: () => void;
+}) {
+  const today = todayKey();
+  const rec = getDay(employeeId, date);
+  const kpiSum = useMemo(() => {
+    if (!rec) return {} as Record<string, number>;
+    const out: Record<string, number> = {};
+    for (const s of Object.values(rec.submissions)) {
+      for (const [k, v] of Object.entries(s.values)) {
+        if (typeof v === "number") out[k] = (out[k] || 0) + v;
+      }
+    }
+    return out;
+  }, [rec]);
+  const active = totalActiveMs(rec || ({} as DynDayRecord));
+
+  return (
+    <div className="p-4 md:p-8 space-y-6 max-w-3xl mx-auto">
+      <DateStrip employeeId={employeeId} viewDate={date} onChange={onChangeDate} today={today} />
+      <header className="space-y-2">
+        <div className="text-xs uppercase tracking-widest text-muted-foreground font-mono flex items-center gap-2">
+          <CalendarDays className="h-3.5 w-3.5 text-primary" /> History · {shortDate(date)}
+        </div>
+        <div className="flex items-baseline gap-3 flex-wrap">
+          <h1 className="font-display text-3xl font-semibold tracking-tight">{employeeName}'s day</h1>
+          <Button variant="ghost" size="sm" onClick={onBackToToday} className="h-8">
+            <ArrowLeft className="h-3.5 w-3.5 mr-1" /> Back to today
+          </Button>
+        </div>
+      </header>
+
+      {!rec ? (
+        <Card className="p-6 text-center text-sm text-muted-foreground">
+          Nothing was logged on {shortDate(date)}.
+        </Card>
+      ) : (
+        <>
+          <Card className="p-4">
+            <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-2">Day snapshot</div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
+              <Stat label="Steps done" value={`${Object.keys(rec.submissions).length}`} />
+              <Stat label="Time on flow" value={fmtDuration(active)} />
+              <Stat label="BBD" value={String(kpiSum.bbd ?? 0)} />
+              <Stat label="Quotes" value={String(kpiSum.quotations ?? 0)} />
+              <Stat label="Cold calls" value={String(kpiSum.cold_calls ?? 0)} />
+              <Stat label="Connected" value={String(kpiSum.connected_calls ?? 0)} />
+              <Stat label="Doors init." value={String(kpiSum.doors_initiated ?? 0)} />
+              <Stat label="Checks" value={String(kpiSum.checks_drafted ?? 0)} />
+            </div>
+          </Card>
+
+          <div className="space-y-3">
+            {Object.values(rec.submissions)
+              .sort((a, b) => a.ts - b.ts)
+              .map((sub) => (
+                <Card key={sub.stageId} className="p-4 border-emerald-500/25 bg-emerald-500/[0.02]">
+                  <div className="flex items-center gap-2 mb-2 flex-wrap">
+                    <Badge variant="outline" className="font-mono text-[10px] border-emerald-500/40 text-emerald-700">Done</Badge>
+                    <h3 className="font-medium text-sm">{prettyStageLabel(sub.stageId)}</h3>
+                    <span className="ml-auto text-[10px] font-mono text-muted-foreground">
+                      {new Date(sub.ts).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
+                    </span>
+                  </div>
+                  {Object.keys(sub.values).length > 0 && (
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
+                      {Object.entries(sub.values).map(([k, v]) => {
+                        const f = getField(k);
+                        return (
+                          <div key={k} className="p-2 rounded bg-muted/40">
+                            <div className="text-[10px] font-mono uppercase text-muted-foreground truncate">{f?.label || k}</div>
+                            <div className="truncate">{String(v)}</div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                  {sub.waMessage && <div className="mt-2"><WhatsAppCopyBlock text={sub.waMessage} /></div>}
+                </Card>
+              ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="p-2 rounded-md bg-background/50 border border-border/40">
+      <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">{label}</div>
+      <div className="font-display text-lg font-semibold tabular-nums">{value}</div>
     </div>
   );
 }

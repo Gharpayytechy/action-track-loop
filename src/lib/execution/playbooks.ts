@@ -207,16 +207,21 @@ export const BUILT_IN_PLAYBOOKS: Playbook[] = [
   // Every role now runs the same 12-step BBD / cold+connected / quotes cycle,
   // with role-specific extras on Mission + EOD only.
   standard12({ id: "pb_generic",     name: "Generic Employee",         roleHint: "Any",           description: "Universal 12-step cycle: works for any function." }),
+  standard12({ id: "pb_generic_10x", name: "Generic · 10x Mode",       roleHint: "Any",           description: "Same 12-step cycle, 10x targets — for A-players pushing personal bests.", missionExtras: ["calls","tours_sched","prebook","movein","super_lead"], eodExtras: ["calls","tours_done","prebook","movein","super_lead","revenue"] }),
   standard12({ id: "pb_operator",    name: "Operator · Full Execution", roleHint: "Operator",      description: "GHARPAYY operator execution.", missionExtras: ["calls","tours_sched","prebook","movein"], eodExtras: ["calls","tours_done","prebook","movein","super_lead"], eodTemplate: WA_IMPACT }),
   standard12({ id: "pb_tcm",         name: "TCM · Tour Consultant",     roleHint: "TCM",           description: "Tour consultant.",              missionExtras: ["tours_sched"],                                eodExtras: ["tours_done","prebook","movein"] }),
   standard12({ id: "pb_sales",       name: "Sales Closer",              roleHint: "Sales Closer",  description: "Sales closer pipeline → close.", missionExtras: ["deals"],                                     eodExtras: ["deals","revenue","calls"], eodTemplate: WA_SALES_EOD }),
   standard12({ id: "pb_hr",          name: "HR / Recruiter",            roleHint: "HR",            description: "HR / recruiter pipeline.",       missionExtras: ["candidates_pipeline","screens","interviews"], eodExtras: ["screens","interviews","offers","joiners"], eodTemplate: WA_HR_EOD }),
   standard12({ id: "pb_floor_lead",  name: "Floor Lead / Team Coach",   roleHint: "Floor Lead",    description: "Team coaching floor.",           missionExtras: ["team_goal_pct"],                              eodExtras: ["oneones_done","nudges_sent","escalations","team_goal_pct"], eodTemplate: WA_MGR_EOD }),
+  standard12({ id: "pb_coach",       name: "Coach · Training Architect",roleHint: "Coach",         description: "Training and ramp coach.",       missionExtras: ["oneones_done"],                               eodExtras: ["oneones_done","nudges_sent","joiners"], eodTemplate: WA_MGR_EOD }),
+  standard12({ id: "pb_flow_ops",    name: "Flow Ops · Air-traffic",    roleHint: "Flow Ops",      description: "Lead flow orchestration.",       missionExtras: ["leads_generated"],                            eodExtras: ["leads_generated","escalations","sla_flags"] }),
   standard12({ id: "pb_ops_mgr",     name: "Ops Manager",               roleHint: "Ops Manager",   description: "Ops manager, sites & SLA.",      missionExtras: ["site_checks"],                                eodExtras: ["site_checks","escalations","sla_flags"] }),
   standard12({ id: "pb_marketing",   name: "Marketing",                 roleHint: "Marketing",     description: "Marketing / growth.",            missionExtras: ["leads_generated","campaigns_shipped"],        eodExtras: ["leads_generated","campaigns_shipped","spend"] }),
   standard12({ id: "pb_finance",     name: "Finance",                   roleHint: "Finance",       description: "Finance / collections.",         missionExtras: ["collections"],                                eodExtras: ["collections","invoices","reconciled"] }),
   standard12({ id: "pb_support",     name: "Support",                   roleHint: "Support",       description: "Support / CSAT.",                missionExtras: ["tickets","frt_mins"],                         eodExtras: ["tickets","frt_mins","csat"] }),
   standard12({ id: "pb_leadership",  name: "Leadership · War Room",     roleHint: "Leadership",    description: "Leadership war room.",           missionExtras: ["hard_decision"],                              eodExtras: ["hard_decision"] }),
+  standard12({ id: "pb_admin",       name: "Admin · System Owner",      roleHint: "Admin",         description: "Admin operating the system.",    missionExtras: ["hard_decision"],                              eodExtras: ["hard_decision","escalations"], eodTemplate: WA_MGR_EOD }),
+  standard12({ id: "pb_owner",       name: "Property Owner",            roleHint: "Owner",         description: "Property partner playbook.",     missionExtras: ["site_checks"],                                eodExtras: ["site_checks","collections"] }),
 
   // -------- Sub-Intern (1:30 PM → 8:00 PM, one break 5:00–5:20) --------
   pb({
@@ -362,16 +367,22 @@ export function resolvePlaybookFor(userId: string, fallbackByRole?: (u: string) 
 // Suggested role → playbook mapping used when no explicit assignment
 export function defaultPlaybookForRole(role: string): string {
   const r = role.toLowerCase();
+  if (r.includes("sub-intern") || r.includes("sub intern")) return "pb_sub_intern";
   if (r.includes("intern")) return "pb_sub_intern";
-  if (r.includes("operator")) return "pb_operator";
+  if (r.includes("flow ops") || r.includes("flowops")) return "pb_flow_ops";
+  if (r.includes("floor") || r.includes("coach") && r.includes("lead")) return "pb_floor_lead";
+  if (r.includes("coach")) return "pb_coach";
   if (r.includes("tcm") || r.includes("tour")) return "pb_tcm";
   if (r.includes("sales") || r.includes("closer")) return "pb_sales";
-  if (r.includes("hr") || r.includes("recruit")) return "pb_hr";
-  if (r.includes("floor") || r.includes("coach")) return "pb_floor_lead";
-  if (r.includes("ops")) return "pb_ops_mgr";
+  if (r.includes("recruit")) return "pb_hr";
+  if (r.includes("hr")) return "pb_hr";
+  if (r.includes("ops manager")) return "pb_ops_mgr";
   if (r.includes("market")) return "pb_marketing";
   if (r.includes("finance")) return "pb_finance";
   if (r.includes("support")) return "pb_support";
-  if (r.includes("owner") || r.includes("admin") || r.includes("lead")) return "pb_leadership";
+  if (r.includes("owner")) return "pb_owner";
+  if (r.includes("admin")) return "pb_admin";
+  if (r.includes("leadership") || r.includes("lead")) return "pb_leadership";
+  if (r.includes("operator")) return "pb_operator";
   return "pb_generic";
 }

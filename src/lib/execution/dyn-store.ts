@@ -108,3 +108,19 @@ export function resetDay(employeeId: string, date = todayKey()) {
   const all = readAll().filter((r) => !(r.employeeId === employeeId && r.date === date));
   writeAll(all);
 }
+
+/** Add records that don't already exist for (employeeId, date). Silent no-op for duplicates. */
+export function seedRecordsIfMissing(recs: DynDayRecord[]) {
+  const all = readAll();
+  const key = (r: DynDayRecord) => `${r.employeeId}::${r.date}`;
+  const have = new Set(all.map(key));
+  let changed = false;
+  for (const r of recs) {
+    if (!have.has(key(r))) { all.push(r); changed = true; }
+  }
+  if (changed) writeAll(all);
+}
+
+export function listDatesFor(employeeId: string): string[] {
+  return readAll().filter((r) => r.employeeId === employeeId).map((r) => r.date).sort((a, b) => b.localeCompare(a));
+}
