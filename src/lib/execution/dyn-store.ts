@@ -65,9 +65,25 @@ export function saveSubmission(employeeId: string, date: string, sub: StageSubmi
   let rec = all.find((r) => r.employeeId === employeeId && r.date === date);
   if (!rec) return;
   rec.submissions[sub.stageId] = sub;
+  // Submitting clears the draft for this stage
+  if (rec.drafts && rec.drafts[sub.stageId]) delete rec.drafts[sub.stageId];
   if (advance) {
     rec.stageIdx = Math.min(rec.stageIdx + 1, totalStages);
     if (rec.stageIdx >= totalStages) rec.finishedAt = Date.now();
+  }
+  writeAll(all);
+}
+
+export function saveDraft(employeeId: string, date: string, stageId: string, draft: { values: Record<string, unknown>; proofs: ProofBag }) {
+  const all = readAll();
+  const rec = all.find((r) => r.employeeId === employeeId && r.date === date);
+  if (!rec) return;
+  const hasContent = Object.keys(draft.values).length > 0 || Object.keys(draft.proofs).length > 0;
+  if (!rec.drafts) rec.drafts = {};
+  if (hasContent) {
+    rec.drafts[stageId] = { ...draft, updatedAt: Date.now() };
+  } else {
+    delete rec.drafts[stageId];
   }
   writeAll(all);
 }
