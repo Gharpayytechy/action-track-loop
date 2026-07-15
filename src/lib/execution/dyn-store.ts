@@ -16,12 +16,19 @@ export interface StageSubmission {
   waMessage?: string; // rendered WA block
 }
 
+export interface StageDraft {
+  values: Record<string, unknown>;
+  proofs: ProofBag;
+  updatedAt: number;
+}
+
 export interface DynDayRecord {
   employeeId: string;
   date: string;
   playbookId: string;
   stageIdx: number;                       // index in resolved playbook
   submissions: Record<string, StageSubmission>; // by stageId
+  drafts?: Record<string, StageDraft>;    // by stageId — partial in-progress work
   startedAt?: number;
   finishedAt?: number;
 }
