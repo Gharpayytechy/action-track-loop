@@ -56,30 +56,44 @@ interface Phase {
 function buildPhases(stages: StageDef[]): Phase[] {
   const map = new Map<string, Phase>();
   const order: string[] = [];
-  const push = (id: string, title: string, hint: string, entry: { stage: StageDef; flatIdx: number }) => {
-    if (!map.has(id)) { map.set(id, { id, title, hint, stages: [] }); order.push(id); }
+  const push = (id: string, entry: { stage: StageDef; flatIdx: number }) => {
+    if (!map.has(id)) {
+      const copy = getPhaseCopy(id);
+      map.set(id, { id, title: copy.title, hint: copy.hint, stages: [] });
+      order.push(id);
+    }
     map.get(id)!.stages.push(entry);
   };
   stages.forEach((stage, flatIdx) => {
     const id = stage.id;
     const entry = { stage, flatIdx };
-    if (id === "login" || id === "mission") push("kickoff", "Morning kickoff", "Show up, lock the target, commit the plan", entry);
-    else if (id.startsWith("c1_") || id === "break1") push("morning", "Morning work block", "Prep 30 checks · run calls · close BBD & quotes · recharge", entry);
-    else if (id.startsWith("c2_") || id === "break2" || id === "pre_break" || id === "resume") push("afternoon", "Afternoon work block", "Second block — repeat with sharper intent, then recharge", entry);
-    else if (id.startsWith("c3_")) push("evening", "Evening push", "Last honest push for BBD and quotations", entry);
-    else if (id === "impact") push("wrap", "Day wrap", "Reflect, send EOD on WhatsApp, log out clean", entry);
-    else push("more", "Extra tasks", "Additional items", entry);
+    if (id === "login" || id === "mission") push("kickoff", entry);
+    else if (id.startsWith("c1_") || id === "break1") push("morning", entry);
+    else if (id.startsWith("c2_") || id === "break2" || id === "pre_break" || id === "resume") push("afternoon", entry);
+    else if (id.startsWith("c3_")) push("evening", entry);
+    else if (id === "impact") push("wrap", entry);
+    else push("more", entry);
   });
   return order.map((k) => map.get(k)!);
 }
 
-// ---- KPI + timing helpers for yesterday-vs-today ----
-const KPI_KEYS = ["bbd", "quotations", "cold_calls", "connected_calls", "checks_drafted", "doors_initiated"] as const;
-type KpiKey = typeof KPI_KEYS[number];
-const KPI_LABEL: Record<KpiKey, string> = {
-  bbd: "BBD", quotations: "Quotes", cold_calls: "Cold calls",
-  connected_calls: "Connected", checks_drafted: "Checks", doors_initiated: "Doors",
+// ---- KPI + timing helpers (KPI list is admin-configurable) ----
+const KPI_LABEL: Record<string, string> = {
+  bbd: "BBD",
+  quotations: "Quotes",
+  cold_calls: "Cold calls",
+  connected_calls: "Connected",
+  checks_drafted: "Checks",
+  doors_initiated: "Doors",
+  calls: "Calls",
+  tours_sched: "Tours planned",
+  tours_done: "Tours done",
+  prebook: "Prebooks",
+  movein: "Move-ins",
+  deals: "Deals",
+  revenue: "Revenue",
 };
+function kpiLabel(k: string): string { return KPI_LABEL[k] || k.replace(/_/g, " "); }
 
 function sumKpis(rec?: DynDayRecord): Record<KpiKey, number> {
   const out = Object.fromEntries(KPI_KEYS.map((k) => [k, 0])) as Record<KpiKey, number>;
