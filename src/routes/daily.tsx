@@ -651,3 +651,46 @@ function Stat({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
+
+// Weekly ledger helper — sums KPIs from Mon..Sun for this week and last week.
+function weekBounds(anchorISO: string, offsetWeeks: number): { from: string; to: string } {
+  const d = new Date(anchorISO + "T00:00:00");
+  const day = (d.getDay() + 6) % 7; // Mon = 0
+  const monday = new Date(d);
+  monday.setDate(d.getDate() - day - offsetWeeks * 7);
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  return { from: monday.toISOString().slice(0, 10), to: sunday.toISOString().slice(0, 10) };
+}
+
+function buildWeeklyLedger(employeeId: string, today: string, kpiKeys: string[]): {
+  thisWeek: Record<string, number>;
+  lastWeek: Record<string, number>;
+  hasAny: boolean;
+} {
+  const acc = (from: string, to: string): Record<string, number> => {
+    const out: Record<string, number> = Object.fromEntries(kpiKeys.map((k) => [k, 0]));
+    const start = new Date(from + "T00:00:00");
+    const end = new Date(to + "T00:00:00");
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+      const iso = d.toISOString().slice(0, 10);
+      const rec = getDay(employeeId, iso);
+      if (!rec) continue;
+      for (const sub of Object.values(rec.submissions)) {
+        for (const k of kpiKeys) {
+          const v = Number(sub.values[k]);
+          if (!isNaN(v)) out[k] += v;
+        }
+      }
+    }
+    return out;
+  };
+  const tw = weekBounds(today, 0);
+  const lw = weekBounds(today, 1);
+  const thisWeek = acc(tw.from, tw.to);
+  const lastWeek = acc(lw.from, lw.to);
+  const hasAny = Object.values(thisWeek).some((v) => v > 0) || Object.values(lastWeek).some((v) => v > 0);
+  return { thisWeek, lastWeek, hasAny };
+}
+  );
+}
