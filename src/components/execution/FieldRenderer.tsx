@@ -18,7 +18,7 @@ export function FieldRenderer({ field, value, target, onChange, required }: Prop
     <Label className="text-xs flex items-center gap-2 mb-1">
       {field.label}
       {required && <span className="text-destructive">*</span>}
-      {target !== undefined && <Badge variant="outline" className="text-[10px] font-mono">target {target}</Badge>}
+      {target !== undefined && <Badge variant="outline" className="text-[10px] font-mono">goal {target}</Badge>}
     </Label>
   );
 
