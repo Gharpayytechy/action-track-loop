@@ -253,9 +253,7 @@ function DailyPage() {
 
   return (
     <div className="p-4 md:p-8 space-y-6 max-w-3xl mx-auto">
-      <DateStrip employeeId={actor.id} viewDate={viewDate} onChange={setViewDate} today={today} />
-
-      {/* Hero: greeting, playbook, progress. No yesterday comparison here. */}
+      {/* Hero: greeting, playbook, progress. History hidden behind info toggle. */}
       <header className="space-y-4">
         <div className="flex items-start justify-between gap-3 flex-wrap">
           <div className="min-w-0">
@@ -274,10 +272,25 @@ function DailyPage() {
                   : `You are ${pct}% through today's workflow. Continue with the next phase when ready.`}
             </p>
           </div>
-          <Link to="/admin/playbooks" className="inline-flex items-center gap-1 text-xs h-9 px-3 rounded-md border hover:bg-secondary shrink-0">
-            <Settings2 className="h-3.5 w-3.5" /> Manage
-          </Link>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={() => setShowHistory((s) => !s)}
+              className="inline-flex items-center gap-1 text-xs h-9 w-9 rounded-md border hover:bg-secondary justify-center"
+              aria-label="Browse previous days"
+              title="Browse previous days"
+            >
+              <Info className="h-4 w-4" />
+            </button>
+            <Link to="/admin/playbooks" className="inline-flex items-center gap-1 text-xs h-9 px-3 rounded-md border hover:bg-secondary">
+              <Settings2 className="h-3.5 w-3.5" /> Manage
+            </Link>
+          </div>
         </div>
+
+        {showHistory && (
+          <DateStrip employeeId={actor.id} viewDate={viewDate} onChange={setViewDate} today={today} />
+        )}
 
         {/* Progress card. Today's totals appear only after real activity. */}
         <Card className="p-4 border-border/60">
@@ -304,46 +317,6 @@ function DailyPage() {
             </div>
           )}
         </Card>
-
-        {/* Weekly ledger — bank-statement view: this week vs last week */}
-        {weekly.hasAny && (
-          <Card className="p-4 border-border/60">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Weekly ledger</div>
-              <Badge variant="outline" className="font-mono text-[10px]">This week vs last week</Badge>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs">
-                <thead className="text-muted-foreground border-b border-border/40">
-                  <tr>
-                    <th className="text-left py-1.5 pr-2 font-mono uppercase text-[10px] tracking-wider">Metric</th>
-                    <th className="text-right py-1.5 px-2 font-mono uppercase text-[10px] tracking-wider">This week</th>
-                    <th className="text-right py-1.5 px-2 font-mono uppercase text-[10px] tracking-wider">Last week</th>
-                    <th className="text-right py-1.5 pl-2 font-mono uppercase text-[10px] tracking-wider">Change</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {kpiKeys.map((k) => {
-                    const t = weekly.thisWeek[k] || 0;
-                    const l = weekly.lastWeek[k] || 0;
-                    const d = t - l;
-                    const tone = d > 0 ? "text-emerald-600" : d < 0 ? "text-rose-600" : "text-muted-foreground";
-                    return (
-                      <tr key={k} className="border-b border-border/20 last:border-0">
-                        <td className="py-2 pr-2">{kpiLabel(k)}</td>
-                        <td className="text-right py-2 px-2 font-mono font-semibold tabular-nums">{t}</td>
-                        <td className="text-right py-2 px-2 font-mono text-muted-foreground tabular-nums">{l}</td>
-                        <td className={`text-right py-2 pl-2 font-mono tabular-nums ${tone}`}>
-                          {d > 0 ? "+" : ""}{d}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </Card>
-        )}
 
         {/* Resume / next-action card */}
         {done < total && activePhase && activeStage && (
