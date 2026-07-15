@@ -31,8 +31,8 @@ import {
 export const Route = createFileRoute("/daily")({
   head: () => ({
     meta: [
-      { title: "Daily Flow · Execution OS — Gharpayy" },
-      { name: "description", content: "A calm, guided day. Beat yesterday, one block at a time — proofs, updates, and WhatsApp-ready messages built in." },
+      { title: "Daily Flow · Execution OS" },
+      { name: "description", content: "Structured daily workflow with proofs, updates, and WhatsApp-ready messages built in." },
     ],
   }),
   component: DailyPage,
