@@ -14,7 +14,12 @@ import { WhatsAppCopyBlock } from "@/components/execution/WhatsAppCopyBlock";
 import { aggregate, RANGE_PRESETS, toCSV, downloadCSV, type GroupBy, type RecordCtx } from "@/lib/execution/aggregate";
 import { stageTimings, totalActiveMs, fmtDuration, stageMedians, saveTimeHints } from "@/lib/execution/insights";
 import { prettyStageLabel } from "@/components/execution/StageRenderer";
-import { Activity, Filter, Download, LayoutGrid, LineChart, ListTree, Settings2, ChevronRight, AlertTriangle, Clock, Lightbulb } from "lucide-react";
+import { Activity, Filter, Download, LayoutGrid, LineChart, ListTree, Settings2, ChevronRight, AlertTriangle, Clock, Lightbulb, Plus, Trash2, RotateCcw, Users } from "lucide-react";
+import {
+  getKpiKeys, setKpiKeys, getAllPhaseCopy, setPhaseCopy, resetDailyCfg,
+  subscribeDailyCfg, dailyCfgVersion,
+} from "@/lib/execution/daily-config";
+import { getAllFields } from "@/lib/execution/field-library";
 
 export const Route = createFileRoute("/admin/ops")({
   head: () => ({
@@ -31,6 +36,7 @@ export const Route = createFileRoute("/admin/ops")({
 function OpsDashboard() {
   useSyncExternalStore(subscribeDyn, dynVersion, () => 0);
   useSyncExternalStore(subscribePlaybooks, playbooksVersion, () => 0);
+  useSyncExternalStore(subscribeDailyCfg, dailyCfgVersion, () => 0);
   const [tab, setTab] = useState<"live" | "timeline" | "insights" | "analytics" | "stack" | "config">("live");
 
   return (
@@ -263,6 +269,9 @@ function InsightsTab() {
         <StatCard label="Avg / person" value={uniquePeople ? fmtDuration(Math.round(totalTime / uniquePeople)) : "—"} />
       </div>
 
+      <ActivelyFillingCard />
+
+
       {[...byPlaybook.entries()].map(([pbId, recs]) => {
         const pb = playbooks.find((p) => p.id === pbId);
         if (!pb) return null;
@@ -493,23 +502,163 @@ function StackTab() {
 
 // -------------------- CONFIG TAB --------------------
 function ConfigTab() {
+  const kpiKeys = getKpiKeys();
+  const phases = getAllPhaseCopy();
+  const allFields = getAllFields();
+  const numericFields = allFields.filter((f) => ["number", "currency", "percent", "kpiChip"].includes(f.type));
+  const [newKpi, setNewKpi] = useState<string>("");
+
+  const addKpi = () => {
+    if (!newKpi) return;
+    if (kpiKeys.includes(newKpi)) { setNewKpi(""); return; }
+    setKpiKeys([...kpiKeys, newKpi]);
+    setNewKpi("");
+  };
+  const removeKpi = (k: string) => setKpiKeys(kpiKeys.filter((x) => x !== k));
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-      <Link to="/admin/playbooks" className="block"><Card className="p-4 hover:border-primary transition-colors">
-        <div className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Playbooks</div>
-        <h3 className="font-display font-semibold mt-1">Playbook Builder</h3>
-        <p className="text-xs text-muted-foreground mt-2">Create, edit, version and assign playbooks per role or per person.</p>
-      </Card></Link>
-      <Link to="/admin/playbooks" search={{ tab: "fields" }} className="block"><Card className="p-4 hover:border-primary transition-colors">
-        <div className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Fields</div>
-        <h3 className="font-display font-semibold mt-1">Field Library</h3>
-        <p className="text-xs text-muted-foreground mt-2">40+ built-in fields · add custom fields with validation, unit, target.</p>
-      </Card></Link>
-      <Link to="/admin/playbooks" search={{ tab: "assign" }} className="block"><Card className="p-4 hover:border-primary transition-colors">
-        <div className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Assign</div>
-        <h3 className="font-display font-semibold mt-1">Per-user overrides</h3>
-        <p className="text-xs text-muted-foreground mt-2">Add, hide, or require fields for any single person. Custom targets.</p>
-      </Card></Link>
+    <div className="space-y-4">
+      {/* KPI keys shown on Daily Flow */}
+      <Card className="p-4 space-y-3">
+        <div className="flex items-start justify-between gap-2 flex-wrap">
+          <div>
+            <h3 className="font-display font-semibold">KPIs shown to employees</h3>
+            <p className="text-xs text-muted-foreground mt-1">
+              These metrics appear on each person's Daily Flow after they submit their first stage.
+            </p>
+          </div>
+          <Button variant="ghost" size="sm" onClick={resetDailyCfg}>
+            <RotateCcw className="h-3.5 w-3.5 mr-1" /> Reset to defaults
+          </Button>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {kpiKeys.map((k) => {
+            const f = allFields.find((x) => x.id === k);
+            return (
+              <span key={k} className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md border text-xs bg-muted/40">
+                <span className="font-medium">{f?.label || k}</span>
+                <span className="text-muted-foreground font-mono text-[10px]">{k}</span>
+                <button onClick={() => removeKpi(k)} className="text-muted-foreground hover:text-destructive">
+                  <Trash2 className="h-3 w-3" />
+                </button>
+              </span>
+            );
+          })}
+          {kpiKeys.length === 0 && <span className="text-xs text-muted-foreground">No KPIs configured. Add one below.</span>}
+        </div>
+        <div className="flex items-center gap-2">
+          <select className="h-9 rounded border bg-background px-2 text-sm min-w-56" value={newKpi} onChange={(e) => setNewKpi(e.target.value)}>
+            <option value="">Select a field to add</option>
+            {numericFields.filter((f) => !kpiKeys.includes(f.id)).map((f) => (
+              <option key={f.id} value={f.id}>{f.label} ({f.id})</option>
+            ))}
+          </select>
+          <Button size="sm" onClick={addKpi} disabled={!newKpi}>
+            <Plus className="h-3.5 w-3.5 mr-1" /> Add KPI
+          </Button>
+        </div>
+      </Card>
+
+      {/* Phase commentary */}
+      <Card className="p-4 space-y-3">
+        <div>
+          <h3 className="font-display font-semibold">Phase commentary</h3>
+          <p className="text-xs text-muted-foreground mt-1">
+            Edit the title and helper text shown for each phase of the daily flow. Changes apply to every employee.
+          </p>
+        </div>
+        <div className="space-y-3">
+          {phases.map((p) => (
+            <div key={p.id} className="p-3 border rounded-md space-y-2">
+              <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Phase · {p.id}</div>
+              <Input
+                value={p.title}
+                onChange={(e) => setPhaseCopy(p.id, { title: e.target.value })}
+                className="h-9 text-sm"
+                placeholder="Phase title"
+              />
+              <textarea
+                value={p.hint}
+                onChange={(e) => setPhaseCopy(p.id, { hint: e.target.value })}
+                className="w-full min-h-16 rounded border bg-background px-2 py-1.5 text-sm resize-y"
+                placeholder="Helper text shown under the phase title"
+              />
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      {/* Deep links to other config surfaces */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <Link to="/admin/playbooks" className="block"><Card className="p-4 hover:border-primary transition-colors">
+          <div className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Playbooks</div>
+          <h3 className="font-display font-semibold mt-1">Playbook Builder</h3>
+          <p className="text-xs text-muted-foreground mt-2">Create, edit, version and assign playbooks per role or per person.</p>
+        </Card></Link>
+        <Link to="/admin/playbooks" search={{ tab: "fields" }} className="block"><Card className="p-4 hover:border-primary transition-colors">
+          <div className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Fields</div>
+          <h3 className="font-display font-semibold mt-1">Field Library</h3>
+          <p className="text-xs text-muted-foreground mt-2">Add, archive, or edit any field including targets and units.</p>
+        </Card></Link>
+        <Link to="/admin/playbooks" search={{ tab: "assign" }} className="block"><Card className="p-4 hover:border-primary transition-colors">
+          <div className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Assign</div>
+          <h3 className="font-display font-semibold mt-1">Per-user overrides</h3>
+          <p className="text-xs text-muted-foreground mt-2">Add, hide, or require fields for any single person. Custom targets.</p>
+        </Card></Link>
+      </div>
     </div>
+  );
+}
+// ---- Actively-filling live card ----
+function ActivelyFillingCard() {
+  const today = new Date().toISOString().slice(0, 10);
+  const now = Date.now();
+  const rows = EMPLOYEES.map((e) => {
+    const rec = getDay(e.id, today);
+    if (!rec) return null;
+    const subs = Object.values(rec.submissions);
+    const draftIds = rec.drafts ? Object.keys(rec.drafts) : [];
+    const lastTs = Math.max(rec.startedAt || 0, ...subs.map((s) => s.ts), ...(rec.drafts ? Object.values(rec.drafts).map((d) => d.updatedAt) : []));
+    const minutesSince = lastTs ? Math.round((now - lastTs) / 60_000) : Infinity;
+    const status: "filling" | "recent" | "idle" =
+      minutesSince <= 5 ? "filling" : minutesSince <= 60 ? "recent" : "idle";
+    return { emp: e, subs: subs.length, drafts: draftIds.length, minutesSince, status, lastTs };
+  }).filter(Boolean) as Array<{ emp: typeof EMPLOYEES[number]; subs: number; drafts: number; minutesSince: number; status: "filling" | "recent" | "idle"; lastTs: number }>;
+
+  const active = rows.filter((r) => r.status !== "idle").sort((a, b) => a.minutesSince - b.minutesSince);
+
+  if (active.length === 0) {
+    return (
+      <Card className="p-4">
+        <div className="flex items-center gap-2 mb-1">
+          <Users className="h-4 w-4 text-muted-foreground" />
+          <h3 className="font-display font-semibold">Currently filling</h3>
+        </div>
+        <p className="text-xs text-muted-foreground">No one has activity in the last hour.</p>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="p-4">
+      <div className="flex items-center gap-2 mb-3">
+        <Users className="h-4 w-4 text-primary" />
+        <h3 className="font-display font-semibold">Currently filling</h3>
+        <Badge variant="outline" className="font-mono text-[10px] ml-auto">{active.length} active</Badge>
+      </div>
+      <div className="space-y-1.5">
+        {active.map((r) => (
+          <div key={r.emp.id} className="flex items-center gap-3 text-sm">
+            <span className={`h-2 w-2 rounded-full ${r.status === "filling" ? "bg-emerald-500 animate-pulse" : "bg-amber-500"}`} />
+            <span className="font-medium truncate flex-1">{r.emp.name}</span>
+            <span className="text-xs text-muted-foreground truncate hidden md:inline">{r.emp.role}</span>
+            <span className="text-[11px] font-mono text-muted-foreground">{r.subs} submitted{r.drafts > 0 ? `, ${r.drafts} draft` : ""}</span>
+            <span className="text-[11px] font-mono text-muted-foreground w-16 text-right">
+              {r.status === "filling" ? "now" : `${r.minutesSince}m ago`}
+            </span>
+          </div>
+        ))}
+      </div>
+    </Card>
   );
 }
