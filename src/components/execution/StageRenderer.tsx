@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Camera, Check, Lock, Upload, MessageSquare, MapPin, Sunrise, Target, Coffee, PhoneCall, ClipboardList, Flag, Trophy, Sparkles, Clock, Save } from "lucide-react";
+import { Camera, Check, Lock, Upload, MessageSquare, MapPin, Sunrise, Target, Coffee, PhoneCall, ClipboardList, Flag, Trophy, Sparkles, Clock, Save, Info, X } from "lucide-react";
 import { toast } from "sonner";
 import type { StageDef, ProofKind } from "@/lib/execution/playbooks";
 import { getField, subscribeFields, fieldsVersion } from "@/lib/execution/field-library";
@@ -12,6 +12,7 @@ import { SelfieCapture } from "@/components/SelfieCapture";
 import { useSyncExternalStore } from "react";
 import { getOverride } from "@/lib/execution/playbooks";
 import { fmtDuration } from "@/lib/execution/insights";
+import { getPrevDayRecord } from "@/lib/execution/dyn-store";
 
 interface Props {
   stage: StageDef;
@@ -44,6 +45,10 @@ const PROOF_LABEL: Record<ProofKind, string> = {
   geo: "Location",
   file: "Attachment",
 };
+
+// Target time to fill any single card (seconds).
+const CARD_TARGET_SECS = 60;
+const CARD_WARN_SECS = 30;
 
 // Strip leading "N · " numbering from playbook labels
 export function prettyStageLabel(label: string): string {
