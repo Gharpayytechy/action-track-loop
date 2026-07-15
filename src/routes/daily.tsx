@@ -67,11 +67,11 @@ function buildPhases(stages: StageDef[]): Phase[] {
   stages.forEach((stage, flatIdx) => {
     const id = stage.id;
     const entry = { stage, flatIdx };
-    if (id === "login" || id === "mission") push("kickoff", entry);
-    else if (id.startsWith("c1_") || id === "break1") push("morning", entry);
-    else if (id.startsWith("c2_") || id === "break2" || id === "pre_break" || id === "resume") push("afternoon", entry);
-    else if (id.startsWith("c3_")) push("evening", entry);
-    else if (id === "impact") push("wrap", entry);
+    // 4-step grouping: Morning · Midday · Evening · EOD.
+    if (id === "login" || id === "mission" || id === "c1_draft" || id === "c1_calls" || id === "c1_outcome") push("morning", entry);
+    else if (id === "pre_break" || id === "break1" || id === "resume") push("midday", entry);
+    else if (id === "c2_draft" || id === "c2_calls" || id === "c2_outcome" || id === "break2" || id.startsWith("c3_")) push("evening", entry);
+    else if (id === "impact") push("eod", entry);
     else push("more", entry);
   });
   return order.map((k) => map.get(k)!);
