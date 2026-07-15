@@ -27,12 +27,14 @@ import { Route as KudosRouteImport } from './routes/kudos'
 import { Route as InboxRouteImport } from './routes/inbox'
 import { Route as HrmsRouteImport } from './routes/hrms'
 import { Route as DailyLegacyRouteImport } from './routes/daily-legacy'
+import { Route as DailyRouteImport } from './routes/daily'
 import { Route as ConsoleRouteImport } from './routes/console'
 import { Route as CommandRouteImport } from './routes/command'
 import { Route as CalendarRouteImport } from './routes/calendar'
 import { Route as AttendanceRouteImport } from './routes/attendance'
 import { Route as AchievementsRouteImport } from './routes/achievements'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminOpsRouteImport } from './routes/admin.ops'
 import { Route as AdminConsoleRouteImport } from './routes/admin.console'
 
 const WarRoomRoute = WarRoomRouteImport.update({
@@ -125,6 +127,11 @@ const DailyLegacyRoute = DailyLegacyRouteImport.update({
   path: '/daily-legacy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DailyRoute = DailyRouteImport.update({
+  id: '/daily',
+  path: '/daily',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ConsoleRoute = ConsoleRouteImport.update({
   id: '/console',
   path: '/console',
@@ -155,6 +162,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminOpsRoute = AdminOpsRouteImport.update({
+  id: '/admin/ops',
+  path: '/admin/ops',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminConsoleRoute = AdminConsoleRouteImport.update({
   id: '/admin/console',
   path: '/admin/console',
@@ -168,6 +180,7 @@ export interface FileRoutesByFullPath {
   '/calendar': typeof CalendarRoute
   '/command': typeof CommandRoute
   '/console': typeof ConsoleRoute
+  '/daily': typeof DailyRoute
   '/daily-legacy': typeof DailyLegacyRoute
   '/hrms': typeof HrmsRoute
   '/inbox': typeof InboxRoute
@@ -187,6 +200,7 @@ export interface FileRoutesByFullPath {
   '/team': typeof TeamRoute
   '/war-room': typeof WarRoomRoute
   '/admin/console': typeof AdminConsoleRoute
+  '/admin/ops': typeof AdminOpsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -195,6 +209,7 @@ export interface FileRoutesByTo {
   '/calendar': typeof CalendarRoute
   '/command': typeof CommandRoute
   '/console': typeof ConsoleRoute
+  '/daily': typeof DailyRoute
   '/daily-legacy': typeof DailyLegacyRoute
   '/hrms': typeof HrmsRoute
   '/inbox': typeof InboxRoute
@@ -214,6 +229,7 @@ export interface FileRoutesByTo {
   '/team': typeof TeamRoute
   '/war-room': typeof WarRoomRoute
   '/admin/console': typeof AdminConsoleRoute
+  '/admin/ops': typeof AdminOpsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -223,6 +239,7 @@ export interface FileRoutesById {
   '/calendar': typeof CalendarRoute
   '/command': typeof CommandRoute
   '/console': typeof ConsoleRoute
+  '/daily': typeof DailyRoute
   '/daily-legacy': typeof DailyLegacyRoute
   '/hrms': typeof HrmsRoute
   '/inbox': typeof InboxRoute
@@ -242,6 +259,7 @@ export interface FileRoutesById {
   '/team': typeof TeamRoute
   '/war-room': typeof WarRoomRoute
   '/admin/console': typeof AdminConsoleRoute
+  '/admin/ops': typeof AdminOpsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -252,6 +270,7 @@ export interface FileRouteTypes {
     | '/calendar'
     | '/command'
     | '/console'
+    | '/daily'
     | '/daily-legacy'
     | '/hrms'
     | '/inbox'
@@ -271,6 +290,7 @@ export interface FileRouteTypes {
     | '/team'
     | '/war-room'
     | '/admin/console'
+    | '/admin/ops'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -279,6 +299,7 @@ export interface FileRouteTypes {
     | '/calendar'
     | '/command'
     | '/console'
+    | '/daily'
     | '/daily-legacy'
     | '/hrms'
     | '/inbox'
@@ -298,6 +319,7 @@ export interface FileRouteTypes {
     | '/team'
     | '/war-room'
     | '/admin/console'
+    | '/admin/ops'
   id:
     | '__root__'
     | '/'
@@ -306,6 +328,7 @@ export interface FileRouteTypes {
     | '/calendar'
     | '/command'
     | '/console'
+    | '/daily'
     | '/daily-legacy'
     | '/hrms'
     | '/inbox'
@@ -325,6 +348,7 @@ export interface FileRouteTypes {
     | '/team'
     | '/war-room'
     | '/admin/console'
+    | '/admin/ops'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -334,6 +358,7 @@ export interface RootRouteChildren {
   CalendarRoute: typeof CalendarRoute
   CommandRoute: typeof CommandRoute
   ConsoleRoute: typeof ConsoleRoute
+  DailyRoute: typeof DailyRoute
   DailyLegacyRoute: typeof DailyLegacyRoute
   HrmsRoute: typeof HrmsRoute
   InboxRoute: typeof InboxRoute
@@ -353,6 +378,7 @@ export interface RootRouteChildren {
   TeamRoute: typeof TeamRoute
   WarRoomRoute: typeof WarRoomRoute
   AdminConsoleRoute: typeof AdminConsoleRoute
+  AdminOpsRoute: typeof AdminOpsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -483,6 +509,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DailyLegacyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/daily': {
+      id: '/daily'
+      path: '/daily'
+      fullPath: '/daily'
+      preLoaderRoute: typeof DailyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/console': {
       id: '/console'
       path: '/console'
@@ -525,6 +558,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/ops': {
+      id: '/admin/ops'
+      path: '/admin/ops'
+      fullPath: '/admin/ops'
+      preLoaderRoute: typeof AdminOpsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/console': {
       id: '/admin/console'
       path: '/admin/console'
@@ -542,6 +582,7 @@ const rootRouteChildren: RootRouteChildren = {
   CalendarRoute: CalendarRoute,
   CommandRoute: CommandRoute,
   ConsoleRoute: ConsoleRoute,
+  DailyRoute: DailyRoute,
   DailyLegacyRoute: DailyLegacyRoute,
   HrmsRoute: HrmsRoute,
   InboxRoute: InboxRoute,
@@ -561,6 +602,7 @@ const rootRouteChildren: RootRouteChildren = {
   TeamRoute: TeamRoute,
   WarRoomRoute: WarRoomRoute,
   AdminConsoleRoute: AdminConsoleRoute,
+  AdminOpsRoute: AdminOpsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
