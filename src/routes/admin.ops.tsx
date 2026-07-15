@@ -12,7 +12,9 @@ import { getAllPlaybooks, resolvePlaybookFor, defaultPlaybookForRole, subscribeP
 import { getField } from "@/lib/execution/field-library";
 import { WhatsAppCopyBlock } from "@/components/execution/WhatsAppCopyBlock";
 import { aggregate, RANGE_PRESETS, toCSV, downloadCSV, type GroupBy, type RecordCtx } from "@/lib/execution/aggregate";
-import { Activity, Filter, Download, LayoutGrid, LineChart, ListTree, Settings2, ChevronRight, AlertTriangle } from "lucide-react";
+import { stageTimings, totalActiveMs, fmtDuration, stageMedians, saveTimeHints } from "@/lib/execution/insights";
+import { prettyStageLabel } from "@/components/execution/StageRenderer";
+import { Activity, Filter, Download, LayoutGrid, LineChart, ListTree, Settings2, ChevronRight, AlertTriangle, Clock, Lightbulb } from "lucide-react";
 
 export const Route = createFileRoute("/admin/ops")({
   head: () => ({
@@ -29,7 +31,7 @@ export const Route = createFileRoute("/admin/ops")({
 function OpsDashboard() {
   useSyncExternalStore(subscribeDyn, dynVersion, () => 0);
   useSyncExternalStore(subscribePlaybooks, playbooksVersion, () => 0);
-  const [tab, setTab] = useState<"live" | "timeline" | "analytics" | "stack" | "config">("live");
+  const [tab, setTab] = useState<"live" | "timeline" | "insights" | "analytics" | "stack" | "config">("live");
 
   return (
     <div className="p-4 md:p-6 max-w-[1400px] mx-auto space-y-5">
@@ -39,9 +41,10 @@ function OpsDashboard() {
       </header>
 
       <Tabs value={tab} onValueChange={(v) => setTab(v as typeof tab)}>
-        <TabsList className="grid grid-cols-5 w-full max-w-3xl">
+        <TabsList className="grid grid-cols-3 md:grid-cols-6 w-full max-w-3xl">
           <TabsTrigger value="live"><Activity className="h-3.5 w-3.5 mr-1.5" />Live</TabsTrigger>
           <TabsTrigger value="timeline"><ListTree className="h-3.5 w-3.5 mr-1.5" />Timeline</TabsTrigger>
+          <TabsTrigger value="insights"><Lightbulb className="h-3.5 w-3.5 mr-1.5" />Insights</TabsTrigger>
           <TabsTrigger value="analytics"><LineChart className="h-3.5 w-3.5 mr-1.5" />Analytics</TabsTrigger>
           <TabsTrigger value="stack"><LayoutGrid className="h-3.5 w-3.5 mr-1.5" />Stack</TabsTrigger>
           <TabsTrigger value="config"><Settings2 className="h-3.5 w-3.5 mr-1.5" />Config</TabsTrigger>
@@ -49,6 +52,7 @@ function OpsDashboard() {
 
         <TabsContent value="live" className="mt-4"><LiveTab /></TabsContent>
         <TabsContent value="timeline" className="mt-4"><TimelineTab /></TabsContent>
+        <TabsContent value="insights" className="mt-4"><InsightsTab /></TabsContent>
         <TabsContent value="analytics" className="mt-4"><AnalyticsTab /></TabsContent>
         <TabsContent value="stack" className="mt-4"><StackTab /></TabsContent>
         <TabsContent value="config" className="mt-4"><ConfigTab /></TabsContent>
@@ -137,6 +141,13 @@ function TimelineTab() {
   const pb = resolvePlaybookFor(empId, () => defaultPlaybookForRole(emp.role));
   const rec = getDay(empId, date);
 
+  const stageOrder = pb?.stages.map((s) => s.id) || [];
+  const timings = rec ? stageTimings(rec, stageOrder) : [];
+  const timingMap = new Map(timings.map((t) => [t.stageId, t]));
+  const totalMs = rec ? totalActiveMs(rec) : 0;
+  const avgMs = timings.length ? Math.round(timings.reduce((s, t) => s + t.durationMs, 0) / timings.length) : 0;
+  const slowest = timings.length ? timings.reduce((a, b) => (a.durationMs > b.durationMs ? a : b)) : null;
+
   return (
     <div className="space-y-4">
       <Card className="p-3 flex flex-wrap gap-2 items-end">
@@ -152,6 +163,16 @@ function TimelineTab() {
         </div>
       </Card>
 
+      {/* Time insights bar */}
+      {rec && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+          <StatCard label="Total on flow" value={fmtDuration(totalMs)} />
+          <StatCard label="Steps done" value={`${Object.keys(rec.submissions).length}/${stageOrder.length}`} />
+          <StatCard label="Avg / step" value={fmtDuration(avgMs)} />
+          <StatCard label="Slowest step" value={slowest ? fmtDuration(slowest.durationMs) : "—"} />
+        </div>
+      )}
+
       {!rec ? (
         <Card className="p-6 text-center text-sm text-muted-foreground">No submissions on {date}.</Card>
       ) : (
@@ -159,12 +180,19 @@ function TimelineTab() {
           {pb?.stages.map((stage, i) => {
             const sub = rec.submissions[stage.id];
             const done = !!sub;
+            const t = timingMap.get(stage.id);
+            const isSlowest = slowest && slowest.stageId === stage.id;
             return (
-              <Card key={stage.id} className={`p-4 ${done ? "border-emerald-500/40" : "opacity-60"}`}>
-                <div className="flex items-center gap-2 mb-2">
+              <Card key={stage.id} className={`p-4 ${done ? "border-emerald-500/40" : "opacity-60"} ${isSlowest ? "ring-1 ring-amber-500/40" : ""}`}>
+                <div className="flex items-center gap-2 mb-2 flex-wrap">
                   <Badge variant="outline" className="font-mono text-[10px]">#{i + 1}</Badge>
-                  <h3 className="font-medium">{stage.label}</h3>
+                  <h3 className="font-medium">{prettyStageLabel(stage.label)}</h3>
                   {stage.time && <span className="text-[10px] font-mono text-muted-foreground">{stage.time}</span>}
+                  {t && (
+                    <span className={`text-[10px] font-mono inline-flex items-center gap-1 ${isSlowest ? "text-amber-600" : "text-muted-foreground"}`}>
+                      <Clock className="h-3 w-3" /> {fmtDuration(t.durationMs)} to fill
+                    </span>
+                  )}
                   {sub && <span className="ml-auto text-[10px] font-mono text-muted-foreground">{new Date(sub.ts).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}</span>}
                 </div>
                 {sub && (
@@ -196,6 +224,104 @@ function TimelineTab() {
     </div>
   );
 }
+
+// -------------------- INSIGHTS TAB --------------------
+function InsightsTab() {
+  const [rangeId, setRangeId] = useState("last7");
+  const range = RANGE_PRESETS.find((r) => r.id === rangeId)!;
+  const records = getRecordsInRange(range.from(), range.to());
+
+  // Group by playbook so medians reflect that role's flow
+  const byPlaybook = new Map<string, typeof records>();
+  for (const r of records) {
+    const arr = byPlaybook.get(r.playbookId) || [];
+    arr.push(r); byPlaybook.set(r.playbookId, arr);
+  }
+
+  const playbooks = getAllPlaybooks();
+
+  const totalTime = records.reduce((s, r) => s + totalActiveMs(r), 0);
+  const totalSteps = records.reduce((s, r) => s + Object.keys(r.submissions).length, 0);
+  const uniquePeople = new Set(records.map((r) => r.employeeId)).size;
+
+  return (
+    <div className="space-y-4">
+      <Card className="p-3 flex flex-wrap gap-2 items-end">
+        <div>
+          <div className="text-[10px] font-mono uppercase text-muted-foreground mb-1">Range</div>
+          <select className="h-9 rounded border bg-background px-2 text-sm" value={rangeId} onChange={(e) => setRangeId(e.target.value)}>
+            {RANGE_PRESETS.map((r) => <option key={r.id} value={r.id}>{r.label}</option>)}
+          </select>
+        </div>
+        <div className="ml-auto text-xs text-muted-foreground">{records.length} day-records</div>
+      </Card>
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+        <StatCard label="People active" value={String(uniquePeople)} />
+        <StatCard label="Steps submitted" value={String(totalSteps)} />
+        <StatCard label="Total time on flow" value={fmtDuration(totalTime)} />
+        <StatCard label="Avg / person" value={uniquePeople ? fmtDuration(Math.round(totalTime / uniquePeople)) : "—"} />
+      </div>
+
+      {[...byPlaybook.entries()].map(([pbId, recs]) => {
+        const pb = playbooks.find((p) => p.id === pbId);
+        if (!pb) return null;
+        const stageOrder = pb.stages.map((s) => s.id);
+        const stageLabels = Object.fromEntries(pb.stages.map((s) => [s.id, prettyStageLabel(s.label)]));
+        const medians = stageMedians(recs, stageOrder).sort((a, b) => b.medianMs - a.medianMs);
+        const hints = saveTimeHints(medians, stageLabels);
+        return (
+          <Card key={pbId} className="p-4 space-y-3">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <h3 className="font-display font-semibold">{pb.name}</h3>
+              <Badge variant="outline" className="font-mono text-[10px]">{recs.length} runs</Badge>
+            </div>
+
+            {hints.length > 0 && (
+              <div className="space-y-1.5">
+                {hints.map((h, i) => (
+                  <div key={i} className="flex items-start gap-2 p-2 rounded border border-amber-500/30 bg-amber-500/5 text-xs">
+                    <Lightbulb className="h-3.5 w-3.5 text-amber-600 shrink-0 mt-0.5" />
+                    <div><span className="font-medium">{h.label}.</span> <span className="text-muted-foreground">{h.detail}</span></div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead className="text-muted-foreground">
+                  <tr className="border-b">
+                    <th className="text-left py-1.5 pr-2">Step</th>
+                    <th className="text-right py-1.5 px-2">Median fill</th>
+                    <th className="text-right py-1.5 px-2">Slowest</th>
+                    <th className="text-right py-1.5 pl-2">Samples</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {medians.map((m) => (
+                    <tr key={m.stageId} className="border-b last:border-0">
+                      <td className="py-1.5 pr-2 truncate max-w-xs">{stageLabels[m.stageId]}</td>
+                      <td className="text-right py-1.5 px-2 font-mono">{fmtDuration(m.medianMs)}</td>
+                      <td className="text-right py-1.5 px-2 font-mono text-muted-foreground">{fmtDuration(m.slowest)}</td>
+                      <td className="text-right py-1.5 pl-2 font-mono text-muted-foreground">{m.samples}</td>
+                    </tr>
+                  ))}
+                  {medians.length === 0 && <tr><td colSpan={4} className="text-center py-3 text-muted-foreground">No timing data yet.</td></tr>}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+        );
+      })}
+
+      {byPlaybook.size === 0 && (
+        <Card className="p-6 text-center text-sm text-muted-foreground">No submissions in this range yet.</Card>
+      )}
+    </div>
+  );
+}
+
 
 // -------------------- ANALYTICS TAB --------------------
 function AnalyticsTab() {
