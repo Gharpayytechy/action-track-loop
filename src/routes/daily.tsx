@@ -489,9 +489,82 @@ function DailyPage() {
   );
 }
 
+// ---------- Phase wrap-up: one message the employee sends, then the next phase opens ----------
+function PhaseWrap({
+  rec, phase, employeeId, employeeName, employeeRole, nextPhaseId, nextPhaseTitle, onOpenNext,
+}: {
+  rec: DynDayRecord;
+  phase: Phase;
+  employeeId: string;
+  employeeName: string;
+  employeeRole: string;
+  nextPhaseId?: string;
+  nextPhaseTitle?: string;
+  onOpenNext: (id: string) => void;
+}) {
+  useSyncExternalStore(subscribePhaseSent, phaseSentVersion, () => 0);
+  const sent = isPhaseSent(employeeId, rec.date, phase.id);
+  const message = useMemo(
+    () => composePhaseMessage(rec, {
+      name: employeeName,
+      role: employeeRole,
+      date: rec.date,
+      phaseId: phase.id,
+      phaseTitle: phase.title,
+      stageIds: phase.stages.map((s) => s.stage.id),
+    }),
+    [rec, phase, employeeName, employeeRole],
+  );
+
+  return (
+    <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/[0.04] p-4 mt-1">
+      <div className="flex items-start gap-3">
+        <div className="h-9 w-9 rounded-lg bg-emerald-500 text-white grid place-items-center shrink-0">
+          <Check className="h-4 w-4" />
+        </div>
+        <div className="min-w-0">
+          <h4 className="font-display font-semibold text-base leading-tight">{phase.title} complete</h4>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            {sent
+              ? "Update shared with the team. You can copy it again if needed."
+              : "Review your update below, send it to the team group, then continue."}
+          </p>
+        </div>
+      </div>
+
+      <WhatsAppCopyBlock text={message} label="Copy update" />
+
+      <div className="flex items-center justify-between gap-3 flex-wrap mt-3">
+        <div className="text-[11px] text-muted-foreground">
+          {sent
+            ? `Marked as sent at ${new Date(phaseSentAt(employeeId, rec.date, phase.id) || Date.now()).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}.`
+            : "Written in your words from what you filled in this phase."}
+        </div>
+        {!sent ? (
+          <Button
+            size="sm"
+            className="h-9"
+            onClick={() => {
+              markPhaseSent(employeeId, rec.date, phase.id);
+              if (nextPhaseId) onOpenNext(nextPhaseId);
+            }}
+          >
+            Mark as sent{nextPhaseTitle ? ` and open ${nextPhaseTitle}` : ""} <ArrowRight className="h-3.5 w-3.5 ml-1" />
+          </Button>
+        ) : nextPhaseId ? (
+          <Button size="sm" variant="outline" className="h-9" onClick={() => onOpenNext(nextPhaseId)}>
+            Go to {nextPhaseTitle} <ArrowRight className="h-3.5 w-3.5 ml-1" />
+          </Button>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
 // ---------- Date strip: browse recent days ----------
 function shortDate(d: string): string {
   const dt = new Date(d + "T00:00:00");
+
   return dt.toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" });
 }
 
