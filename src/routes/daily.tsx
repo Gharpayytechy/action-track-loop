@@ -451,8 +451,25 @@ function DailyPage() {
                       />
                     );
                   })}
+
+                  {st === "done" && (
+                    <PhaseWrap
+                      rec={rec}
+                      phase={phase}
+                      employeeId={actor.id}
+                      employeeName={actor.name}
+                      employeeRole={actor.role}
+                      nextPhaseId={phases[phaseIdx + 1]?.id}
+                      nextPhaseTitle={phases[phaseIdx + 1]?.title}
+                      onOpenNext={(id) => {
+                        setOpenIds(new Set([id]));
+                        setTimeout(() => document.getElementById(`phase-${id}`)?.scrollIntoView({ behavior: "smooth", block: "start" }), 60);
+                      }}
+                    />
+                  )}
                 </div>
               )}
+
             </Card>
           );
         })}
