@@ -376,9 +376,9 @@ export function StageRenderer(props: Props) {
               submission.proofs[k] ? <img key={k} src={submission.proofs[k]!} className="h-10 w-10 rounded-md object-cover ring-1 ring-border" /> : null
             ))}
           </div>
-          {submission.waMessage && <WhatsAppCopyBlock text={submission.waMessage} />}
         </div>
       )}
+
 
       <SelfieCapture
         open={selfieOpen}
