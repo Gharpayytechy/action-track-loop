@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import type { StageDef, ProofKind } from "@/lib/execution/playbooks";
 import { getField, subscribeFields, fieldsVersion } from "@/lib/execution/field-library";
 import { FieldRenderer } from "./FieldRenderer";
-import { WhatsAppCopyBlock } from "./WhatsAppCopyBlock";
+
 import { renderTemplate } from "@/lib/execution/wa-format";
 import { SelfieCapture } from "@/components/SelfieCapture";
 import { useSyncExternalStore } from "react";
@@ -376,9 +376,9 @@ export function StageRenderer(props: Props) {
               submission.proofs[k] ? <img key={k} src={submission.proofs[k]!} className="h-10 w-10 rounded-md object-cover ring-1 ring-border" /> : null
             ))}
           </div>
-          {submission.waMessage && <WhatsAppCopyBlock text={submission.waMessage} />}
         </div>
       )}
+
 
       <SelfieCapture
         open={selfieOpen}
