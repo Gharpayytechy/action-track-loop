@@ -27,6 +27,11 @@ import { fmtDuration, totalActiveMs } from "@/lib/execution/insights";
 import {
   getKpiKeys, getPhaseCopy, subscribeDailyCfg, dailyCfgVersion,
 } from "@/lib/execution/daily-config";
+import {
+  composePhaseMessage, isPhaseSent, markPhaseSent, phaseSentAt,
+  subscribePhaseSent, phaseSentVersion,
+} from "@/lib/execution/phase-message";
+
 
 export const Route = createFileRoute("/daily")({
   head: () => ({
