@@ -18,6 +18,7 @@ import { Route as ScoreRouteImport } from './routes/score'
 import { Route as RosterRouteImport } from './routes/roster'
 import { Route as RecruitingRouteImport } from './routes/recruiting'
 import { Route as QuestsRouteImport } from './routes/quests'
+import { Route as PlannedOffRouteImport } from './routes/planned-off'
 import { Route as PeopleRouteImport } from './routes/people'
 import { Route as OneOnOnesRouteImport } from './routes/one-on-ones'
 import { Route as LiveRouteImport } from './routes/live'
@@ -84,6 +85,11 @@ const RecruitingRoute = RecruitingRouteImport.update({
 const QuestsRoute = QuestsRouteImport.update({
   id: '/quests',
   path: '/quests',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlannedOffRoute = PlannedOffRouteImport.update({
+  id: '/planned-off',
+  path: '/planned-off',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PeopleRoute = PeopleRouteImport.update({
@@ -214,6 +220,7 @@ export interface FileRoutesByFullPath {
   '/live': typeof LiveRoute
   '/one-on-ones': typeof OneOnOnesRoute
   '/people': typeof PeopleRoute
+  '/planned-off': typeof PlannedOffRoute
   '/quests': typeof QuestsRoute
   '/recruiting': typeof RecruitingRoute
   '/roster': typeof RosterRoute
@@ -247,6 +254,7 @@ export interface FileRoutesByTo {
   '/live': typeof LiveRoute
   '/one-on-ones': typeof OneOnOnesRoute
   '/people': typeof PeopleRoute
+  '/planned-off': typeof PlannedOffRoute
   '/quests': typeof QuestsRoute
   '/recruiting': typeof RecruitingRoute
   '/roster': typeof RosterRoute
@@ -281,6 +289,7 @@ export interface FileRoutesById {
   '/live': typeof LiveRoute
   '/one-on-ones': typeof OneOnOnesRoute
   '/people': typeof PeopleRoute
+  '/planned-off': typeof PlannedOffRoute
   '/quests': typeof QuestsRoute
   '/recruiting': typeof RecruitingRoute
   '/roster': typeof RosterRoute
@@ -316,6 +325,7 @@ export interface FileRouteTypes {
     | '/live'
     | '/one-on-ones'
     | '/people'
+    | '/planned-off'
     | '/quests'
     | '/recruiting'
     | '/roster'
@@ -349,6 +359,7 @@ export interface FileRouteTypes {
     | '/live'
     | '/one-on-ones'
     | '/people'
+    | '/planned-off'
     | '/quests'
     | '/recruiting'
     | '/roster'
@@ -382,6 +393,7 @@ export interface FileRouteTypes {
     | '/live'
     | '/one-on-ones'
     | '/people'
+    | '/planned-off'
     | '/quests'
     | '/recruiting'
     | '/roster'
@@ -416,6 +428,7 @@ export interface RootRouteChildren {
   LiveRoute: typeof LiveRoute
   OneOnOnesRoute: typeof OneOnOnesRoute
   PeopleRoute: typeof PeopleRoute
+  PlannedOffRoute: typeof PlannedOffRoute
   QuestsRoute: typeof QuestsRoute
   RecruitingRoute: typeof RecruitingRoute
   RosterRoute: typeof RosterRoute
@@ -496,6 +509,13 @@ declare module '@tanstack/react-router' {
       path: '/quests'
       fullPath: '/quests'
       preLoaderRoute: typeof QuestsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/planned-off': {
+      id: '/planned-off'
+      path: '/planned-off'
+      fullPath: '/planned-off'
+      preLoaderRoute: typeof PlannedOffRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/people': {
@@ -672,6 +692,7 @@ const rootRouteChildren: RootRouteChildren = {
   LiveRoute: LiveRoute,
   OneOnOnesRoute: OneOnOnesRoute,
   PeopleRoute: PeopleRoute,
+  PlannedOffRoute: PlannedOffRoute,
   QuestsRoute: QuestsRoute,
   RecruitingRoute: RecruitingRoute,
   RosterRoute: RosterRoute,
