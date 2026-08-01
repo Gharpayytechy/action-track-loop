@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAttendanceState } from "@/hooks/useAttendance";
 import {
@@ -14,13 +15,13 @@ import {
 import { phasesFor, activePhaseId, type FlowPhase, type PhaseId } from "@/lib/execution/core-tasks";
 import {
   getCoreDay, bump, addRecovery, history, subscribeCore, coreVersion,
-  toggleStep, startPhase, completePhase, allToday, type CoreDay,
+  toggleStep, startPhase, completePhase, submitPhase, allToday, type CoreDay,
 } from "@/lib/execution/core-progress";
 import { seedCoreDemo, coreRoleOf } from "@/lib/execution/core-seed";
 import { EMPLOYEES } from "@/data/seed";
 import {
   ArrowRight, Minus, Plus, ShieldAlert, Target, TrendingUp, Clock, CheckCircle2,
-  AlertTriangle, Check, Circle, ChevronDown, PlayCircle, Lock, Users,
+  AlertTriangle, Check, Circle, ChevronDown, PlayCircle, Lock, Users, Send, FileText,
 } from "lucide-react";
 
 export const Route = createFileRoute("/flow/$role")({
