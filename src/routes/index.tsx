@@ -258,11 +258,14 @@ function HeroPillars({ actor }: { actor: Employee }) {
 // ============ Pod-level rollup of the same three pillars (Leader/HR/Leadership) ============
 
 function PodPillars({ pod, label }: { pod: Employee[]; label: string }) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
   const stats = useMemo(() => {
     let onClock = 0, onBreak = 0, inField = 0;
     let openTasks = 0, doneToday = 0;
     let totalScore = 0, atRisk = 0;
     const startOfDay = new Date(); startOfDay.setHours(0, 0, 0, 0);
+    if (!mounted) return { onClock, onBreak, inField, openTasks, doneToday, avg: 0, atRisk, total: pod.length };
     for (const e of pod) {
       const s = todaySummary(e.id).status;
       if (s === "Clocked In") onClock++;
@@ -277,7 +280,7 @@ function PodPillars({ pod, label }: { pod: Employee[]; label: string }) {
     }
     const avg = pod.length ? Math.round(totalScore / pod.length) : 0;
     return { onClock, onBreak, inField, openTasks, doneToday, avg, atRisk, total: pod.length };
-  }, [pod]);
+  }, [pod, mounted]);
 
   return (
     <section className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 mb-6">
