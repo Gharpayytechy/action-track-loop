@@ -2,6 +2,8 @@
 // A playbook = ordered list of Stages; each stage declares required proofs and fields.
 // Admin can clone, edit, version, and assign these in /admin/playbooks.
 
+import { ROLE_PLAYBOOKS, roleFlowFor } from "@/lib/execution/role-flows";
+
 export type ProofKind = "selfie" | "whatsapp" | "crm_ss" | "geo" | "file";
 
 export interface StageDef {
@@ -204,6 +206,9 @@ function standard12(f: RoleFlavor): Playbook {
 }
 
 export const BUILT_IN_PLAYBOOKS: Playbook[] = [
+  // Role-specific daily flows from the Role + KRA system (one per role).
+  ...ROLE_PLAYBOOKS,
+
   // Every role now runs the same 12-step BBD / cold+connected / quotes cycle,
   // with role-specific extras on Mission + EOD only.
   standard12({ id: "pb_generic",     name: "Generic Employee",         roleHint: "Any",           description: "Universal 12-step cycle: works for any function." }),
@@ -366,9 +371,12 @@ export function resolvePlaybookFor(userId: string, fallbackByRole?: (u: string) 
 
 // Suggested role → playbook mapping used when no explicit assignment
 export function defaultPlaybookForRole(role: string): string {
-  const r = role.toLowerCase();
+  const r = (role || "").toLowerCase();
+  const flow = roleFlowFor(r);
+  if (flow) return flow.playbookId;
   if (r.includes("sub-intern") || r.includes("sub intern")) return "pb_sub_intern";
   if (r.includes("intern")) return "pb_sub_intern";
+
   if (r.includes("flow ops") || r.includes("flowops")) return "pb_flow_ops";
   if (r.includes("floor") || r.includes("coach") && r.includes("lead")) return "pb_floor_lead";
   if (r.includes("coach")) return "pb_coach";

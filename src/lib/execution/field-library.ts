@@ -1,5 +1,7 @@
 // Field library — the palette admins pick from when building playbooks.
 // 40+ prebuilt fields grouped by function; admins can add custom fields at runtime.
+import { ROLE_METRIC_FIELDS } from "@/lib/execution/role-metrics";
+
 
 export type FieldType =
   | "text" | "longtext" | "number" | "currency" | "percent"
@@ -122,9 +124,12 @@ export function fieldsVersion() { return ver; }
 export function getAllFields(): FieldDef[] {
   const s = read();
   const deleted = new Set(s.deletedDefaults);
+  const known = new Set(DEFAULT_FIELDS.map((f) => f.id));
+  const roleFields = (ROLE_METRIC_FIELDS as FieldDef[]).filter((f) => !known.has(f.id) && !deleted.has(f.id));
   const defaults = DEFAULT_FIELDS.filter((f) => !deleted.has(f.id));
-  return [...defaults, ...s.fields];
+  return [...defaults, ...roleFields, ...s.fields];
 }
+
 export function getField(id: string): FieldDef | undefined {
   return getAllFields().find((f) => f.id === id);
 }
