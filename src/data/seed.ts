@@ -11,7 +11,32 @@ export type Role =
   | "HR"
   | "Owner"
   | "Coach"
-  | "Recruiter";
+  | "Recruiter"
+  // Role + KRA system roles
+  | "Lead Intake & CRM Executive"
+  | "Lead Control Tower Executive"
+  | "Flow Ops Executive"
+  | "Lead Revival Specialist"
+  | "Tour Conversion Manager"
+  | "Visit War Room Controller"
+  | "Field Visit Executive"
+  | "Closure & Negotiation Specialist"
+  | "Supply Acquisition Executive"
+  | "Owner Success Executive"
+  | "Inventory Controller"
+  | "Property Readiness Executive"
+  | "Property Owner / Operator"
+  | "Property Manager"
+  | "Booking & Payment Controller"
+  | "Check-in & Customer Delight Executive"
+  | "Tenant Guild / After-Sales Executive"
+  | "Quality Auditor"
+  | "Performance Enforcer"
+  | "HRMS & Workforce Control Executive"
+  | "Team Lead"
+  | "Zone Lead"
+  | "Department Lead / Operations Manager";
+
 export type AppRole = "admin" | "manager" | "employee";
 
 export interface Employee {
