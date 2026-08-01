@@ -101,6 +101,11 @@ function RoleFlowPage() {
     return null;
   }, [phases, day.checks, nowPhase]);
 
+  const pendingReport = useMemo(
+    () => phases.find((p) => p.steps.every((s) => day.checks[s.id]) && !day.submissions?.[p.id]) || null,
+    [phases, day.checks, day.submissions],
+  );
+
   return (
     <div className="p-4 md:p-6 space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -148,8 +153,15 @@ function RoleFlowPage() {
               </>
             ) : (
               <div className="mt-2 text-lg font-display font-semibold">
-                Every step is ticked. {nextAction(role, cp, primaryGap)}
+                {pendingReport
+                  ? `Every step is ticked — now submit the ${pendingReport.codename} report.`
+                  : "Every step is ticked and every report is in."}
               </div>
+            )}
+            {nextStep && pendingReport && (
+              <p className="text-xs text-muted-foreground mt-2">
+                Also pending: the {pendingReport.codename} report for {pendingReport.due}.
+              </p>
             )}
             <p className="text-sm text-muted-foreground mt-3">{nextAction(role, cp, primaryGap)}</p>
           </Card>
