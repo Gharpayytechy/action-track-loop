@@ -136,7 +136,7 @@ export const ROLE_FLOWS: RoleFlow[] = [
     p2: "Provide tour access, respond to approved commercial requests and honour timed holds.",
     p3: "Acknowledge paid bookings, prepare rooms and close unresolved commitments.",
     metrics: ["rooms_updated", "hold_responses", "bookings_acknowledged"],
-    match: ["property owner", "owner /", "operator"],
+    match: ["property owner", "owner /"],
   },
   {
     roleId: "SUP-PM", playbookId: "pb_role_sup_pm", roleName: "Property Manager", department: "Supply Operations",
