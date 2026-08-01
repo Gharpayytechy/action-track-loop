@@ -12,7 +12,12 @@ import {
 import { phasesFor } from "@/lib/execution/core-tasks";
 import { subscribeCore, coreVersion, allToday, history } from "@/lib/execution/core-progress";
 import { seedCoreDemo, coreRoleOf } from "@/lib/execution/core-seed";
-import { AlertTriangle, ArrowRight, ShieldAlert, TrendingUp, Users, Activity } from "lucide-react";
+import {
+  PRESENCE_META, effectiveState, fmtSince, presenceFor, presenceVersion,
+  seedPresence, subscribePresence, type EffectiveState,
+} from "@/lib/presence-store";
+import { DAYOFF_LABEL, dayOffVersion, nameOf, plansOn, subscribeDayOff, tomorrowKey } from "@/lib/dayoff-store";
+import { AlertTriangle, ArrowRight, ShieldAlert, TrendingUp, Users, Activity, CalendarOff, FileText } from "lucide-react";
 
 export const Route = createFileRoute("/flow/admin")({
   head: () => ({
@@ -32,12 +37,14 @@ const pct = (h: number, w: number) => (w <= 0 ? 100 : Math.round((h / w) * 100))
 
 function AdminAnalytics() {
   const [hydrated, setHydrated] = useState(false);
-  useEffect(() => { seedCoreDemo(); setHydrated(true); }, []);
+  useEffect(() => { seedCoreDemo(); seedPresence(); setHydrated(true); }, []);
   const v = useSyncExternalStore(subscribeCore, () => coreVersion(), () => 0);
+  const pv = useSyncExternalStore(subscribePresence, () => presenceVersion(), () => 0);
+  const dv = useSyncExternalStore(subscribeDayOff, () => dayOffVersion(), () => 0);
   const cp = currentCheckpoint();
 
   const data = useMemo(() => {
-    void v;
+    void v; void pv;
     if (!hydrated) return [];
     return CORE_ROLES.map((role) => {
       const today = allToday(role.id);
@@ -51,9 +58,18 @@ function AdminAnalytics() {
         });
         const avg = Math.round(lines.reduce((a, l) => a + Math.min(150, l.pct), 0) / lines.length);
         const primary = [...lines].sort((a, b) => b.gap - a.gap)[0];
-        const totalSteps = phasesFor(role).flatMap((p) => p.steps).length;
+        const phases = phasesFor(role);
+        const totalSteps = phases.flatMap((p) => p.steps).length;
         const steps = Object.keys(rec?.checks || {}).length;
-        return { p, lines, avg, primary, steps, totalSteps, recoveries: rec?.recoveries || [] };
+        const presRec = presenceFor(p.id);
+        return {
+          p, lines, avg, primary, steps, totalSteps,
+          recoveries: rec?.recoveries || [],
+          phases,
+          submissions: rec?.submissions || {},
+          pres: presRec,
+          eff: effectiveState(presRec) as EffectiveState,
+        };
       });
       const roleAvg = people.length ? Math.round(people.reduce((a, x) => a + x.avg, 0) / people.length) : 0;
       const delivered = role.targets.map((t) => ({
@@ -64,7 +80,15 @@ function AdminAnalytics() {
       }));
       return { role, people, roleAvg, delivered };
     });
-  }, [v, cp, hydrated]);
+  }, [v, pv, cp, hydrated]);
+
+  const everyone = data.flatMap((d) => d.people.map((x) => ({ ...x, role: d.role })));
+  const floor = everyone.reduce<Record<EffectiveState, number>>(
+    (acc, x) => { acc[x.eff] = (acc[x.eff] || 0) + 1; return acc; },
+    { active: 0, idle: 0, away: 0, break: 0, offline: 0 },
+  );
+  const tk = tomorrowKey();
+  const offTomorrow = hydrated ? (void dv, plansOn(tk)) : [];
 
   const alerts = data.flatMap((d) =>
     d.people
@@ -95,6 +119,26 @@ function AdminAnalytics() {
         </div>
       </div>
 
+      <Card className="p-4">
+        <div className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground mb-3">Floor status right now</div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          {(["active", "idle", "break", "away", "offline"] as EffectiveState[]).map((s) => (
+            <div key={s} className={`rounded-md border p-3 ${PRESENCE_META[s].tone}`}>
+              <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-widest">
+                <span className={`h-2 w-2 rounded-full ${PRESENCE_META[s].dot}`} />{PRESENCE_META[s].label}
+              </div>
+              <div className="font-display text-2xl font-semibold mt-1">{floor[s] || 0}</div>
+            </div>
+          ))}
+          <div className="rounded-md border border-border p-3">
+            <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+              <CalendarOff className="h-3 w-3" /> Off tomorrow
+            </div>
+            <div className="font-display text-2xl font-semibold mt-1">{offTomorrow.length}</div>
+          </div>
+        </div>
+      </Card>
+
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {data.map(({ role, roleAvg, people, delivered }) => (
           <Card key={role.id} className="p-4 space-y-2">
@@ -121,6 +165,8 @@ function AdminAnalytics() {
       <Tabs defaultValue="people">
         <TabsList className="flex-wrap h-auto">
           <TabsTrigger value="people">People</TabsTrigger>
+          <TabsTrigger value="floor">Floor &amp; planning</TabsTrigger>
+          <TabsTrigger value="reports">Phase reports</TabsTrigger>
           <TabsTrigger value="alerts">Alerts &amp; recovery</TabsTrigger>
           <TabsTrigger value="forecast">Forecast</TabsTrigger>
           <TabsTrigger value="compliance">Flow compliance</TabsTrigger>
@@ -141,6 +187,7 @@ function AdminAnalytics() {
                     <thead>
                       <tr className="text-left text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
                         <th className="py-2">Person</th>
+                        <th>Presence</th>
                         {role.targets.map((t) => <th key={t.id}>{t.label}</th>)}
                         <th>Primary gap</th><th>Steps</th><th>Status</th>
                       </tr>
@@ -151,6 +198,13 @@ function AdminAnalytics() {
                           <td className="py-2">
                             <div className="font-medium">{x.p.name}</div>
                             <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">{x.p.team} · {x.p.zone}</div>
+                          </td>
+                          <td className="whitespace-nowrap">
+                            <span className="inline-flex items-center gap-1.5 text-xs">
+                              <span className={`h-2 w-2 rounded-full ${PRESENCE_META[x.eff].dot}`} />
+                              {PRESENCE_META[x.eff].label}
+                              <span className="text-muted-foreground font-mono text-[10px]">{fmtSince(x.pres.since)}</span>
+                            </span>
                           </td>
                           {x.lines.map((l) => (
                             <td key={l.t.id} className="whitespace-nowrap">{l.have}<span className="text-muted-foreground">/{l.want}</span></td>
@@ -164,6 +218,95 @@ function AdminAnalytics() {
                   </table>
                 </div>
               )}
+            </Card>
+          ))}
+        </TabsContent>
+
+        <TabsContent value="floor" className="space-y-5 mt-5">
+          <Card className="p-5">
+            <div className="flex items-center gap-2 font-medium mb-3"><Activity className="h-4 w-4 text-primary" /> Who is working, who is idle, who stepped away</div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-left text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
+                    <th className="py-2">Person</th><th>Role</th><th>Presence</th><th>For</th><th>Last activity</th><th>Achievement</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[...everyone]
+                    .sort((a, b) => ["active", "idle", "break", "away", "offline"].indexOf(a.eff) - ["active", "idle", "break", "away", "offline"].indexOf(b.eff))
+                    .map((x) => (
+                      <tr key={x.p.id} className="border-t border-border">
+                        <td className="py-2 font-medium">{x.p.name}</td>
+                        <td className="text-muted-foreground">{x.role.name}</td>
+                        <td>
+                          <Badge variant="outline" className={PRESENCE_META[x.eff].tone}>
+                            <span className={`h-1.5 w-1.5 rounded-full mr-1.5 ${PRESENCE_META[x.eff].dot}`} />
+                            {PRESENCE_META[x.eff].label}
+                          </Badge>
+                        </td>
+                        <td className="font-mono text-xs">{fmtSince(x.pres.since)}</td>
+                        <td className="font-mono text-xs text-muted-foreground">{fmtSince(x.pres.lastSeen)} ago</td>
+                        <td><Badge variant="outline" className={BAND_META[bandFor(x.avg)].tone}>{x.avg}%</Badge></td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+
+          <Card className="p-5">
+            <div className="flex items-center gap-2 font-medium mb-3">
+              <CalendarOff className="h-4 w-4 text-primary" /> Planned off tomorrow · {tk}
+            </div>
+            {offTomorrow.length === 0 ? (
+              <div className="text-sm text-muted-foreground">
+                Nobody has filed for tomorrow yet. The window closes 12 hours before the shift starts.
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {offTomorrow.map((p) => (
+                  <div key={p.id} className="flex flex-wrap items-center gap-2 border-t border-border pt-2 text-sm">
+                    <span className="font-medium">{nameOf(p.employeeId)}</span>
+                    <Badge variant="outline">{DAYOFF_LABEL[p.kind]}</Badge>
+                    <span className="text-muted-foreground">{p.reason}</span>
+                    <span className="ml-auto text-[11px] font-mono uppercase tracking-widest text-muted-foreground">cover: {p.coverOwner}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="reports" className="space-y-5 mt-5">
+          {data.map(({ role, people }) => (
+            <Card key={role.id} className="p-5 space-y-3">
+              <div className="flex items-center gap-2 font-medium"><FileText className="h-4 w-4 text-primary" /> {role.name} · phase reports submitted today</div>
+              {people.length === 0 && <div className="text-sm text-muted-foreground">No one mapped.</div>}
+              {people.map((x) => (
+                <div key={x.p.id} className="border-t border-border pt-3">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="font-medium text-sm">{x.p.name}</span>
+                    {x.phases.map((ph) => {
+                      const got = !!x.submissions[ph.id];
+                      return (
+                        <Badge key={ph.id} variant="outline" className={got ? "border-success/40 text-success" : "border-border text-muted-foreground"}>
+                          {ph.codename}{got ? " ✓" : " —"}
+                        </Badge>
+                      );
+                    })}
+                  </div>
+                  {x.phases.filter((ph) => x.submissions[ph.id]).map((ph) => (
+                    <div key={ph.id} className="mt-2 text-xs text-muted-foreground border-l-2 border-primary/50 pl-3 py-1">
+                      <div className="font-mono uppercase tracking-widest">{ph.codename} · {new Date(x.submissions[ph.id]!.ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</div>
+                      {ph.report.map((fl) => {
+                        const val = x.submissions[ph.id]!.values[fl.id];
+                        return val ? <div key={fl.id}>• {fl.label}: <span className="text-foreground">{val}</span></div> : null;
+                      })}
+                    </div>
+                  ))}
+                </div>
+              ))}
             </Card>
           ))}
         </TabsContent>
