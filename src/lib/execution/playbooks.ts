@@ -371,9 +371,12 @@ export function resolvePlaybookFor(userId: string, fallbackByRole?: (u: string) 
 
 // Suggested role → playbook mapping used when no explicit assignment
 export function defaultPlaybookForRole(role: string): string {
-  const r = role.toLowerCase();
+  const r = (role || "").toLowerCase();
+  const flow = roleFlowFor(r);
+  if (flow) return flow.playbookId;
   if (r.includes("sub-intern") || r.includes("sub intern")) return "pb_sub_intern";
   if (r.includes("intern")) return "pb_sub_intern";
+
   if (r.includes("flow ops") || r.includes("flowops")) return "pb_flow_ops";
   if (r.includes("floor") || r.includes("coach") && r.includes("lead")) return "pb_floor_lead";
   if (r.includes("coach")) return "pb_coach";
