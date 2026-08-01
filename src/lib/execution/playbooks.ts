@@ -2,6 +2,8 @@
 // A playbook = ordered list of Stages; each stage declares required proofs and fields.
 // Admin can clone, edit, version, and assign these in /admin/playbooks.
 
+import { ROLE_PLAYBOOKS, roleFlowFor } from "@/lib/execution/role-flows";
+
 export type ProofKind = "selfie" | "whatsapp" | "crm_ss" | "geo" | "file";
 
 export interface StageDef {
