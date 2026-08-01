@@ -1,8 +1,10 @@
-// Per-employee, per-day counters for the four core-role targets, plus the
-// recovery plans required by the achievement-enforcement engine.
+// Per-employee, per-day counters for the four core-role targets, the tickable
+// daily-flow state, and the recovery plans required by the achievement
+// enforcement engine.
 
 import { todayKey } from "@/lib/attendance-store";
 import type { CoreRoleId } from "@/lib/execution/core-roles";
+import type { PhaseId } from "@/lib/execution/core-tasks";
 
 export interface RecoveryPlan { ts: number; checkpoint: string; metric: string; gap: number; answers: string[] }
 
@@ -11,6 +13,8 @@ export interface CoreDay {
   roleId: CoreRoleId;
   date: string;
   counts: Record<string, number>;
+  checks: Record<string, number>;              // stepId -> completed timestamp
+  phases: Partial<Record<PhaseId, { startedAt?: number; doneAt?: number }>>;
   recoveries: RecoveryPlan[];
 }
 
@@ -21,9 +25,16 @@ const notify = () => { ver++; listeners.forEach((l) => l()); };
 export function subscribeCore(fn: () => void) { listeners.add(fn); return () => { listeners.delete(fn); }; }
 export function coreVersion() { return ver; }
 
+function blank(employeeId: string, roleId: CoreRoleId, date: string): CoreDay {
+  return { employeeId, roleId, date, counts: {}, checks: {}, phases: {}, recoveries: [] };
+}
+
 function readAll(): CoreDay[] {
   if (typeof window === "undefined") return [];
-  try { return JSON.parse(localStorage.getItem(KEY) || "[]") as CoreDay[]; } catch { return []; }
+  try {
+    const raw = JSON.parse(localStorage.getItem(KEY) || "[]") as CoreDay[];
+    return raw.map((r) => ({ ...blank(r.employeeId, r.roleId, r.date), ...r }));
+  } catch { return []; }
 }
 function writeAll(all: CoreDay[]) { localStorage.setItem(KEY, JSON.stringify(all)); notify(); }
 
@@ -32,9 +43,7 @@ function key(r: CoreDay, employeeId: string, roleId: string, date: string) {
 }
 
 export function getCoreDay(employeeId: string, roleId: CoreRoleId, date = todayKey()): CoreDay {
-  const all = readAll();
-  return all.find((r) => key(r, employeeId, roleId, date))
-    || { employeeId, roleId, date, counts: {}, recoveries: [] };
+  return readAll().find((r) => key(r, employeeId, roleId, date)) || blank(employeeId, roleId, date);
 }
 
 function upsert(rec: CoreDay) {
@@ -47,6 +56,25 @@ function upsert(rec: CoreDay) {
 export function bump(employeeId: string, roleId: CoreRoleId, metric: string, delta: number, date = todayKey()) {
   const rec = getCoreDay(employeeId, roleId, date);
   rec.counts[metric] = Math.max(0, (rec.counts[metric] || 0) + delta);
+  upsert(rec);
+}
+
+export function toggleStep(employeeId: string, roleId: CoreRoleId, stepId: string, date = todayKey()) {
+  const rec = getCoreDay(employeeId, roleId, date);
+  if (rec.checks[stepId]) delete rec.checks[stepId];
+  else rec.checks[stepId] = Date.now();
+  upsert(rec);
+}
+
+export function startPhase(employeeId: string, roleId: CoreRoleId, phase: PhaseId, date = todayKey()) {
+  const rec = getCoreDay(employeeId, roleId, date);
+  rec.phases[phase] = { ...(rec.phases[phase] || {}), startedAt: rec.phases[phase]?.startedAt || Date.now() };
+  upsert(rec);
+}
+
+export function completePhase(employeeId: string, roleId: CoreRoleId, phase: PhaseId, date = todayKey()) {
+  const rec = getCoreDay(employeeId, roleId, date);
+  rec.phases[phase] = { startedAt: rec.phases[phase]?.startedAt || Date.now(), doneAt: Date.now() };
   upsert(rec);
 }
 
@@ -64,7 +92,7 @@ export function history(employeeId: string, roleId: CoreRoleId, days = 14): Core
     const d = new Date();
     d.setDate(d.getDate() - i);
     const ds = d.toISOString().slice(0, 10);
-    out.push(all.find((r) => r.date === ds) || { employeeId, roleId, date: ds, counts: {}, recoveries: [] });
+    out.push(all.find((r) => r.date === ds) || blank(employeeId, roleId, ds));
   }
   return out;
 }
@@ -72,4 +100,16 @@ export function history(employeeId: string, roleId: CoreRoleId, days = 14): Core
 /** Everyone working a role today — used by the analytics tab. */
 export function allToday(roleId: CoreRoleId, date = todayKey()): CoreDay[] {
   return readAll().filter((r) => r.roleId === roleId && r.date === date);
+}
+
+/** Every record across every role — used by admin analytics. */
+export function allRecords(): CoreDay[] { return readAll(); }
+
+export function bulkSeed(records: CoreDay[]) {
+  const all = readAll();
+  for (const rec of records) {
+    const i = all.findIndex((r) => key(r, rec.employeeId, rec.roleId, rec.date));
+    if (i < 0) all.push(rec);
+  }
+  writeAll(all);
 }
