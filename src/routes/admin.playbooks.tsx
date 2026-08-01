@@ -1,4 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { CORE_ROLES } from "@/lib/execution/core-roles";
 import { useMemo, useState, useSyncExternalStore } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -49,6 +50,29 @@ function PlaybookManager() {
         <div className="text-xs uppercase tracking-widest text-muted-foreground font-mono">System · configurable execution</div>
         <h1 className="font-display text-3xl font-semibold tracking-tight">Playbook Manager</h1>
       </header>
+
+      <Card className="p-4">
+        <div className="text-sm font-medium">Core role playbooks (consolidated)</div>
+        <p className="text-xs text-muted-foreground mt-1">
+          The operating document is now four roles with locked P1/P2/EOD/weekly/monthly targets, five weighted KRAs,
+          checkpoints, non-negotiables, escalations, enforcement bands, recovery questions and incentive models.
+        </p>
+        <div className="flex flex-wrap gap-2 mt-3">
+          {CORE_ROLES.map((r) => (
+            <Link
+              key={r.id}
+              to="/flow/$role"
+              params={{ role: r.id }}
+              className="inline-flex items-center gap-2 rounded-md border border-border px-3 py-1.5 text-sm hover:bg-muted"
+            >
+              {r.name}
+              <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                {r.targets.map((t) => `${t.eod} ${t.label}`).join(" · ")}
+              </span>
+            </Link>
+          ))}
+        </div>
+      </Card>
 
       <Tabs defaultValue={tab}>
         <TabsList>

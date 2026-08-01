@@ -34,6 +34,8 @@ import { Route as CalendarRouteImport } from './routes/calendar'
 import { Route as AttendanceRouteImport } from './routes/attendance'
 import { Route as AchievementsRouteImport } from './routes/achievements'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as FlowIndexRouteImport } from './routes/flow.index'
+import { Route as FlowRoleRouteImport } from './routes/flow.$role'
 import { Route as AdminPlaybooksRouteImport } from './routes/admin.playbooks'
 import { Route as AdminOpsRouteImport } from './routes/admin.ops'
 import { Route as AdminConsoleRouteImport } from './routes/admin.console'
@@ -163,6 +165,16 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FlowIndexRoute = FlowIndexRouteImport.update({
+  id: '/flow/',
+  path: '/flow/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FlowRoleRoute = FlowRoleRouteImport.update({
+  id: '/flow/$role',
+  path: '/flow/$role',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminPlaybooksRoute = AdminPlaybooksRouteImport.update({
   id: '/admin/playbooks',
   path: '/admin/playbooks',
@@ -208,6 +220,8 @@ export interface FileRoutesByFullPath {
   '/admin/console': typeof AdminConsoleRoute
   '/admin/ops': typeof AdminOpsRoute
   '/admin/playbooks': typeof AdminPlaybooksRoute
+  '/flow/$role': typeof FlowRoleRoute
+  '/flow/': typeof FlowIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -238,6 +252,8 @@ export interface FileRoutesByTo {
   '/admin/console': typeof AdminConsoleRoute
   '/admin/ops': typeof AdminOpsRoute
   '/admin/playbooks': typeof AdminPlaybooksRoute
+  '/flow/$role': typeof FlowRoleRoute
+  '/flow': typeof FlowIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -269,6 +285,8 @@ export interface FileRoutesById {
   '/admin/console': typeof AdminConsoleRoute
   '/admin/ops': typeof AdminOpsRoute
   '/admin/playbooks': typeof AdminPlaybooksRoute
+  '/flow/$role': typeof FlowRoleRoute
+  '/flow/': typeof FlowIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -301,6 +319,8 @@ export interface FileRouteTypes {
     | '/admin/console'
     | '/admin/ops'
     | '/admin/playbooks'
+    | '/flow/$role'
+    | '/flow/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -331,6 +351,8 @@ export interface FileRouteTypes {
     | '/admin/console'
     | '/admin/ops'
     | '/admin/playbooks'
+    | '/flow/$role'
+    | '/flow'
   id:
     | '__root__'
     | '/'
@@ -361,6 +383,8 @@ export interface FileRouteTypes {
     | '/admin/console'
     | '/admin/ops'
     | '/admin/playbooks'
+    | '/flow/$role'
+    | '/flow/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -392,6 +416,8 @@ export interface RootRouteChildren {
   AdminConsoleRoute: typeof AdminConsoleRoute
   AdminOpsRoute: typeof AdminOpsRoute
   AdminPlaybooksRoute: typeof AdminPlaybooksRoute
+  FlowRoleRoute: typeof FlowRoleRoute
+  FlowIndexRoute: typeof FlowIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -571,6 +597,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/flow/': {
+      id: '/flow/'
+      path: '/flow'
+      fullPath: '/flow/'
+      preLoaderRoute: typeof FlowIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/flow/$role': {
+      id: '/flow/$role'
+      path: '/flow/$role'
+      fullPath: '/flow/$role'
+      preLoaderRoute: typeof FlowRoleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/playbooks': {
       id: '/admin/playbooks'
       path: '/admin/playbooks'
@@ -624,16 +664,9 @@ const rootRouteChildren: RootRouteChildren = {
   AdminConsoleRoute: AdminConsoleRoute,
   AdminOpsRoute: AdminOpsRoute,
   AdminPlaybooksRoute: AdminPlaybooksRoute,
+  FlowRoleRoute: FlowRoleRoute,
+  FlowIndexRoute: FlowIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

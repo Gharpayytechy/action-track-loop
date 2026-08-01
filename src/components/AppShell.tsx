@@ -62,6 +62,11 @@ const ALL: Tier[] = ["leadership", "hr", "leader", "recruiter", "teammate"];
 const NAV: NavItem[] = [
   { to: "/",            label: "Arena Home",   icon: LayoutDashboard, tiers: ALL },
   { to: "/daily",       label: "Daily Flow",   icon: Sun,             tiers: ALL },
+  { to: "/flow",                 label: "Role Flows",         icon: Target, tiers: ALL },
+  { to: "/flow/control_tower",   label: "Control Tower",      icon: Shield, tiers: ALL },
+  { to: "/flow/flow_ops",        label: "Flow Ops",           icon: Activity, tiers: ALL },
+  { to: "/flow/tcm",             label: "Tour Conversion",    icon: Users, tiers: ALL },
+  { to: "/flow/closing",         label: "Closing Specialist", icon: Coins, tiers: ALL },
   { to: "/console",     label: "Operator Console", icon: Zap,         tiers: ["leadership","hr","leader","recruiter"] },
   { to: "/live",        label: "Live Ops",     icon: Activity,        tiers: ["leadership","hr","leader"] },
   { to: "/admin/ops",   label: "Ops Dashboard",icon: Activity,        tiers: ["leadership","hr","leader"] },
