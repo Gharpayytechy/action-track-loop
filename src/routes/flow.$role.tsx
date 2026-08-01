@@ -15,7 +15,7 @@ import {
 import { phasesFor, activePhaseId, type FlowPhase, type PhaseId } from "@/lib/execution/core-tasks";
 import {
   getCoreDay, bump, addRecovery, history, subscribeCore, coreVersion,
-  toggleStep, startPhase, completePhase, submitPhase, allToday, type CoreDay,
+  toggleStep, startPhase, completePhase, submitPhase, setCount, allToday, type CoreDay,
 } from "@/lib/execution/core-progress";
 import { seedCoreDemo, coreRoleOf } from "@/lib/execution/core-seed";
 import { EMPLOYEES } from "@/data/seed";
@@ -532,7 +532,15 @@ function PhaseReport(props: {
         <Button
           size="sm"
           disabled={missing.length > 0}
-          onClick={() => { submitPhase(actorId, roleId, phase.id, values); setEditing(false); }}
+          onClick={() => {
+            submitPhase(actorId, roleId, phase.id, values);
+            // Reported actuals reconcile the live counters so analytics stay honest.
+            for (const [k, val] of Object.entries(values)) {
+              const m = /^m_(?:p1|p2|eod)_(.+)$/.exec(k);
+              if (m && val !== "" && !Number.isNaN(Number(val))) setCount(actorId, roleId, m[1], Number(val));
+            }
+            setEditing(false);
+          }}
         >
           <Send className="h-3.5 w-3.5 mr-1" /> Submit {phase.codename} report
         </Button>
