@@ -442,6 +442,7 @@ function PhaseCard(props: {
             roleId={role.id}
             existing={submission?.values}
             submittedAt={submission?.ts}
+            counts={props.counts}
           />
 
           <Button
@@ -467,12 +468,20 @@ function PhaseCard(props: {
 
 function PhaseReport(props: {
   phase: FlowPhase; actorId: string; roleId: CoreRole["id"];
-  existing?: Record<string, string>; submittedAt?: number;
+  existing?: Record<string, string>; submittedAt?: number; counts: Record<string, number>;
 }) {
-  const { phase, actorId, roleId, existing, submittedAt } = props;
-  const [values, setValues] = useState<Record<string, string>>(existing || {});
+  const { phase, actorId, roleId, existing, submittedAt, counts } = props;
+  const prefill = useMemo(() => {
+    const out: Record<string, string> = {};
+    for (const fl of phase.report) {
+      const m = /^m_(?:p1|p2|eod)_(.+)$/.exec(fl.id);
+      if (m) out[fl.id] = String(counts[m[1]] ?? 0);
+    }
+    return out;
+  }, [phase, counts]);
+  const [values, setValues] = useState<Record<string, string>>({ ...prefill, ...(existing || {}) });
   const [editing, setEditing] = useState(!submittedAt);
-  useEffect(() => { if (existing) setValues(existing); }, [existing]);
+  useEffect(() => { setValues((v) => ({ ...prefill, ...(existing || {}), ...v })); }, [prefill, existing]);
 
   const missing = phase.report.filter((f) => f.required !== false && !String(values[f.id] ?? "").trim());
 
