@@ -301,7 +301,7 @@ function DailyPage() {
           <div className="flex items-center justify-between gap-3 flex-wrap mb-2">
             <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Progress</div>
             <Badge variant="outline" className="font-mono text-[10px]">
-              {done} of {total} phases complete
+              {done} of {total} steps complete
             </Badge>
           </div>
           <Progress value={pct} className="h-1.5" />
