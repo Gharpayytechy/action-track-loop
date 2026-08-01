@@ -350,8 +350,10 @@ export function AppShell() {
 }
 
 function XPCoinWidget({ actorId }: { actorId: string }) {
-  const lp = levelProgress(xpFor(actorId));
-  const coins = coinsFor(actorId);
+  const [ready, setReady] = useState(false);
+  useEffect(() => { setReady(true); }, []);
+  const lp = levelProgress(ready ? xpFor(actorId) : 0);
+  const coins = ready ? coinsFor(actorId) : 0;
   return (
     <div className="rounded-md bg-sidebar-hover/40 border border-sidebar-border p-2.5">
       <div className="flex items-center justify-between mb-1">
