@@ -6,7 +6,7 @@ import { CORE_ROLES, coreRoleForName, currentCheckpoint, targetAt, type CoreRole
 import { phasesFor } from "@/lib/execution/core-tasks";
 import { bulkSeed, type CoreDay } from "@/lib/execution/core-progress";
 
-const FLAG = "gp_core_seed_v2";
+const FLAG = "gp_core_seed_v3";
 
 function hash(s: string) {
   let h = 2166136261;
@@ -49,6 +49,7 @@ export function seedCoreDemo() {
 
       const checks: Record<string, number> = {};
       const phases: CoreDay["phases"] = {};
+      const submissions: CoreDay["submissions"] = {};
       const list = phasesFor(role);
       const reached = today ? (cp === "p1" ? 1 : cp === "p2" ? 2 : 4) : 4;
       list.forEach((p, pi) => {
@@ -59,6 +60,21 @@ export function seedCoreDemo() {
           const ok = complete || hash(`${emp.id}${date}${s.id}`) < factor - 0.15;
           if (ok) checks[s.id] = d.getTime() + si * 60000;
         });
+        if (complete) {
+          const values: Record<string, string> = {};
+          for (const fl of p.report) {
+            const m = /^m_(p1|p2|eod)_(.+)$/.exec(fl.id);
+            if (m) {
+              const t = role.targets.find((x) => x.id === m[2]);
+              values[fl.id] = String(t ? Math.round(targetAt(t, m[1] as "p1" | "p2" | "eod") * factor) : 0);
+            } else if (fl.kind === "number") {
+              values[fl.id] = String(Math.round(2 + hash(`${emp.id}${date}${fl.id}`) * 6));
+            } else {
+              values[fl.id] = fl.placeholder || "Filed on time.";
+            }
+          }
+          submissions[p.id] = { ts: d.getTime() + (pi + 1) * 3_600_000, values };
+        }
       });
 
       const recoveries = factor < 0.9 && !today
@@ -76,7 +92,7 @@ export function seedCoreDemo() {
           }]
         : [];
 
-      recs.push({ employeeId: emp.id, roleId: role.id, date, counts, checks, phases, submissions: {}, recoveries });
+      recs.push({ employeeId: emp.id, roleId: role.id, date, counts, checks, phases, submissions, recoveries });
     }
   }
 

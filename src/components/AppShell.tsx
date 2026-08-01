@@ -70,6 +70,7 @@ const NAV: NavItem[] = [
   { to: "/flow/tcm",             label: "Tour Conversion",    icon: Users, tiers: ALL },
   { to: "/flow/closing",         label: "Closing Specialist", icon: Coins, tiers: ALL },
   { to: "/flow/admin",           label: "Role Analytics",     icon: Trophy, tiers: ["leadership","hr","leader"] },
+  { to: "/reports",              label: "Live Reports",       icon: ClipboardList, tiers: ["leadership","hr","leader"] },
   { to: "/console",     label: "Operator Console", icon: Zap,         tiers: ["leadership","hr","leader","recruiter"] },
   { to: "/live",        label: "Live Ops",     icon: Activity,        tiers: ["leadership","hr","leader"] },
   { to: "/admin/ops",   label: "Ops Dashboard",icon: Activity,        tiers: ["leadership","hr","leader"] },
