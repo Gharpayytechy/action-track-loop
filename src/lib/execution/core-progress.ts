@@ -62,6 +62,13 @@ export function bump(employeeId: string, roleId: CoreRoleId, metric: string, del
   upsert(rec);
 }
 
+/** Set a counter to an absolute value (used when a phase report reconciles actuals). */
+export function setCount(employeeId: string, roleId: CoreRoleId, metric: string, value: number, date = todayKey()) {
+  const rec = getCoreDay(employeeId, roleId, date);
+  rec.counts[metric] = Math.max(0, Math.round(value));
+  upsert(rec);
+}
+
 export function toggleStep(employeeId: string, roleId: CoreRoleId, stepId: string, date = todayKey()) {
   const rec = getCoreDay(employeeId, roleId, date);
   if (rec.checks[stepId]) delete rec.checks[stepId];
