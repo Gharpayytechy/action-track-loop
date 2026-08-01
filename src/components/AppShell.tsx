@@ -67,6 +67,7 @@ const NAV: NavItem[] = [
   { to: "/flow/flow_ops",        label: "Flow Ops",           icon: Activity, tiers: ALL },
   { to: "/flow/tcm",             label: "Tour Conversion",    icon: Users, tiers: ALL },
   { to: "/flow/closing",         label: "Closing Specialist", icon: Coins, tiers: ALL },
+  { to: "/flow/admin",           label: "Role Analytics",     icon: Trophy, tiers: ["leadership","hr","leader"] },
   { to: "/console",     label: "Operator Console", icon: Zap,         tiers: ["leadership","hr","leader","recruiter"] },
   { to: "/live",        label: "Live Ops",     icon: Activity,        tiers: ["leadership","hr","leader"] },
   { to: "/admin/ops",   label: "Ops Dashboard",icon: Activity,        tiers: ["leadership","hr","leader"] },
@@ -109,7 +110,9 @@ export function AppShell() {
   const { actor, setActor, employees } = useAttendanceState();
   const hasPlaybook = !!playbookFor(actor.id);
   const shield = hasPlaybook ? shieldNow(actor.id) : { active: false, label: "" };
-  const status = liveStatusFor(actor.id);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+  const status = mounted ? liveStatusFor(actor.id) : "Off";
   const [bellOpen, setBellOpen] = useState(false);
   const [calOpen, setCalOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);

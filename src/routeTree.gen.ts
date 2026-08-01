@@ -35,6 +35,7 @@ import { Route as AttendanceRouteImport } from './routes/attendance'
 import { Route as AchievementsRouteImport } from './routes/achievements'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as FlowIndexRouteImport } from './routes/flow.index'
+import { Route as FlowAdminRouteImport } from './routes/flow.admin'
 import { Route as FlowRoleRouteImport } from './routes/flow.$role'
 import { Route as AdminPlaybooksRouteImport } from './routes/admin.playbooks'
 import { Route as AdminOpsRouteImport } from './routes/admin.ops'
@@ -170,6 +171,11 @@ const FlowIndexRoute = FlowIndexRouteImport.update({
   path: '/flow/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FlowAdminRoute = FlowAdminRouteImport.update({
+  id: '/flow/admin',
+  path: '/flow/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FlowRoleRoute = FlowRoleRouteImport.update({
   id: '/flow/$role',
   path: '/flow/$role',
@@ -221,6 +227,7 @@ export interface FileRoutesByFullPath {
   '/admin/ops': typeof AdminOpsRoute
   '/admin/playbooks': typeof AdminPlaybooksRoute
   '/flow/$role': typeof FlowRoleRoute
+  '/flow/admin': typeof FlowAdminRoute
   '/flow/': typeof FlowIndexRoute
 }
 export interface FileRoutesByTo {
@@ -253,6 +260,7 @@ export interface FileRoutesByTo {
   '/admin/ops': typeof AdminOpsRoute
   '/admin/playbooks': typeof AdminPlaybooksRoute
   '/flow/$role': typeof FlowRoleRoute
+  '/flow/admin': typeof FlowAdminRoute
   '/flow': typeof FlowIndexRoute
 }
 export interface FileRoutesById {
@@ -286,6 +294,7 @@ export interface FileRoutesById {
   '/admin/ops': typeof AdminOpsRoute
   '/admin/playbooks': typeof AdminPlaybooksRoute
   '/flow/$role': typeof FlowRoleRoute
+  '/flow/admin': typeof FlowAdminRoute
   '/flow/': typeof FlowIndexRoute
 }
 export interface FileRouteTypes {
@@ -320,6 +329,7 @@ export interface FileRouteTypes {
     | '/admin/ops'
     | '/admin/playbooks'
     | '/flow/$role'
+    | '/flow/admin'
     | '/flow/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -352,6 +362,7 @@ export interface FileRouteTypes {
     | '/admin/ops'
     | '/admin/playbooks'
     | '/flow/$role'
+    | '/flow/admin'
     | '/flow'
   id:
     | '__root__'
@@ -384,6 +395,7 @@ export interface FileRouteTypes {
     | '/admin/ops'
     | '/admin/playbooks'
     | '/flow/$role'
+    | '/flow/admin'
     | '/flow/'
   fileRoutesById: FileRoutesById
 }
@@ -417,6 +429,7 @@ export interface RootRouteChildren {
   AdminOpsRoute: typeof AdminOpsRoute
   AdminPlaybooksRoute: typeof AdminPlaybooksRoute
   FlowRoleRoute: typeof FlowRoleRoute
+  FlowAdminRoute: typeof FlowAdminRoute
   FlowIndexRoute: typeof FlowIndexRoute
 }
 
@@ -604,6 +617,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FlowIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/flow/admin': {
+      id: '/flow/admin'
+      path: '/flow/admin'
+      fullPath: '/flow/admin'
+      preLoaderRoute: typeof FlowAdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/flow/$role': {
       id: '/flow/$role'
       path: '/flow/$role'
@@ -665,6 +685,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminOpsRoute: AdminOpsRoute,
   AdminPlaybooksRoute: AdminPlaybooksRoute,
   FlowRoleRoute: FlowRoleRoute,
+  FlowAdminRoute: FlowAdminRoute,
   FlowIndexRoute: FlowIndexRoute,
 }
 export const routeTree = rootRouteImport

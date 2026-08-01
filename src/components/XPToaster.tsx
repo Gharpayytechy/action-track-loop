@@ -11,7 +11,7 @@ export function XPToaster() {
   useEffect(() => {
     const off = onXPGain((g) => {
       const t: Toast = { id: crypto.randomUUID(), amount: g.amount, note: g.note, leveledUp: g.leveledUp, newLevel: g.newLevel };
-      setToasts((cur) => [...cur, t]);
+      setToasts((cur) => [...cur, t].slice(-3));
       window.setTimeout(() => setToasts((cur) => cur.filter((x) => x.id !== t.id)), g.leveledUp ? 4500 : 2200);
     });
     return () => { off; };
