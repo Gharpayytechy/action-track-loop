@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAttendanceState } from "@/hooks/useAttendance";
 import {
@@ -14,13 +15,13 @@ import {
 import { phasesFor, activePhaseId, type FlowPhase, type PhaseId } from "@/lib/execution/core-tasks";
 import {
   getCoreDay, bump, addRecovery, history, subscribeCore, coreVersion,
-  toggleStep, startPhase, completePhase, allToday, type CoreDay,
+  toggleStep, startPhase, completePhase, submitPhase, setCount, allToday, type CoreDay,
 } from "@/lib/execution/core-progress";
 import { seedCoreDemo, coreRoleOf } from "@/lib/execution/core-seed";
 import { EMPLOYEES } from "@/data/seed";
 import {
   ArrowRight, Minus, Plus, ShieldAlert, Target, TrendingUp, Clock, CheckCircle2,
-  AlertTriangle, Check, Circle, ChevronDown, PlayCircle, Lock, Users,
+  AlertTriangle, Check, Circle, ChevronDown, PlayCircle, Lock, Users, Send, FileText,
 } from "lucide-react";
 
 export const Route = createFileRoute("/flow/$role")({
@@ -68,7 +69,7 @@ function RoleFlowPage() {
   const phases = useMemo(() => phasesFor(role), [role]);
 
   const day = useMemo(
-    () => { void v; return hydrated ? getCoreDay(actor.id, role.id) : ({ employeeId: actor.id, roleId: role.id, date: "", counts: {}, checks: {}, phases: {}, recoveries: [] } as CoreDay); },
+    () => { void v; return hydrated ? getCoreDay(actor.id, role.id) : ({ employeeId: actor.id, roleId: role.id, date: "", counts: {}, checks: {}, phases: {}, submissions: {}, recoveries: [] } as CoreDay); },
     [actor.id, role.id, v, hydrated],
   );
   const counts = day.counts;
@@ -99,6 +100,11 @@ function RoleFlowPage() {
     }
     return null;
   }, [phases, day.checks, nowPhase]);
+
+  const pendingReport = useMemo(
+    () => phases.find((p) => p.steps.every((s) => day.checks[s.id]) && !day.submissions?.[p.id]) || null,
+    [phases, day.checks, day.submissions],
+  );
 
   return (
     <div className="p-4 md:p-6 space-y-6">
@@ -147,8 +153,15 @@ function RoleFlowPage() {
               </>
             ) : (
               <div className="mt-2 text-lg font-display font-semibold">
-                Every step is ticked. {nextAction(role, cp, primaryGap)}
+                {pendingReport
+                  ? `Every step is ticked — now submit the ${pendingReport.codename} report.`
+                  : "Every step is ticked and every report is in."}
               </div>
+            )}
+            {nextStep && pendingReport && (
+              <p className="text-xs text-muted-foreground mt-2">
+                Also pending: the {pendingReport.codename} report for {pendingReport.due}.
+              </p>
             )}
             <p className="text-sm text-muted-foreground mt-3">{nextAction(role, cp, primaryGap)}</p>
           </Card>
@@ -348,7 +361,9 @@ function PhaseCard(props: {
   const [open, setOpen] = useState(openByDefault);
   const done = phase.steps.filter((s) => day.checks[s.id]).length;
   const all = phase.steps.length;
-  const complete = done === all;
+  const ticked = done === all;
+  const submission = day.submissions?.[phase.id];
+  const complete = ticked && !!submission;
   const started = !!day.phases[phase.id]?.startedAt;
   const nowMins = new Date().getHours() * 60 + new Date().getMinutes();
   const overdue = !complete && nowMins > phase.dueMins;
@@ -365,7 +380,10 @@ function PhaseCard(props: {
           {complete ? <Check className="h-4 w-4" /> : index}
         </span>
         <span className="flex-1 min-w-0">
-          <span className="block font-medium truncate">{phase.name}</span>
+          <span className="block font-medium truncate">
+            <span className="font-display">{phase.codename}</span>
+            <span className="text-muted-foreground font-normal"> · {phase.name}</span>
+          </span>
           <span className="block text-xs text-muted-foreground">{phase.window} · {done}/{all} ticked{overdue ? " · overdue" : ""}</span>
         </span>
         {phase.checkpoint && <Badge variant="outline" className="hidden sm:inline-flex font-mono text-[10px]">due {phase.due}</Badge>}
@@ -418,6 +436,15 @@ function PhaseCard(props: {
             </div>
           )}
 
+          <PhaseReport
+            phase={phase}
+            actorId={actorId}
+            roleId={role.id}
+            existing={submission?.values}
+            submittedAt={submission?.ts}
+            counts={props.counts}
+          />
+
           <Button
             size="sm"
             disabled={!complete || !!day.phases[phase.id]?.doneAt}
@@ -426,12 +453,111 @@ function PhaseCard(props: {
             {day.phases[phase.id]?.doneAt
               ? <><CheckCircle2 className="h-3.5 w-3.5 mr-1" /> Phase closed</>
               : complete
-                ? <><Check className="h-3.5 w-3.5 mr-1" /> Mark phase complete</>
-                : <><Lock className="h-3.5 w-3.5 mr-1" /> Tick all {all} steps to close</>}
+                ? <><Check className="h-3.5 w-3.5 mr-1" /> Mark {phase.codename} complete</>
+                : !ticked
+                  ? <><Lock className="h-3.5 w-3.5 mr-1" /> Tick all {all} steps to close</>
+                  : <><Lock className="h-3.5 w-3.5 mr-1" /> Submit the {phase.codename} report to close</>}
           </Button>
         </div>
       )}
     </Card>
+  );
+}
+
+/* ---------------- end-of-phase submission ---------------- */
+
+function PhaseReport(props: {
+  phase: FlowPhase; actorId: string; roleId: CoreRole["id"];
+  existing?: Record<string, string>; submittedAt?: number; counts: Record<string, number>;
+}) {
+  const { phase, actorId, roleId, existing, submittedAt, counts } = props;
+  const prefill = useMemo(() => {
+    const out: Record<string, string> = {};
+    for (const fl of phase.report) {
+      const m = /^m_(?:p1|p2|eod)_(.+)$/.exec(fl.id);
+      if (m) out[fl.id] = String(counts[m[1]] ?? 0);
+    }
+    return out;
+  }, [phase, counts]);
+  const [values, setValues] = useState<Record<string, string>>({ ...prefill, ...(existing || {}) });
+  const [editing, setEditing] = useState(!submittedAt);
+  useEffect(() => { setValues((v) => ({ ...prefill, ...(existing || {}), ...v })); }, [prefill, existing]);
+
+  const missing = phase.report.filter((f) => f.required !== false && !String(values[f.id] ?? "").trim());
+
+  if (submittedAt && !editing) {
+    return (
+      <div className="rounded-md border border-success/40 bg-success/5 p-3 space-y-1.5">
+        <div className="flex items-center gap-2 text-sm font-medium text-success">
+          <FileText className="h-4 w-4" /> {phase.codename} report submitted
+          <span className="ml-auto text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+            {new Date(submittedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+          </span>
+        </div>
+        {phase.report.map((f) => (
+          <div key={f.id} className="text-xs">
+            <span className="text-muted-foreground">{f.label}: </span>
+            <span className="text-foreground">{values[f.id] || "—"}</span>
+          </div>
+        ))}
+        <Button size="sm" variant="outline" className="mt-1" onClick={() => setEditing(true)}>Edit report</Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-md border border-primary/30 bg-primary/5 p-3 space-y-3">
+      <div className="flex items-center gap-2 text-sm font-medium">
+        <FileText className="h-4 w-4 text-primary" /> Submit the {phase.codename} report
+      </div>
+      <p className="text-xs text-muted-foreground">
+        This is the data your manager sees for {phase.due}. Numbers first, then the honest one-liners.
+      </p>
+      <div className="grid gap-3 sm:grid-cols-2">
+        {phase.report.map((f) => (
+          <div key={f.id} className={f.kind === "long" ? "sm:col-span-2" : ""}>
+            <label className="block text-xs text-muted-foreground mb-1">
+              {f.label}{f.required === false && <span className="ml-1 text-[10px] uppercase font-mono">optional</span>}
+            </label>
+            {f.kind === "long" ? (
+              <Textarea
+                rows={2}
+                value={values[f.id] || ""}
+                placeholder={f.placeholder}
+                onChange={(e) => setValues((v) => ({ ...v, [f.id]: e.target.value }))}
+              />
+            ) : (
+              <Input
+                type={f.kind === "number" ? "number" : "text"}
+                value={values[f.id] || ""}
+                placeholder={f.placeholder}
+                onChange={(e) => setValues((v) => ({ ...v, [f.id]: e.target.value }))}
+              />
+            )}
+          </div>
+        ))}
+      </div>
+      <div className="flex flex-wrap items-center gap-2">
+        <Button
+          size="sm"
+          disabled={missing.length > 0}
+          onClick={() => {
+            submitPhase(actorId, roleId, phase.id, values);
+            // Reported actuals reconcile the live counters so analytics stay honest.
+            for (const [k, val] of Object.entries(values)) {
+              const m = /^m_(?:p1|p2|eod)_(.+)$/.exec(k);
+              if (m && val !== "" && !Number.isNaN(Number(val))) setCount(actorId, roleId, m[1], Number(val));
+            }
+            setEditing(false);
+          }}
+        >
+          <Send className="h-3.5 w-3.5 mr-1" /> Submit {phase.codename} report
+        </Button>
+        {missing.length > 0 && (
+          <span className="text-xs text-muted-foreground">{missing.length} field{missing.length === 1 ? "" : "s"} still empty</span>
+        )}
+      </div>
+    </div>
   );
 }
 

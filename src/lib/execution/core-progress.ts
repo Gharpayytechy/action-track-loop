@@ -8,6 +8,8 @@ import type { PhaseId } from "@/lib/execution/core-tasks";
 
 export interface RecoveryPlan { ts: number; checkpoint: string; metric: string; gap: number; answers: string[] }
 
+export interface PhaseSubmission { ts: number; values: Record<string, string> }
+
 export interface CoreDay {
   employeeId: string;
   roleId: CoreRoleId;
@@ -15,6 +17,7 @@ export interface CoreDay {
   counts: Record<string, number>;
   checks: Record<string, number>;              // stepId -> completed timestamp
   phases: Partial<Record<PhaseId, { startedAt?: number; doneAt?: number }>>;
+  submissions: Partial<Record<PhaseId, PhaseSubmission>>;
   recoveries: RecoveryPlan[];
 }
 
@@ -26,7 +29,7 @@ export function subscribeCore(fn: () => void) { listeners.add(fn); return () => 
 export function coreVersion() { return ver; }
 
 function blank(employeeId: string, roleId: CoreRoleId, date: string): CoreDay {
-  return { employeeId, roleId, date, counts: {}, checks: {}, phases: {}, recoveries: [] };
+  return { employeeId, roleId, date, counts: {}, checks: {}, phases: {}, submissions: {}, recoveries: [] };
 }
 
 function readAll(): CoreDay[] {
@@ -59,6 +62,13 @@ export function bump(employeeId: string, roleId: CoreRoleId, metric: string, del
   upsert(rec);
 }
 
+/** Set a counter to an absolute value (used when a phase report reconciles actuals). */
+export function setCount(employeeId: string, roleId: CoreRoleId, metric: string, value: number, date = todayKey()) {
+  const rec = getCoreDay(employeeId, roleId, date);
+  rec.counts[metric] = Math.max(0, Math.round(value));
+  upsert(rec);
+}
+
 export function toggleStep(employeeId: string, roleId: CoreRoleId, stepId: string, date = todayKey()) {
   const rec = getCoreDay(employeeId, roleId, date);
   if (rec.checks[stepId]) delete rec.checks[stepId];
@@ -75,6 +85,19 @@ export function startPhase(employeeId: string, roleId: CoreRoleId, phase: PhaseI
 export function completePhase(employeeId: string, roleId: CoreRoleId, phase: PhaseId, date = todayKey()) {
   const rec = getCoreDay(employeeId, roleId, date);
   rec.phases[phase] = { startedAt: rec.phases[phase]?.startedAt || Date.now(), doneAt: Date.now() };
+  upsert(rec);
+}
+
+/** Save the data a person submits at the end of a phase. */
+export function submitPhase(
+  employeeId: string,
+  roleId: CoreRoleId,
+  phase: PhaseId,
+  values: Record<string, string>,
+  date = todayKey(),
+) {
+  const rec = getCoreDay(employeeId, roleId, date);
+  rec.submissions = { ...(rec.submissions || {}), [phase]: { ts: Date.now(), values } };
   upsert(rec);
 }
 
