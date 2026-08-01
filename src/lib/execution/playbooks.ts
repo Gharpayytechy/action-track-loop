@@ -204,6 +204,9 @@ function standard12(f: RoleFlavor): Playbook {
 }
 
 export const BUILT_IN_PLAYBOOKS: Playbook[] = [
+  // Role-specific daily flows from the Role + KRA system (one per role).
+  ...ROLE_PLAYBOOKS,
+
   // Every role now runs the same 12-step BBD / cold+connected / quotes cycle,
   // with role-specific extras on Mission + EOD only.
   standard12({ id: "pb_generic",     name: "Generic Employee",         roleHint: "Any",           description: "Universal 12-step cycle: works for any function." }),
