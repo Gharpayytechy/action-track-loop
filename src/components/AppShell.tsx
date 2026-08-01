@@ -30,6 +30,7 @@ import {
   ShoppingBag,
   Coins,
   Sun,
+  CalendarOff,
 } from "lucide-react";
 import { CadenceTimer } from "./CadenceTimer";
 import { XPToaster } from "./XPToaster";
@@ -47,6 +48,7 @@ import { CalendarPeek } from "./CalendarPeek";
 import { CommandPalette } from "./CommandPalette";
 import { GiveKudoModal } from "./GiveKudoModal";
 import { Avatar } from "./Avatar";
+import { PresenceBar } from "./PresenceBar";
 import {
   Select,
   SelectContent,
@@ -77,6 +79,7 @@ const NAV: NavItem[] = [
   { to: "/achievements",label: "Achievements", icon: Award,           tiers: ALL },
   { to: "/calendar",    label: "Calendar",     icon: Calendar,        tiers: ALL },
   { to: "/leaves",      label: "Leaves",       icon: PlaneTakeoff,    tiers: ALL },
+  { to: "/planned-off", label: "Tomorrow's Off", icon: CalendarOff,   tiers: ALL },
   { to: "/kudos",       label: "Kudos",        icon: Heart,           tiers: ALL },
   { to: "/quests",      label: "Quests",       icon: Target,          tiers: ALL },
   { to: "/leaderboard", label: "Leaderboard",  icon: Trophy,          tiers: ALL },
@@ -266,6 +269,7 @@ export function AppShell() {
             </Link>
           )}
           <div className="ml-auto flex items-center gap-1 relative">
+            <PresenceBar actorId={actor.id} />
             <div className="relative hidden sm:block">
               <button
                 onClick={() => { setCalOpen((v) => !v); setBellOpen(false); }}
