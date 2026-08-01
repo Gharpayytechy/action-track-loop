@@ -349,7 +349,9 @@ function PhaseCard(props: {
   const [open, setOpen] = useState(openByDefault);
   const done = phase.steps.filter((s) => day.checks[s.id]).length;
   const all = phase.steps.length;
-  const complete = done === all;
+  const ticked = done === all;
+  const submission = day.submissions?.[phase.id];
+  const complete = ticked && !!submission;
   const started = !!day.phases[phase.id]?.startedAt;
   const nowMins = new Date().getHours() * 60 + new Date().getMinutes();
   const overdue = !complete && nowMins > phase.dueMins;
@@ -366,7 +368,10 @@ function PhaseCard(props: {
           {complete ? <Check className="h-4 w-4" /> : index}
         </span>
         <span className="flex-1 min-w-0">
-          <span className="block font-medium truncate">{phase.name}</span>
+          <span className="block font-medium truncate">
+            <span className="font-display">{phase.codename}</span>
+            <span className="text-muted-foreground font-normal"> · {phase.name}</span>
+          </span>
           <span className="block text-xs text-muted-foreground">{phase.window} · {done}/{all} ticked{overdue ? " · overdue" : ""}</span>
         </span>
         {phase.checkpoint && <Badge variant="outline" className="hidden sm:inline-flex font-mono text-[10px]">due {phase.due}</Badge>}
