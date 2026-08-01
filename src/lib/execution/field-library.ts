@@ -1,5 +1,7 @@
 // Field library — the palette admins pick from when building playbooks.
 // 40+ prebuilt fields grouped by function; admins can add custom fields at runtime.
+import { ROLE_METRIC_FIELDS } from "@/lib/execution/role-metrics";
+
 
 export type FieldType =
   | "text" | "longtext" | "number" | "currency" | "percent"
