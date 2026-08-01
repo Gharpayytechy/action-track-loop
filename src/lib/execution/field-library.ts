@@ -122,9 +122,12 @@ export function fieldsVersion() { return ver; }
 export function getAllFields(): FieldDef[] {
   const s = read();
   const deleted = new Set(s.deletedDefaults);
+  const known = new Set(DEFAULT_FIELDS.map((f) => f.id));
+  const roleFields = (ROLE_METRIC_FIELDS as FieldDef[]).filter((f) => !known.has(f.id) && !deleted.has(f.id));
   const defaults = DEFAULT_FIELDS.filter((f) => !deleted.has(f.id));
-  return [...defaults, ...s.fields];
+  return [...defaults, ...roleFields, ...s.fields];
 }
+
 export function getField(id: string): FieldDef | undefined {
   return getAllFields().find((f) => f.id === id);
 }
