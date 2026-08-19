@@ -4,10 +4,10 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   Clock, Copy, Check, Undo2, AlertTriangle, ArrowRight, Cpu, User,
-  GitCompareArrows, Moon, Sunrise, Lock, ShieldCheck,
+  GitCompareArrows, Moon, Sunrise, Lock, ShieldCheck, Coffee,
 } from "lucide-react";
 import {
-  CHECKPOINTS, ROLE_FLOWS, checkpointStatus,
+  CHECKPOINTS, ROLE_FLOWS, checkpointStatus, activeBreak, breakAfter, RHYTHM_RULE,
   type CheckpointId, type ReportField, type RoleFlow, type RoleFlowKey,
 } from "@/data/reporting-os";
 import {
@@ -80,6 +80,7 @@ export function ReportingHeaderStat({ actorId, roleKey }: { actorId: string; rol
 export function NowLine() {
   const m = useMinuteTick();
   const live = liveCheckpoint(m);
+  const brk = activeBreak(m);
   return (
     <div className="rounded-lg border border-border bg-secondary/40 px-4 py-2.5 flex items-center gap-2 text-sm">
       {live ? (
@@ -89,12 +90,91 @@ export function NowLine() {
           <span className="font-semibold">{live.label}</span>
           <span className="ml-auto text-xs text-muted-foreground">{live.clock}</span>
         </>
+      ) : brk ? (
+        <>
+          <Coffee className="h-4 w-4 text-warning" />
+          <span className="font-mono text-[11px] uppercase tracking-widest text-warning">{brk.label}</span>
+          <span className="text-muted-foreground">{brk.thenWhat}</span>
+          <span className="ml-auto text-xs text-muted-foreground shrink-0">{brk.clock}</span>
+        </>
       ) : (
         <>
-          {m < 8 * 60 ? <Sunrise className="h-4 w-4 text-warning" /> : <Moon className="h-4 w-4 text-muted-foreground" />}
-          <span className="text-muted-foreground">No checkpoint window open right now — prep the next one below.</span>
+          {m < t1035 ? <Sunrise className="h-4 w-4 text-warning" /> : <Moon className="h-4 w-4 text-muted-foreground" />}
+          <span className="text-muted-foreground">
+            {m < t1035
+              ? "Day has not started. The 10:35 goal declaration opens the rhythm."
+              : "No checkpoint window open right now — prep the next one below."}
+          </span>
         </>
       )}
+    </div>
+  );
+}
+
+const t1035 = 10 * 60 + 35;
+
+/** The whole operating rhythm on one strip: checkpoints and breaks in order. */
+export function RhythmStrip() {
+  const m = useMinuteTick();
+  const live = liveCheckpoint(m);
+  const brk = activeBreak(m);
+  const items = useMemo(() => {
+    const out: { key: string; clock: string; label: string; note: string; isBreak: boolean }[] = [];
+    CHECKPOINTS.filter((c) => c.id !== "weekly").forEach((c) => {
+      out.push({
+        key: c.id, clock: c.clock, label: c.label, note: c.purpose,
+        isBreak: false,
+      });
+      const b = breakAfter(c.id);
+      if (b) out.push({ key: b.id, clock: b.clock, label: b.label, note: b.thenWhat, isBreak: true });
+    });
+    return out;
+  }, []);
+
+  return (
+    <div className="rounded-xl border border-border bg-card p-4">
+      <div className="flex items-center gap-2 mb-3">
+        <Clock className="h-4 w-4 text-primary" />
+        <h2 className="font-display text-sm font-semibold">The daily operating rhythm</h2>
+      </div>
+      <ol className="space-y-1.5">
+        {items.map((it) => {
+          const active = it.isBreak ? brk?.id === it.key : live?.id === it.key;
+          return (
+            <li
+              key={it.key}
+              className={`flex gap-3 rounded-md border px-3 py-2 text-sm transition-colors ${
+                active
+                  ? "border-primary/50 bg-primary/10"
+                  : it.isBreak
+                    ? "border-dashed border-border bg-muted/30"
+                    : "border-border bg-background"
+              }`}
+            >
+              <span className="font-mono text-[11px] tabular-nums text-muted-foreground w-[92px] shrink-0 pt-0.5">
+                {it.clock}
+              </span>
+              <span className="min-w-0">
+                <span className="font-medium flex items-center gap-1.5">
+                  {it.isBreak && <Coffee className="h-3.5 w-3.5 text-warning shrink-0" />}
+                  {it.label}
+                </span>
+                <span className="block text-xs text-muted-foreground">{it.note}</span>
+              </span>
+            </li>
+          );
+        })}
+      </ol>
+      <div className="mt-3 rounded-md border border-primary/25 bg-primary/5 px-3 py-2">
+        <div className="font-mono text-[10px] uppercase tracking-widest text-primary mb-1">
+          One rule above everything
+        </div>
+        <p className="text-xs text-muted-foreground">
+          {RHYTHM_RULE.join(" ")} The system never rewards someone merely for being busy — it
+          asks what you promised, what happened, what the gap is, what you will do next, and what
+          business outcome you created.
+        </p>
+      </div>
     </div>
   );
 }

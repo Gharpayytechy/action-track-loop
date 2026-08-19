@@ -8,7 +8,7 @@
 
 import { useMemo, useState } from "react";
 import {
-  CHECKPOINTS, ROLE_FLOWS, checkpointStatus, checkpointById,
+  CHECKPOINTS, ROLE_FLOWS, checkpointStatus, checkpointById, breakAfter, activeBreak,
   type CheckpointId, type ReportField, type RoleFlow, type RoleFlowKey,
 } from "@/data/reporting-os";
 import {
@@ -21,7 +21,7 @@ import { crmValue, fieldLocked, sourceLabel } from "@/lib/execution/crm-bridge";
 import { WhatsAppCopyBlock } from "@/components/execution/WhatsAppCopyBlock";
 import {
   Check, CheckCheck, Clock, Lock, Cpu, User, Pencil, Send, Zap, Flame,
-  AlertTriangle, ArrowRight, ShieldCheck,
+  AlertTriangle, ArrowRight, ShieldCheck, Coffee,
 } from "lucide-react";
 
 /* ------------------------------ bubbles ------------------------------ */
@@ -412,17 +412,30 @@ export function WhatsAppReportingThread({ actorId, roleKey }: {
           </p>
         </In>
 
-        {CHECKPOINTS.map((c) => (
-          <CheckpointThread
-            key={c.id}
-            cpId={c.id}
-            flow={flow}
-            actorId={actorId}
-            day={day}
-            nowM={m}
-            openByDefault={c.id === openDefault}
-          />
-        ))}
+        {CHECKPOINTS.map((c) => {
+          const brk = breakAfter(c.id);
+          return (
+            <div key={c.id} className="space-y-3">
+              <CheckpointThread
+                cpId={c.id}
+                flow={flow}
+                actorId={actorId}
+                day={day}
+                nowM={m}
+                openByDefault={c.id === openDefault}
+              />
+              {brk && (
+                <BreakBubble
+                  label={brk.label}
+                  clock={brk.clock}
+                  thenWhat={brk.thenWhat}
+                  live={activeBreak(m)?.id === brk.id}
+                  started={Boolean(day.submitted[c.id])}
+                />
+              )}
+            </div>
+          );
+        })}
 
         <DayChip>End of today's reporting cadence</DayChip>
       </div>
@@ -435,6 +448,42 @@ function HeroStat({ label, value }: { label: string; value: string }) {
     <div className="rounded-lg bg-white/10 border border-white/15 px-2 py-1.5">
       <div className="text-[9px] font-mono uppercase tracking-widest text-emerald-100/80 truncate">{label}</div>
       <div className="font-display text-base font-bold tabular-nums leading-tight">{value}</div>
+    </div>
+  );
+}
+
+/**
+ * The scheduled break that sits between two checkpoints. It is not a form —
+ * it is the visible pause that separates "what happened" from "what you will
+ * do next", and it states what the floor owes the moment it ends.
+ */
+function BreakBubble({
+  label, clock, thenWhat, live, started,
+}: {
+  label: string;
+  clock: string;
+  thenWhat: string;
+  live: boolean;
+  started: boolean;
+}) {
+  return (
+    <div className="flex justify-center">
+      <div
+        className={`max-w-[85%] rounded-xl border border-dashed px-3 py-2 text-center ${
+          live
+            ? "border-amber-400/70 bg-amber-50/95"
+            : started
+              ? "border-emerald-400/50 bg-emerald-50/80"
+              : "border-black/15 bg-white/70"
+        }`}
+      >
+        <div className="flex items-center justify-center gap-1.5 text-[11px] font-mono uppercase tracking-widest text-amber-700">
+          <Coffee className="h-3.5 w-3.5" />
+          {label} · {clock}
+          {live && <span className="text-amber-800">· on break</span>}
+        </div>
+        <p className="mt-1 text-[11px] text-neutral-600 leading-snug">{thenWhat}</p>
+      </div>
     </div>
   );
 }

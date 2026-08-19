@@ -1,6 +1,18 @@
-// Reporting OS — day-wise checkpoint flow (Good Morning → 1 PM → 4 PM → 5 PM → 8 PM EOD → Weekly)
-// Operationalized from the 100X Reporting OS framework: every role reports the same
-// cadence, and every number links to the next role in the connected funnel.
+// Reporting OS — the daily operating rhythm.
+//
+//   10:35 AM  Day starts        → goal declared
+//   10:36 AM  Commitment        → what must be achieved by 1:15 PM
+//   1:15 PM   Phase 1 actuals   → break starts
+//   2:00 PM   Break ends        → recovery + acceleration commitment to 5:00 PM
+//   5:00 PM   Phase 2 actuals   → final gap identified → break starts
+//   5:20 PM   Break ends        → final impact phase begins
+//   8:00 PM   Final impact      → tomorrow pipeline locked → day ends
+//
+// One rule above everything: 10:35 decides the goal, 1:15 exposes reality,
+// 5:00 forces recovery, 8:00 measures impact. Nobody is rewarded for being busy.
+// Every checkpoint answers: what did you promise, what happened, what is the
+// gap, what will you do next, what business outcome did you create?
+
 
 export type CheckpointId = "gm" | "p1" | "p2" | "p3" | "wrap" | "weekly";
 
@@ -41,13 +53,77 @@ export interface RoleFlow {
 const t = (h: number, m = 0) => h * 60 + m;
 
 export const CHECKPOINTS: Checkpoint[] = [
-  { id: "gm", code: "GM", label: "Good Morning", clock: "Before 9:30 AM", atMin: t(8, 0), dueMin: t(9, 30), purpose: "Plan the day. Own the numbers before the floor moves." },
-  { id: "p1", code: "P1", label: "1 PM Report", clock: "1:00 PM", atMin: t(12, 30), dueMin: t(13, 15), purpose: "Mid-day check. Is every lead owned and moving?" },
-  { id: "p2", code: "P2", label: "4 PM Report", clock: "4:00 PM", atMin: t(15, 30), dueMin: t(16, 15), purpose: "Pre-close push. Recover the gap while the day is still alive." },
-  { id: "p3", code: "P3", label: "5 PM Report", clock: "5:00 PM", atMin: t(16, 45), dueMin: t(17, 15), purpose: "Day closure. Lock the result, name the misses." },
-  { id: "wrap", code: "WRAP", label: "8 PM Wrap-Up", clock: "8:00 PM", atMin: t(19, 30), dueMin: t(20, 15), purpose: "EOD system closure. Final reconciliation, clean-up, tomorrow's plan." },
-  { id: "weekly", code: "WEEK", label: "Weekly Report", clock: "Sunday 8:00 PM", atMin: t(19, 30), dueMin: t(20, 30), purpose: "Six days of checkpoints turned into decisions." },
+  {
+    id: "gm", code: "GOAL", label: "Day Start · Goal", clock: "10:35 AM",
+    atMin: t(10, 35), dueMin: t(10, 50),
+    purpose: "Declare the goal, then commit: what must be achieved by 1:15 PM?",
+  },
+  {
+    id: "p1", code: "P1", label: "Phase 1 Actuals", clock: "1:15 PM",
+    atMin: t(13, 0), dueMin: t(13, 15),
+    purpose: "Reality check. Promised vs delivered — then the break starts.",
+  },
+  {
+    id: "p2", code: "RECOVER", label: "Recovery Commit", clock: "2:00 PM",
+    atMin: t(14, 0), dueMin: t(14, 20),
+    purpose: "Break is over. Name the gap and commit: what must be done by 5:00 PM?",
+  },
+  {
+    id: "p3", code: "P2", label: "Phase 2 Actuals", clock: "5:00 PM",
+    atMin: t(16, 45), dueMin: t(17, 0),
+    purpose: "Final gap identified. Lock what the impact phase must deliver by 8 PM.",
+  },
+  {
+    id: "wrap", code: "IMPACT", label: "Final Impact · Day End", clock: "8:00 PM",
+    atMin: t(19, 30), dueMin: t(20, 0),
+    purpose: "Measure the business outcome created. Lock tomorrow's pipeline. Day ends.",
+  },
+  {
+    id: "weekly", code: "WEEK", label: "Weekly Report", clock: "Sunday 8:00 PM",
+    atMin: t(19, 30), dueMin: t(20, 30),
+    purpose: "Six days of checkpoints turned into decisions.",
+  },
 ];
+
+/** The single line that governs the whole system. */
+export const RHYTHM_RULE = [
+  "10:35 decides the goal.",
+  "1:15 exposes reality.",
+  "5:00 forces recovery.",
+  "8:00 measures impact.",
+];
+
+/** Scheduled recovery breaks that sit between checkpoints. */
+export interface BreakWindow {
+  id: string;
+  label: string;
+  clock: string;
+  startMin: number;
+  endMin: number;
+  after: CheckpointId;   // break opens once this checkpoint is filed
+  thenWhat: string;      // what the floor owes when the break ends
+}
+
+export const BREAKS: BreakWindow[] = [
+  {
+    id: "b1", label: "Break 1", clock: "1:15 – 2:00 PM",
+    startMin: t(13, 15), endMin: t(14, 0), after: "p1",
+    thenWhat: "Recovery + acceleration begins. Commit what lands by 5:00 PM.",
+  },
+  {
+    id: "b2", label: "Break 2", clock: "5:00 – 5:20 PM",
+    startMin: t(17, 0), endMin: t(17, 20), after: "p3",
+    thenWhat: "Final Impact phase begins. Everything now aims at the 8:00 PM outcome.",
+  },
+];
+
+export function breakAfter(cp: CheckpointId): BreakWindow | undefined {
+  return BREAKS.find((b) => b.after === cp);
+}
+
+export function activeBreak(m: number): BreakWindow | undefined {
+  return BREAKS.find((b) => m >= b.startMin && m < b.endMin);
+}
 
 export function checkpointById(id: CheckpointId) {
   return CHECKPOINTS.find((c) => c.id === id)!;
@@ -71,7 +147,7 @@ const CONTROL_TOWER: RoleFlow = {
       { id: "ct_gm_waiting", label: "Chats waiting for us", kind: "number", source: "auto", meaning: "Must be 0 beyond SLA." },
       { id: "ct_gm_tours", label: "Tours today", kind: "number", source: "auto", meaning: "Scheduled today across all zones." },
       { id: "ct_gm_risks", label: "Top 3 operating risks", kind: "list", source: "human", meaning: "Exact stage + count + owner." },
-      { id: "ct_gm_interventions", label: "Top 3 interventions before 1 PM", kind: "list", source: "human", meaning: "What Control Tower will actively fix." },
+      { id: "ct_gm_interventions", label: "Top 3 interventions before 1:15 PM", kind: "list", source: "human", meaning: "What Control Tower will actively fix." },
     ],
     p1: [
       { id: "ct_p1_assigned", label: "Assigned %", kind: "percent", source: "auto", meaning: "Assigned active leads / leads requiring owner." },
@@ -81,7 +157,7 @@ const CONTROL_TOWER: RoleFlow = {
       { id: "ct_p1_tours_sched", label: "Tours scheduled", kind: "number", source: "auto", meaning: "Flow Ops source." },
       { id: "ct_p1_visits", label: "Visits today confirmed", kind: "number", source: "auto", meaning: "TCM source." },
       { id: "ct_p1_broken", label: "Primary broken stage", kind: "text", source: "auto+human", meaning: "Largest count / value leakage." },
-      { id: "ct_p1_recovery", label: "Recovery plan to 4 PM", kind: "text", source: "human", meaning: "Exact people / cases / action / support owner." },
+      { id: "ct_p1_recovery", label: "Recovery plan to 5:00 PM", kind: "text", source: "human", meaning: "Exact people / cases / action / support owner." },
     ],
     p2: [
       { id: "ct_p2_unconf", label: "Unconfirmed tours at risk", kind: "number", source: "auto", meaning: "Tours today not confirmed." },
@@ -89,9 +165,9 @@ const CONTROL_TOWER: RoleFlow = {
       { id: "ct_p2_no_outcome", label: "Completed tours without outcome", kind: "number", source: "auto", meaning: "TCM leakage." },
       { id: "ct_p2_pay_risk", label: "Payments / owner confirmations at risk", kind: "number", source: "auto", meaning: "Closing leakage." },
       { id: "ct_p2_idle", label: "Idle / underloaded people", kind: "number", source: "auto", meaning: "Needs reallocation or diagnosis." },
-      { id: "ct_p2_taken", label: "Interventions taken since 1 PM", kind: "list", source: "human", meaning: "Action + owner + result." },
+      { id: "ct_p2_taken", label: "Interventions taken since 1:15 PM", kind: "list", source: "human", meaning: "Action + owner + result." },
       { id: "ct_p2_risk", label: "Risk if we do nothing", kind: "text", source: "human", meaning: "Expected lost tours / bookings / revenue." },
-      { id: "ct_p2_support", label: "Support needed before 5 PM", kind: "text", source: "human", meaning: "Exact cross-team help." },
+      { id: "ct_p2_support", label: "Support needed before 5:00 PM", kind: "text", source: "human", meaning: "Exact cross-team help." },
     ],
     p3: [
       { id: "ct_p3_bbd", label: "BBD target vs actual", kind: "text", source: "auto", meaning: "21 by P2 / 30 EOD reference." },
@@ -268,11 +344,50 @@ const CLOSING: RoleFlow = {
   },
 };
 
+/**
+ * The five questions the rhythm must answer for every role, every day:
+ * what did you promise, what happened, what is the gap, what next, what
+ * outcome did you create. These are prepended to each role's own fields so
+ * no checkpoint can be filed as a pile of activity with no promise attached.
+ */
+const RHYTHM_FIELDS: Partial<Record<CheckpointId, ReportField[]>> = {
+  gm: [
+    { id: "rx_goal", label: "Today's goal (one number)", kind: "text", source: "human", meaning: "Declared at 10:35. The single outcome the day is judged on." },
+    { id: "rx_commit_115", label: "Commitment by 1:15 PM", kind: "text", source: "human", meaning: "Declared at 10:36. What must be achieved before Phase 1 closes." },
+  ],
+  p1: [
+    { id: "rx_p1_promised", label: "Promised by 1:15", kind: "text", source: "human", meaning: "Restate the 10:36 commitment. No rewriting history." },
+    { id: "rx_p1_actual", label: "Actually delivered", kind: "text", source: "human", meaning: "What really happened by 1:15." },
+    { id: "rx_p1_gap", label: "Gap + why", kind: "text", source: "human", meaning: "The honest difference and its first broken cause." },
+  ],
+  p2: [
+    { id: "rx_commit_500", label: "Commitment by 5:00 PM", kind: "text", source: "human", meaning: "Break is over at 2:00. What recovery + acceleration delivers by 5." },
+  ],
+  p3: [
+    { id: "rx_p2_actual", label: "Delivered by 5:00", kind: "text", source: "human", meaning: "Phase 2 actuals against the 2:00 PM commitment." },
+    { id: "rx_final_gap", label: "Final gap to goal", kind: "text", source: "human", meaning: "Exactly what is still missing from the 10:35 goal." },
+    { id: "rx_commit_800", label: "Commitment by 8:00 PM", kind: "text", source: "human", meaning: "Set at 5:20 when the break ends. What the impact phase must close." },
+  ],
+  wrap: [
+    { id: "rx_outcome", label: "Final business outcome created", kind: "text", source: "human", meaning: "Not activity. The result the business can bank." },
+    { id: "rx_goal_hit", label: "Goal hit?", kind: "yesno", source: "human", meaning: "Against the number declared at 10:35." },
+    { id: "rx_tomorrow", label: "Tomorrow's pipeline locked", kind: "text", source: "human", meaning: "What is already loaded for tomorrow before the day ends." },
+  ],
+};
+
+function withRhythm(flow: RoleFlow): RoleFlow {
+  const checkpoints = { ...flow.checkpoints };
+  (Object.keys(RHYTHM_FIELDS) as CheckpointId[]).forEach((cp) => {
+    checkpoints[cp] = [...(RHYTHM_FIELDS[cp] ?? []), ...(checkpoints[cp] ?? [])];
+  });
+  return { ...flow, checkpoints };
+}
+
 export const ROLE_FLOWS: Record<RoleFlowKey, RoleFlow> = {
-  control_tower: CONTROL_TOWER,
-  flow_ops: FLOW_OPS,
-  tcm: TCM,
-  closing: CLOSING,
+  control_tower: withRhythm(CONTROL_TOWER),
+  flow_ops: withRhythm(FLOW_OPS),
+  tcm: withRhythm(TCM),
+  closing: withRhythm(CLOSING),
 };
 
 export const ROLE_FLOW_ORDER: RoleFlowKey[] = ["control_tower", "flow_ops", "tcm", "closing"];

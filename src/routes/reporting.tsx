@@ -6,7 +6,7 @@ import {
   ROLE_FLOWS, ROLE_FLOW_ORDER, flowForEmployee, type RoleFlowKey,
 } from "@/data/reporting-os";
 import {
-  ReportingOSPanel, ReportingHeaderStat, NowLine,
+  ReportingOSPanel, ReportingHeaderStat, NowLine, RhythmStrip,
 } from "@/components/execution/ReportingOS";
 import { WhatsAppReportingThread } from "@/components/execution/WhatsAppReportingThread";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -84,6 +84,8 @@ function ReportingPage() {
           <NowLine />
         </div>
       </div>
+
+      <RhythmStrip />
 
       <Tabs value={view} onValueChange={(v) => setView(v as "chat" | "board")}>
         <TabsList>
