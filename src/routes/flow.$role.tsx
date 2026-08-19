@@ -23,6 +23,7 @@ import { EMPLOYEES } from "@/data/seed";
 import { ROLE_FLOWS as REPORT_FLOWS } from "@/data/reporting-os";
 import { ReportingOSPanel, ReportingHeaderStat, NowLine } from "@/components/execution/ReportingOS";
 import { ImpactChat } from "@/components/execution/ImpactChat";
+import { WhatsAppPhases } from "@/components/execution/WhatsAppPhases";
 
 import {
   ArrowRight, Minus, Plus, ShieldAlert, Target, TrendingUp, Clock, CheckCircle2,
@@ -129,6 +130,7 @@ function RoleFlowPage() {
       <Tabs defaultValue="run">
         <TabsList className="flex-wrap h-auto">
           <TabsTrigger value="run">Run the day</TabsTrigger>
+          <TabsTrigger value="phases">WhatsApp PHASES</TabsTrigger>
           <TabsTrigger value="reporting">Reporting OS</TabsTrigger>
           <TabsTrigger value="flow">Chat with Impact</TabsTrigger>
           <TabsTrigger value="playbook">Playbook</TabsTrigger>
