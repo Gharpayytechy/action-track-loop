@@ -19,6 +19,7 @@ import {
 import { useEditWindow, useMinuteTick, liveCheckpoint } from "@/components/execution/ReportingOS";
 import { crmValue, fieldLocked, sourceLabel } from "@/lib/execution/crm-bridge";
 import { WhatsAppCopyBlock } from "@/components/execution/WhatsAppCopyBlock";
+import { useChatReveal, StartChatCard, TypingBubble, ContinueBar } from "@/components/execution/chat-reveal";
 import {
   Check, CheckCheck, Clock, Lock, Cpu, User, Pencil, Send, Zap, Flame,
   AlertTriangle, ArrowRight, ShieldCheck, Coffee,
@@ -328,11 +329,19 @@ export function WhatsAppReportingThread({ actorId, roleKey }: {
   const filledFields = CHECKPOINTS.reduce(
     (n, c) => n + checkpointFill(day, roleKey, c.id, actorId).filled, 0,
   );
-  const openDefault = live?.id ?? daily.find((c) => !day.submitted[c.id])?.id ?? "wrap";
   const today = new Date().toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "long" });
 
+  // Identical rhythm to WhatsApp PHASES: one checkpoint at a time, nothing
+  // visible until the person starts the chat.
+  const resumeAt = CHECKPOINTS.filter((c) => day.submitted[c.id]).length;
+  const reveal = useChatReveal(CHECKPOINTS.length, resumeAt);
+  const visible = CHECKPOINTS.slice(0, reveal.shown);
+  const lastVisible = visible[visible.length - 1];
+  const lastFiled = !!lastVisible && Boolean(day.submitted[lastVisible.id]);
+
   const jump = (id: CheckpointId) => {
-    document.getElementById(`wa-cp-${id}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    reveal.goTo(CHECKPOINTS.findIndex((c) => c.id === id));
+    setTimeout(() => document.getElementById(`wa-cp-${id}`)?.scrollIntoView({ behavior: "smooth", block: "start" }), 60);
   };
 
   return (
@@ -391,6 +400,14 @@ export function WhatsAppReportingThread({ actorId, roleKey }: {
       </div>
 
       <div className="wa-chat-bg px-2 py-4 space-y-3 max-h-[78vh] overflow-y-auto">
+        {!reveal.started ? (
+          <StartChatCard
+            title={`${flow.title} · today's reporting`}
+            line={`${CHECKPOINTS.length} checkpoints from 10:35 AM to 8:00 PM. I'll ask for them one at a time.`}
+            onStart={reveal.start}
+          />
+        ) : (
+          <>
         <DayChip>{today}</DayChip>
 
         <In>
@@ -412,7 +429,7 @@ export function WhatsAppReportingThread({ actorId, roleKey }: {
           </p>
         </In>
 
-        {CHECKPOINTS.map((c) => {
+        {visible.map((c, i) => {
           const brk = breakAfter(c.id);
           return (
             <div key={c.id} className="space-y-3">
@@ -422,7 +439,7 @@ export function WhatsAppReportingThread({ actorId, roleKey }: {
                 actorId={actorId}
                 day={day}
                 nowM={m}
-                openByDefault={c.id === openDefault}
+                openByDefault={i === visible.length - 1}
               />
               {brk && (
                 <BreakBubble
@@ -437,7 +454,20 @@ export function WhatsAppReportingThread({ actorId, roleKey }: {
           );
         })}
 
+        {reveal.typing && <TypingBubble initial={flow.title.slice(0, 1)} />}
+        {!reveal.atEnd && !reveal.typing && (
+          <ContinueBar
+            label={`Next: ${CHECKPOINTS[reveal.shown]?.code ?? "checkpoint"}`}
+            waiting={!lastFiled}
+            hint="send this checkpoint to move on"
+            onNext={reveal.next}
+          />
+        )}
+        {reveal.atEnd && (
         <DayChip>End of today's reporting cadence</DayChip>
+        )}
+          </>
+        )}
       </div>
     </div>
   );

@@ -8,6 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import { PhaseReportForm } from "@/components/execution/PhaseReportForm";
 import { WhatsAppCopyBlock } from "@/components/execution/WhatsAppCopyBlock";
 import { SelfieCapture } from "@/components/SelfieCapture";
+import { useChatReveal, StartChatCard, TypingBubble, ContinueBar } from "@/components/execution/chat-reveal";
 import {
   BAND_META, bandFor, targetAt, type CoreRole,
 } from "@/lib/execution/core-roles";
@@ -502,6 +503,13 @@ export function WhatsAppPhases({
   const left = current ? current.dueMins - mins : 0;
   const liveBreak = activeBreak();
 
+  // One phase at a time. Anything already closed is replayed instantly.
+  const resumeAt = phases.filter((p) => !!day.phases[p.id]?.doneAt).length;
+  const reveal = useChatReveal(phases.length, resumeAt);
+  const visible = phases.slice(0, reveal.shown);
+  const lastVisible = visible[visible.length - 1];
+  const lastStarted = !!lastVisible && lastVisible.steps.some((s) => !!day.checks[s.id]);
+
   const jump = (id: string) =>
     document.getElementById(`wa-phase-${id}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
 
@@ -551,7 +559,7 @@ export function WhatsAppPhases({
             return (
               <button
                 key={p.id}
-                onClick={() => jump(p.id)}
+                onClick={() => { reveal.goTo(phases.findIndex((x) => x.id === p.id)); setTimeout(() => jump(p.id), 60); }}
                 className={`shrink-0 wa-pill border ${
                   closed ? "bg-emerald-400/25 border-emerald-200/50 text-emerald-50"
                     : isNow ? "bg-white/90 border-white text-[#075E54]"
@@ -566,6 +574,14 @@ export function WhatsAppPhases({
       </div>
 
       <div className="wa-chat-bg px-2 py-4 space-y-3 max-h-[78vh] overflow-y-auto">
+        {!reveal.started ? (
+          <StartChatCard
+            title={`${role.name} · today's phases`}
+            line={`${phases.length} checkpoints, 10:35 AM to 8:00 PM. I'll bring them to you one at a time.`}
+            onStart={reveal.start}
+          />
+        ) : (
+          <>
         <DayChip>{today}</DayChip>
         {headline && (
           <In time={chatTime(mins)}>
@@ -575,7 +591,7 @@ export function WhatsAppPhases({
             <p className="font-semibold leading-relaxed">{headline}</p>
           </In>
         )}
-        {phases.map((p, i) => {
+        {visible.map((p, i) => {
           const brk = BREAKS.find((b) => b.after === p.id);
           return (
             <div key={p.id} className="space-y-3">
@@ -586,14 +602,29 @@ export function WhatsAppPhases({
                 day={day}
                 actorId={actorId}
                 counts={counts}
-                openByDefault={p.id === nowPhase}
+                openByDefault={i === visible.length - 1}
               />
               {brk && <BreakBubble marker={brk} live={liveBreak?.id === brk.id} />}
             </div>
           );
         })}
-        <WrapBubble role={role} wrap={wrap} auto={auto} />
-        <DayChip>End of today's phases</DayChip>
+        {reveal.typing && <TypingBubble initial={role.name.slice(0, 1)} />}
+        {!reveal.atEnd && !reveal.typing && (
+          <ContinueBar
+            label={`Next: ${phases[reveal.shown]?.codename ?? "phase"}`}
+            waiting={!lastStarted}
+            hint="tick something in this phase to move on"
+            onNext={reveal.next}
+          />
+        )}
+        {reveal.atEnd && (
+          <>
+            <WrapBubble role={role} wrap={wrap} auto={auto} />
+            <DayChip>End of today's phases</DayChip>
+          </>
+        )}
+          </>
+        )}
       </div>
     </div>
   );

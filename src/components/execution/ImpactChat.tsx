@@ -5,6 +5,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { SelfieCapture } from "@/components/SelfieCapture";
 import { WhatsAppCopyBlock } from "@/components/execution/WhatsAppCopyBlock";
+import { StartChatCard } from "@/components/execution/chat-reveal";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import type { CoreRole } from "@/lib/execution/core-roles";
@@ -141,12 +142,14 @@ export function ImpactChat({
     return lastAnswered + 1;
   });
   const [typing, setTyping] = useState(false);
+  // Same gate as every other thread in the app: nothing shows until you start.
+  const [started, setStarted] = useState(false);
 
   const last = beats[revealed - 1];
   const blocked = !!last && interactive(last) && !answered(last);
 
   useEffect(() => {
-    if (blocked || revealed >= beats.length) return;
+    if (!started || blocked || revealed >= beats.length) return;
     const next = beats[revealed];
     const delay =
       next.k === "divider" ? 220
@@ -155,7 +158,7 @@ export function ImpactChat({
     setTyping(next.k === "say" || next.k === "wrap");
     const t = setTimeout(() => { setTyping(false); setRevealed((r) => r + 1); }, delay);
     return () => clearTimeout(t);
-  }, [revealed, blocked, beats]);
+  }, [started, revealed, blocked, beats]);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -354,12 +357,22 @@ export function ImpactChat({
       <div className="wa-track h-1"><span style={{ width: `${progress}%` }} /></div>
 
       <div ref={scrollRef} className="wa-chat-bg px-2 py-4 space-y-2.5 max-h-[76vh] overflow-y-auto">
-        {beats.slice(0, revealed).map(renderBeat)}
-        {typing && <Typing />}
+        {!started ? (
+          <StartChatCard
+            title={`${personName} × Impact`}
+            line="Your whole day as one conversation — goal at 10:35, actuals at 1:15, recovery at 2:00, actuals at 5:00, impact at 8:00."
+            onStart={() => setStarted(true)}
+          />
+        ) : (
+          <>
+            {beats.slice(0, revealed).map(renderBeat)}
+            {typing && <Typing />}
+          </>
+        )}
         <div ref={endRef} />
       </div>
 
-      {blocked && (
+      {started && blocked && (
         <button
           className="w-full py-1.5 text-[10px] font-mono uppercase tracking-widest wa-meta bg-background border-t border-border flex items-center justify-center gap-1"
           onClick={() => endRef.current?.scrollIntoView({ behavior: "smooth" })}

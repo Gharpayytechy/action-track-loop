@@ -23,6 +23,7 @@ import { EMPLOYEES } from "@/data/seed";
 import { ROLE_FLOWS as REPORT_FLOWS } from "@/data/reporting-os";
 import { ReportingOSPanel, ReportingHeaderStat, NowLine } from "@/components/execution/ReportingOS";
 import { ImpactChat } from "@/components/execution/ImpactChat";
+import { WhatsAppReportingThread } from "@/components/execution/WhatsAppReportingThread";
 import { WhatsAppPhases } from "@/components/execution/WhatsAppPhases";
 
 import {
@@ -265,6 +266,17 @@ function RoleFlowPage() {
             )}
           </div>
 
+          {/* ---- Section 2: the same chat shape, for the reporting cadence ---- */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 font-medium">
+              <CheckCircle2 className="h-4 w-4 text-primary" /> Section 2 · Reporting OS — same chat, one checkpoint at a time
+            </div>
+            {hydrated ? (
+              <WhatsAppReportingThread actorId={actor.id} roleKey={role.id} />
+            ) : (
+              <Card className="p-5 text-sm text-muted-foreground">Loading today's reporting thread…</Card>
+            )}
+          </div>
 
           {needsRecovery && (
             <RecoveryCard
