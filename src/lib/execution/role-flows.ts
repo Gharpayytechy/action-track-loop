@@ -222,7 +222,7 @@ export const ROLE_FLOWS: RoleFlow[] = [
     roleId: "LDR-ZONE", playbookId: "pb_role_ldr_zone", roleName: "Zone Lead", department: "Leadership & Business Management",
     result: "The zone booking promise is delivered with focus inventory ready and SLAs held.",
     p1: "Count today, 7-day and 30-day demand, select focus inventory and allocate booking promises.",
-    p2: "Run the 1 PM and 5 PM control on funnel, tours, exact beds, quotations, holds, owners and people.",
+    p2: "Run the 1:15 PM and 5 PM control on funnel, tours, exact beds, quotations, holds, owners and people.",
     p3: "Deliver or forecast the zone result, close risks and submit one evidence-based zone truth.",
     metrics: ["zone_bookings", "focus_properties_ready", "interventions_done"],
     match: ["zone lead", "zone"],

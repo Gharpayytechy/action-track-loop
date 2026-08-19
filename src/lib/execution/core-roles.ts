@@ -9,7 +9,7 @@ export type CoreRoleId = "control_tower" | "flow_ops" | "tcm" | "closing";
 export interface TargetLine {
   id: string;          // metric key
   label: string;       // "BBD"
-  p1: number;          // by 1:00 PM
+  p1: number;          // by 1:15 PM
   p2: number;          // by 5:00 PM
   eod: number;
   weekly: number;      // 6 working days
@@ -94,12 +94,12 @@ export const CORE_ROLES: CoreRole[] = [
       { name: "Lead assignment SLA", weight: 20, measure: "Zero active leads unassigned beyond 30 minutes" },
       { name: "Data truth & dedupe", weight: 15, measure: "Source vs CRM variance = 0, duplicates merged same day" },
       { name: "Revival of stuck queue", weight: 15, measure: "Aged leads re-activated with a valid next action" },
-      { name: "Evidence & update discipline", weight: 15, measure: "1 PM / 5 PM / EOD submitted on time with proof" },
+      { name: "Evidence & update discipline", weight: 15, measure: "1:15 PM / 5 PM / EOD submitted on time with proof" },
     ],
     p1Work: [
       "Reconcile every active source and turn enquiries into clean, deduplicated, correctly zoned leads.",
       "Allocate work by intent, capability and current load — nothing sits unowned.",
-      "Run the first BBD block and reach 9 BBD by 1:00 PM.",
+      "Run the first BBD block and reach 9 BBD by 1:15 PM.",
     ],
     p2Work: [
       "Monitor first action, connects, tours and stuck queues; rebalance before capacity is wasted.",
@@ -116,7 +116,7 @@ export const CORE_ROLES: CoreRole[] = [
       "Revival attempts, connects and reactivations",
       "Named blockers, owner and tomorrow's first priority",
     ],
-    checkpoints: ["10:45 goal locked", "1:00 PM — 9 BBD", "5:00 PM — 21 BBD", "8:00 PM — 30 BBD + EOD evidence"],
+    checkpoints: ["10:35 goal locked", "1:15 PM — 9 BBD", "5:00 PM — 21 BBD", "8:00 PM — 30 BBD + EOD evidence"],
     nonNegotiables: [
       "No active lead ends the day without an owner.",
       "BBD is only counted with a logged conversation and a committed next step.",
@@ -164,7 +164,7 @@ export const CORE_ROLES: CoreRole[] = [
     p1Work: [
       "Work priority leads first: qualify location, budget, date and inventory.",
       "Validate exact sellable beds before promising anything.",
-      "Lock 4 tours and 2 quotations by 1:00 PM.",
+      "Lock 4 tours and 2 quotations by 1:15 PM.",
     ],
     p2Work: [
       "Recommend the best two options, build the dossier and secure a committed tour time.",
@@ -188,7 +188,7 @@ export const CORE_ROLES: CoreRole[] = [
       { name: "Inventory truth", weight: 15, measure: "Zero tours booked on unavailable beds" },
       { name: "Handover discipline", weight: 10, measure: "Every tour handed over with a complete dossier" },
     ],
-    checkpoints: ["10:45 goal locked", "1:00 PM — 4 tours + 2 quotations", "5:00 PM — 8 tours + 5 quotations", "8:00 PM — 10 tours + 6 quotations"],
+    checkpoints: ["10:35 goal locked", "1:15 PM — 4 tours + 2 quotations", "5:00 PM — 8 tours + 5 quotations", "8:00 PM — 10 tours + 6 quotations"],
     nonNegotiables: [
       "No tour scheduled without a verified, available exact bed.",
       "No quotation without approved commercials.",
@@ -237,7 +237,7 @@ export const CORE_ROLES: CoreRole[] = [
     p1Work: [
       "Confirm all 15 tours: exact inventory, property access, travel plan, backup property.",
       "Run live control on movement — en route, arrival, completion.",
-      "By 1:00 PM: 15 controlled, 3 done, 1 booking.",
+      "By 1:15 PM: 15 controlled, 3 done, 1 booking.",
     ],
     p2Work: [
       "Solve delays before the experience breaks; make sure each visit sees the approved purchasable option.",
@@ -261,7 +261,7 @@ export const CORE_ROLES: CoreRole[] = [
       { name: "Post-tour buying path", weight: 15, measure: "Report + next step within 30 minutes of each tour" },
       { name: "No-show recovery", weight: 10, measure: "Every no-show rescheduled or closed with reason" },
     ],
-    checkpoints: ["10:45 goal locked", "1:00 PM — 15 / 3 / 1", "5:00 PM — 15 / 8 / 3", "8:00 PM — 15 / 10 / 5"],
+    checkpoints: ["10:35 goal locked", "1:15 PM — 15 / 3 / 1", "5:00 PM — 15 / 8 / 3", "8:00 PM — 15 / 10 / 5"],
     nonNegotiables: [
       "No tour marked done without evidence.",
       "No customer shown a bed that is not actually sellable.",
@@ -308,7 +308,7 @@ export const CORE_ROLES: CoreRole[] = [
     p1Work: [
       "Rank hot, tour-done, ready-to-pay and decision-due customers; identify the single true objection each.",
       "Secure approved terms and place exact-bed holds.",
-      "1 paid booking by 1:00 PM.",
+      "1 paid booking by 1:15 PM.",
     ],
     p2Work: [
       "Present one final offer per case and collect payment.",
@@ -332,14 +332,14 @@ export const CORE_ROLES: CoreRole[] = [
       { name: "Hold hygiene", weight: 15, measure: "No expired or duplicate holds at EOD" },
       { name: "Handover to check-in", weight: 10, measure: "Complete pack transferred same day" },
     ],
-    checkpoints: ["10:45 goal locked", "1:00 PM — 1 booking", "5:00 PM — 3 bookings", "8:00 PM — 4 paid bookings"],
+    checkpoints: ["10:35 goal locked", "1:15 PM — 1 booking", "5:00 PM — 3 bookings", "8:00 PM — 4 paid bookings"],
     nonNegotiables: [
       "A booking counts only when money is verified against an exact Bed ID.",
       "No double allocation, ever.",
       "False evidence puts incentive on hold immediately.",
     ],
     escalations: [
-      "Zero bookings by 1:00 PM → Team Lead intervention.",
+      "Zero bookings by 1:15 PM → Team Lead intervention.",
       "Below 75% pace → Missed alert + 15-minute recovery plan.",
       "Owner refuses an honoured hold → Zone Lead immediately.",
     ],
@@ -403,7 +403,7 @@ export function currentCheckpoint(d = new Date()): "p1" | "p2" | "eod" {
 }
 
 export const CHECKPOINT_LABEL: Record<"p1" | "p2" | "eod", string> = {
-  p1: "Phase 1 · by 1:00 PM",
+  p1: "Phase 1 · by 1:15 PM",
   p2: "Phase 2 · by 5:00 PM",
   eod: "EOD · by 8:00 PM",
 };
