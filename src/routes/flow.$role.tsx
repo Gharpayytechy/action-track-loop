@@ -174,6 +174,26 @@ function RoleFlowPage() {
 
         {/* ---------------- DAILY FLOW ---------------- */}
         <TabsContent value="flow" className="space-y-5 mt-5">
+        </TabsContent>
+
+        {/* ---------------- WHATSAPP PHASES: the whole rhythm as a thread ---------------- */}
+        <TabsContent value="phases" className="space-y-5 mt-5">
+          {hydrated ? (
+            <WhatsAppPhases
+              role={role}
+              phases={phases}
+              day={day}
+              actorId={actor.id}
+              counts={counts}
+              nowPhase={nowPhase}
+              headline={nextStep ? `${nextStep.phase.codename}: ${nextStep.step.label}` : "Every phase is ticked. Close the day with the 8 PM final impact."}
+            />
+          ) : (
+            <Card className="p-5 text-sm text-muted-foreground">Loading today's thread…</Card>
+          )}
+        </TabsContent>
+
+        <TabsContent value="flow-body" className="space-y-5 mt-5">
           <Card className="p-5 border-primary/40 bg-primary/5">
             <div className="flex items-center gap-2 text-[11px] font-mono uppercase tracking-widest text-primary">
               <Target className="h-3.5 w-3.5" /> This is what we are supposed to do next
