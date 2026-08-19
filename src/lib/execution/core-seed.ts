@@ -92,7 +92,7 @@ export function seedCoreDemo() {
           }]
         : [];
 
-      recs.push({ employeeId: emp.id, roleId: role.id, date, counts, checks, phases, submissions, recoveries });
+      recs.push({ employeeId: emp.id, roleId: role.id, date, counts, checks, phases, submissions, selfies: {}, recoveries });
     }
   }
 

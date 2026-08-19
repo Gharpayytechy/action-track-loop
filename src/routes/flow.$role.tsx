@@ -74,7 +74,7 @@ function RoleFlowPage() {
   const phases = useMemo(() => phasesFor(role), [role]);
 
   const day = useMemo(
-    () => { void v; return hydrated ? getCoreDay(actor.id, role.id) : ({ employeeId: actor.id, roleId: role.id, date: "", counts: {}, checks: {}, phases: {}, submissions: {}, recoveries: [] } as CoreDay); },
+    () => { void v; return hydrated ? getCoreDay(actor.id, role.id) : ({ employeeId: actor.id, roleId: role.id, date: "", counts: {}, checks: {}, phases: {}, submissions: {}, selfies: {}, recoveries: [] } as CoreDay); },
     [actor.id, role.id, v, hydrated],
   );
   const counts = day.counts;

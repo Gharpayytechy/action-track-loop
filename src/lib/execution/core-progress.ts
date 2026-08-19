@@ -10,6 +10,9 @@ export interface RecoveryPlan { ts: number; checkpoint: string; metric: string; 
 
 export interface PhaseSubmission { ts: number; values: Record<string, string> }
 
+/** A selfie proof captured at a fixed moment of the day. */
+export interface SelfieProof { ts: number; img: string }
+
 export interface CoreDay {
   employeeId: string;
   roleId: CoreRoleId;
@@ -18,6 +21,7 @@ export interface CoreDay {
   checks: Record<string, number>;              // stepId -> completed timestamp
   phases: Partial<Record<PhaseId, { startedAt?: number; doneAt?: number }>>;
   submissions: Partial<Record<PhaseId, PhaseSubmission>>;
+  selfies: Record<string, SelfieProof>;        // selfie moment id -> proof
   recoveries: RecoveryPlan[];
 }
 
@@ -29,8 +33,9 @@ export function subscribeCore(fn: () => void) { listeners.add(fn); return () => 
 export function coreVersion() { return ver; }
 
 function blank(employeeId: string, roleId: CoreRoleId, date: string): CoreDay {
-  return { employeeId, roleId, date, counts: {}, checks: {}, phases: {}, submissions: {}, recoveries: [] };
+  return { employeeId, roleId, date, counts: {}, checks: {}, phases: {}, submissions: {}, selfies: {}, recoveries: [] };
 }
+
 
 function readAll(): CoreDay[] {
   if (typeof window === "undefined") return [];
@@ -101,7 +106,22 @@ export function submitPhase(
   upsert(rec);
 }
 
+
+/** Store the selfie proof for one fixed moment of the day (morning, break, EOD). */
+export function saveSelfie(
+  employeeId: string,
+  roleId: CoreRoleId,
+  momentId: string,
+  img: string,
+  date = todayKey(),
+) {
+  const rec = getCoreDay(employeeId, roleId, date);
+  rec.selfies = { ...(rec.selfies || {}), [momentId]: { ts: Date.now(), img } };
+  upsert(rec);
+}
+
 export function addRecovery(employeeId: string, roleId: CoreRoleId, plan: RecoveryPlan, date = todayKey()) {
+
   const rec = getCoreDay(employeeId, roleId, date);
   rec.recoveries = [...(rec.recoveries || []), plan];
   upsert(rec);
