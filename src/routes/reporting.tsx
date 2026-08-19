@@ -8,6 +8,8 @@ import {
 import {
   ReportingOSPanel, ReportingHeaderStat, NowLine,
 } from "@/components/execution/ReportingOS";
+import { WhatsAppReportingThread } from "@/components/execution/WhatsAppReportingThread";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const Route = createFileRoute("/reporting")({
   component: ReportingPage,
