@@ -4,10 +4,10 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   Clock, Copy, Check, Undo2, AlertTriangle, ArrowRight, Cpu, User,
-  GitCompareArrows, Moon, Sunrise, Lock, ShieldCheck,
+  GitCompareArrows, Moon, Sunrise, Lock, ShieldCheck, Coffee,
 } from "lucide-react";
 import {
-  CHECKPOINTS, ROLE_FLOWS, checkpointStatus,
+  CHECKPOINTS, ROLE_FLOWS, checkpointStatus, activeBreak, breakAfter, RHYTHM_RULE,
   type CheckpointId, type ReportField, type RoleFlow, type RoleFlowKey,
 } from "@/data/reporting-os";
 import {
