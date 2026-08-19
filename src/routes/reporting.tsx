@@ -80,7 +80,20 @@ function ReportingPage() {
         </div>
       </div>
 
-      <ReportingOSPanel actorId={actor.id} roleKey={roleKey} />
+      <Tabs value={view} onValueChange={(v) => setView(v as "chat" | "board")}>
+        <TabsList>
+          <TabsTrigger value="chat">WhatsApp thread</TabsTrigger>
+          <TabsTrigger value="board">Board view</TabsTrigger>
+        </TabsList>
+        <TabsContent value="chat" className="mt-4">
+          {hydrated
+            ? <WhatsAppReportingThread actorId={actor.id} roleKey={roleKey} />
+            : <div className="rounded-xl border border-border bg-card p-5 text-sm text-muted-foreground">Loading today's thread…</div>}
+        </TabsContent>
+        <TabsContent value="board" className="mt-4">
+          <ReportingOSPanel actorId={actor.id} roleKey={roleKey} />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
