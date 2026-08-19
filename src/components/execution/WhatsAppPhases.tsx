@@ -11,14 +11,14 @@ import { SelfieCapture } from "@/components/SelfieCapture";
 import {
   BAND_META, bandFor, targetAt, type CoreRole,
 } from "@/lib/execution/core-roles";
-import type { FlowPhase, PhaseId } from "@/lib/execution/core-tasks";
+import { BREAKS, activeBreak, type FlowPhase, type PhaseId, type BreakMarker } from "@/lib/execution/core-tasks";
 import {
   toggleStep, startPhase, completePhase, bump, saveSelfie, type CoreDay,
 } from "@/lib/execution/core-progress";
 import { selfieMomentsFor, SELFIE_MOMENTS, type SelfieMoment } from "@/lib/execution/phase-selfies";
 import {
   Check, CheckCheck, Circle, Camera, Clock, Lock, Minus, Plus, PlayCircle, Zap,
-  ShieldAlert, Flame, Trophy, ListChecks, AlarmClock, Sparkles,
+  ShieldAlert, Flame, Trophy, ListChecks, AlarmClock, Sparkles, Coffee,
 } from "lucide-react";
 
 function pct(have: number, want: number) {
