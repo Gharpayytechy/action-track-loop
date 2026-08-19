@@ -19,11 +19,11 @@ export const DEFAULT_KPI_KEYS: string[] = [
 ];
 
 export const DEFAULT_PHASES: PhaseCopy[] = [
-  { id: "morning", title: "Morning",  hint: "Log in, set the day's goals, and run the first work cycle." },
-  { id: "midday",  title: "Midday",   hint: "Pre-break update, short recharge, and resume for the second cycle." },
-  { id: "evening", title: "Evening",  hint: "Second cycle outcomes and the final push before wrap." },
-  { id: "eod",     title: "End of day", hint: "Reflect, send the EOD update, and log out." },
-  { id: "more",    title: "Additional tasks", hint: "Anything outside the standard flow." },
+  { id: "morning", title: "10:35 · Day Start · Goal", hint: "Check in, declare the goal as one number, and commit what lands by 1:15 PM." },
+  { id: "midday",  title: "1:15 · Phase 1 Actuals",   hint: "Promised vs delivered vs gap, then Break 1 (1:15–2:00) and the 2:00 recovery commit." },
+  { id: "evening", title: "5:00 · Phase 2 Actuals",   hint: "Final gap named and the 8 PM commitment locked, then Break 2 (5:00–5:20)." },
+  { id: "eod",     title: "8:00 · Final Impact · Day End", hint: "Business outcome created, goal hit yes/no, tomorrow's pipeline locked." },
+  { id: "more",    title: "Additional tasks", hint: "Anything outside the standard rhythm." },
 ];
 
 const KEY = "gp_daily_config_v1";

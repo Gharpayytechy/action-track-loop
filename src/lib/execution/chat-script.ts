@@ -68,7 +68,7 @@ const PHASE_OPENER: Record<PhaseId, (r: CoreRole) => string[]> = {
     `I'll ask you one thing at a time. Just answer as you go, don't save it up for later.`,
   ],
   p2: () => [
-    `Second block. Whatever was stuck at 1 PM either moves now or gets escalated. No third option. 🙂`,
+    `Second block. Whatever was stuck at 1:15 PM either moves now or gets escalated. No third option. 🙂`,
   ],
   p3: () => [
     `Final push. 🌇 Whatever the number says right now, the last three hours are yours.`,

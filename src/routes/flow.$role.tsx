@@ -23,6 +23,7 @@ import { EMPLOYEES } from "@/data/seed";
 import { ROLE_FLOWS as REPORT_FLOWS } from "@/data/reporting-os";
 import { ReportingOSPanel, ReportingHeaderStat, NowLine } from "@/components/execution/ReportingOS";
 import { ImpactChat } from "@/components/execution/ImpactChat";
+import { WhatsAppPhases } from "@/components/execution/WhatsAppPhases";
 
 import {
   ArrowRight, Minus, Plus, ShieldAlert, Target, TrendingUp, Clock, CheckCircle2,
@@ -129,6 +130,7 @@ function RoleFlowPage() {
       <Tabs defaultValue="run">
         <TabsList className="flex-wrap h-auto">
           <TabsTrigger value="run">Run the day</TabsTrigger>
+          <TabsTrigger value="phases">WhatsApp PHASES</TabsTrigger>
           <TabsTrigger value="reporting">Reporting OS</TabsTrigger>
           <TabsTrigger value="flow">Chat with Impact</TabsTrigger>
           <TabsTrigger value="playbook">Playbook</TabsTrigger>
@@ -167,6 +169,23 @@ function RoleFlowPage() {
               gap={primaryGap.gap}
               pct={overallPct}
             />
+          )}
+        </TabsContent>
+
+        {/* ---------------- WHATSAPP PHASES: the whole rhythm as a thread ---------------- */}
+        <TabsContent value="phases" className="space-y-5 mt-5">
+          {hydrated ? (
+            <WhatsAppPhases
+              role={role}
+              phases={phases}
+              day={day}
+              actorId={actor.id}
+              counts={counts}
+              nowPhase={nowPhase}
+              headline={nextStep ? `${nextStep.phase.codename}: ${nextStep.step.label}` : "Every phase is ticked. Close the day with the 8 PM final impact."}
+            />
+          ) : (
+            <Card className="p-5 text-sm text-muted-foreground">Loading today's thread…</Card>
           )}
         </TabsContent>
 
@@ -511,7 +530,7 @@ function nextAction(role: CoreRole, cp: "p1" | "p2" | "eod", primary: { t: Targe
       ? `All ${role.name} targets are met. Lock evidence, file the EOD report and hand over to ${role.handoverTo}.`
       : `You are ahead of the ${cp === "p1" ? "1 PM" : "5 PM"} checkpoint. Push into the stretch band on ${primary.t.label}.`;
   }
-  return `Close ${primary.gap} more ${primary.t.label.toLowerCase()} before the ${cp === "p1" ? "1:00 PM" : cp === "p2" ? "5:00 PM" : "8:00 PM"} checkpoint — this is the primary gap right now.`;
+  return `Close ${primary.gap} more ${primary.t.label.toLowerCase()} before the ${cp === "p1" ? "1:15 PM" : cp === "p2" ? "5:00 PM" : "8:00 PM"} checkpoint — this is the primary gap right now.`;
 }
 
 function Info({ label, value }: { label: string; value: string }) {

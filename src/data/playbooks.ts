@@ -78,7 +78,7 @@ const NITHYA: RolePlaybook = {
   interdependence:
     "If Nithya fails → office discipline collapses → Sneha has no floor data → Jiya's trainees enter chaos.",
   collapseRule:
-    "If in-office call volume < 50% of daily target by 1:00 PM, OR any employee unreachable for 2+ hours → alert Sneha at the 1:00 PM window.",
+    "If in-office call volume < 50% of daily target by 1:15 PM, OR any employee unreachable for 2+ hours → alert Sneha at the 1:15 PM window.",
   ownerId: "e12",
   accent: "primary",
   kpis: [
@@ -162,7 +162,7 @@ Today's targets:
 🏠 Tours to support: 10 (Flow Ops)
 💬 WhatsApp chats actioned: All of them
 ⏰ Everyone at desk. Targets spoken. Let's start.
-Next update: 1:00 PM. 💪`,
+Next update: 1:15 PM. 💪`,
     },
     {
       id: "n_w2", label: "Mid-Day Pulse", atMin: t(13, 0), channel: "WhatsApp Group",
@@ -468,7 +468,7 @@ const THANVI: RolePlaybook = {
   interdependence:
     "If Thanvi fails → Jiya has no one to train → Sneha has no floor team → Nithya has no one to manage.",
   collapseRule:
-    "If interviews drop below 15 by 1:00 PM → alert Nithya at the 1:00 PM window.",
+    "If interviews drop below 15 by 1:15 PM → alert Nithya at the 1:15 PM window.",
   ownerId: "e15",
   accent: "info",
   kpis: [
@@ -594,7 +594,7 @@ const PRIYA_POD: RolePlaybook = {
   interdependence:
     "If Pod Command fails → Sneha's tours dry up → Jiya's trainees join a broken floor → Nithya's discipline can't save the day.",
   collapseRule:
-    "If pod connections < 50% of target by 1:00 PM, OR any Operator below 30 calls by 3 PM → escalate to Nithya at the 1 PM window.",
+    "If pod connections < 50% of target by 1:15 PM, OR any Operator below 30 calls by 3 PM → escalate to Nithya at the 1:15 PM window.",
   ownerId: "e2",
   accent: "primary",
   kpis: [
@@ -824,7 +824,7 @@ const SNEHAK_FLOWOPS: RolePlaybook = {
   interdependence:
     "If Lead Router fails → Operators run dry → Pod Command can't book tours → revenue stalls in your queue.",
   collapseRule:
-    "If unassigned-lead queue > 25, OR avg first-touch > 5 min → page Pod Leads at the 1 PM window.",
+    "If unassigned-lead queue > 25, OR avg first-touch > 5 min → page Pod Leads at the 1:15 PM window.",
   ownerId: "e4",
   accent: "info",
   kpis: [

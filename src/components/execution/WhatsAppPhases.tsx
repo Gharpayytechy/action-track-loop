@@ -11,14 +11,14 @@ import { SelfieCapture } from "@/components/SelfieCapture";
 import {
   BAND_META, bandFor, targetAt, type CoreRole,
 } from "@/lib/execution/core-roles";
-import type { FlowPhase, PhaseId } from "@/lib/execution/core-tasks";
+import { BREAKS, activeBreak, type FlowPhase, type PhaseId, type BreakMarker } from "@/lib/execution/core-tasks";
 import {
   toggleStep, startPhase, completePhase, bump, saveSelfie, type CoreDay,
 } from "@/lib/execution/core-progress";
 import { selfieMomentsFor, SELFIE_MOMENTS, type SelfieMoment } from "@/lib/execution/phase-selfies";
 import {
   Check, CheckCheck, Circle, Camera, Clock, Lock, Minus, Plus, PlayCircle, Zap,
-  ShieldAlert, Flame, Trophy, ListChecks, AlarmClock, Sparkles,
+  ShieldAlert, Flame, Trophy, ListChecks, AlarmClock, Sparkles, Coffee,
 } from "lucide-react";
 
 function pct(have: number, want: number) {
@@ -460,6 +460,25 @@ function WrapBubble({ role, wrap, auto }: { role: CoreRole; wrap: ReturnType<typ
 
 /* ---------------- the whole thread ---------------- */
 
+function BreakBubble({ marker, live }: { marker: BreakMarker; live: boolean }) {
+  return (
+    <div className="flex justify-center my-3">
+      <div
+        className={`wa-chip max-w-[92%] px-3 py-2 text-center ${
+          live ? "ring-2 ring-amber-400 bg-amber-500/15" : ""
+        }`}
+      >
+        <div className="flex items-center justify-center gap-1.5 text-[10px] font-mono uppercase tracking-widest text-amber-600 dark:text-amber-300">
+          <Coffee className="h-3 w-3" />
+          {marker.label} · {marker.window}
+          {live && <span className="ml-1 px-1.5 rounded bg-amber-500 text-white">on break now</span>}
+        </div>
+        <p className="text-xs mt-1 leading-relaxed">{marker.note}</p>
+      </div>
+    </div>
+  );
+}
+
 export function WhatsAppPhases({
   role, phases, day, actorId, counts, nowPhase, headline,
 }: {
@@ -481,6 +500,7 @@ export function WhatsAppPhases({
   const current = phases.find((p) => p.id === nowPhase);
   const mins = nowMinutes();
   const left = current ? current.dueMins - mins : 0;
+  const liveBreak = activeBreak();
 
   const jump = (id: string) =>
     document.getElementById(`wa-phase-${id}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -555,18 +575,23 @@ export function WhatsAppPhases({
             <p className="font-semibold leading-relaxed">{headline}</p>
           </In>
         )}
-        {phases.map((p, i) => (
-          <PhaseThread
-            key={p.id}
-            phase={p}
-            index={i}
-            role={role}
-            day={day}
-            actorId={actorId}
-            counts={counts}
-            openByDefault={p.id === nowPhase}
-          />
-        ))}
+        {phases.map((p, i) => {
+          const brk = BREAKS.find((b) => b.after === p.id);
+          return (
+            <div key={p.id} className="space-y-3">
+              <PhaseThread
+                phase={p}
+                index={i}
+                role={role}
+                day={day}
+                actorId={actorId}
+                counts={counts}
+                openByDefault={p.id === nowPhase}
+              />
+              {brk && <BreakBubble marker={brk} live={liveBreak?.id === brk.id} />}
+            </div>
+          );
+        })}
         <WrapBubble role={role} wrap={wrap} auto={auto} />
         <DayChip>End of today's phases</DayChip>
       </div>

@@ -1,9 +1,17 @@
 // Role-specific daily flows for every role in the Gharpayy Role + KRA System (v1.0).
-// Each role runs the same control-point rhythm defined in the operating model:
-//   Morning Goal (10:15–10:45) → Phase 1 (shift start–1:00 PM) →
-//   1:00 PM update + break → Phase 2 (1:00–5:00 PM) → 5:00 PM update →
-//   Phase 3 (5:00 PM–EOD) → EOD submission (by 8:00 PM)
-// The work described in each phase and the metrics captured are role-specific.
+// Each role runs the SAME operating rhythm — only the work and the metrics differ:
+//
+//   10:35 AM  Day Start · Goal    → declare the goal (one number) + the 10:36
+//                                   commitment for 1:15 PM
+//   1:15 PM   Phase 1 Actuals     → promised vs delivered vs gap → Break 1
+//   1:15–2:00 Break 1
+//   2:00 PM   Recovery Commit     → break ends, commit what lands by 5:00 PM
+//   5:00 PM   Phase 2 Actuals     → final gap + the 8 PM commitment → Break 2
+//   5:00–5:20 Break 2
+//   8:00 PM   Final Impact · Day End → outcome created, goal hit y/n, tomorrow locked
+//
+// One rule above everything: nobody is rewarded for being busy. Every checkpoint
+// answers promise → actual → gap → next → outcome before any KPI is accepted.
 
 import type { Playbook, StageDef } from "@/lib/execution/playbooks";
 
@@ -214,7 +222,7 @@ export const ROLE_FLOWS: RoleFlow[] = [
     roleId: "LDR-ZONE", playbookId: "pb_role_ldr_zone", roleName: "Zone Lead", department: "Leadership & Business Management",
     result: "The zone booking promise is delivered with focus inventory ready and SLAs held.",
     p1: "Count today, 7-day and 30-day demand, select focus inventory and allocate booking promises.",
-    p2: "Run the 1 PM and 5 PM control on funnel, tours, exact beds, quotations, holds, owners and people.",
+    p2: "Run the 1:15 PM and 5 PM control on funnel, tours, exact beds, quotations, holds, owners and people.",
     p3: "Deliver or forecast the zone result, close risks and submit one evidence-based zone truth.",
     metrics: ["zone_bookings", "focus_properties_ready", "interventions_done"],
     match: ["zone lead", "zone"],
@@ -235,101 +243,115 @@ const WA_ROLE_START = `*GHARPAYY · ON THE FLOOR*
 {{name}} · {{role}} · {{time}}
 I am logged in and starting my day.`;
 
-const WA_ROLE_GOAL = `*GHARPAYY · TODAY'S GOAL*
+const WA_ROLE_GOAL = `*GHARPAYY · 10:35 DAY START · GOAL*
 {{name}} · {{role}} · {{time}}
 
-My three priorities
-1. {{mission_1}}
-2. {{mission_2}}
-3. {{mission_3}}
+Today's goal (one number): {{goal}}
+Priority #1: {{mission_1}}
 
-Result I am committing to: {{goal}}
-Where I could get stuck: {{biggest_risk}}
-I will finish by: {{expected_finish}}`;
+10:36 commitment — by 1:15 PM I will deliver: {{ap_next}}
+Where I could get stuck: {{biggest_risk}}`;
 
-const WA_ROLE_PHASE = `*GHARPAYY · PHASE UPDATE*
+const WA_ROLE_P1 = `*GHARPAYY · 1:15 PM PHASE 1 ACTUALS*
 {{name}} · {{role}} · {{time}}
 
-What I got done: {{wins}}
-What slowed me down: {{blockers}}
-What I will do differently next: {{cycle_note}}`;
+Promised: {{ap_promise}}
+Delivered: {{ap_actual}}
+Gap: {{ap_gap}} — {{ap_gap_reason}}
+Outcome created: {{ap_outcome}}
+
+Going into Break 1 (1:15–2:00).`;
+
+const WA_ROLE_RECOVER = `*GHARPAYY · 2:00 PM RECOVERY COMMIT*
+{{name}} · {{role}} · {{time}}
+
+Break is over. Gap I am carrying: {{ap_gap}} — {{ap_gap_reason}}
+By 5:00 PM I will deliver: {{ap_next}}`;
+
+const WA_ROLE_P2 = `*GHARPAYY · 5:00 PM PHASE 2 ACTUALS*
+{{name}} · {{role}} · {{time}}
+
+Promised: {{ap_promise}}
+Delivered: {{ap_actual}}
+Final gap: {{ap_gap}} — {{ap_gap_reason}}
+Outcome created: {{ap_outcome}}
+
+By 8:00 PM I will deliver: {{ap_next}}
+Going into Break 2 (5:00–5:20).`;
 
 const WA_ROLE_BREAK = `*GHARPAYY · BREAK*
 {{name}} · {{role}} · {{time}}
-Taking my break, back on the floor by {{expected_finish}}.`;
+On break. Back on the floor by {{expected_finish}}.`;
 
-const WA_ROLE_EOD = `*GHARPAYY · END OF DAY*
+const WA_ROLE_EOD = `*GHARPAYY · 8:00 PM FINAL IMPACT · DAY END*
 {{name}} · {{role}} · {{time}}
 
+Promised: {{ap_promise}}
+Delivered: {{ap_actual}}
+Goal hit: {{ap_goal_hit}}
+Business outcome created: {{ap_outcome}}
+
 What I delivered: {{wins}}
-What held me back: {{blockers}}
+What held me back: {{blockers}} ({{ap_gap_reason}})
 What I learned: {{learning}}
 Mistake I am fixing: {{mistake}}
-My number one for tomorrow: {{tomorrow_priority}}`;
+Tomorrow's pipeline locked · first priority: {{tomorrow_priority}}`;
 
 const GOAL_FIELDS = [
-  "mission_1", "mission_2", "mission_3",
-  "goal", "biggest_risk", "expected_finish", "energy",
+  "goal", "mission_1", "biggest_risk", "energy",
 ];
+
+/** The accountability spine — asked at every checkpoint, ahead of role KPIs. */
+const ACC = ["ap_promise", "ap_actual", "ap_gap", "ap_gap_reason", "ap_outcome", "ap_next"];
 
 /** Build the daily flow (playbook) for one role. */
 export function buildRolePlaybook(f: RoleFlow): Playbook {
   const outcome = (extra: string[] = []) => [...f.metrics, "wins", "blockers", "cycle_note", ...extra];
+  // Five checkpoints, nothing else. Fewer stages = fewer clicks, and every
+  // checkpoint carries the accountability spine before its own KPIs.
   const stages: StageDef[] = [
     {
-      id: "login", label: "Attendance check-in", time: "10:15",
+      id: "login", label: "Check in · 10:35", time: "10:35",
       proofs: ["selfie", "geo"], fields: [], waTemplate: WA_ROLE_START, weight: 5,
     },
     {
-      id: "mission", label: "Today's goal", time: "10:15–10:45",
-      proofs: [], fields: [...GOAL_FIELDS, ...f.metrics],
-      requiredFields: ["mission_1", "goal", "biggest_risk", "expected_finish"],
-      waTemplate: WA_ROLE_GOAL, weight: 12,
+      id: "mission", label: "Day Start · Goal", time: "10:35–10:50",
+      proofs: [], fields: [...GOAL_FIELDS, "ap_next", ...f.metrics],
+      requiredFields: ["goal", "ap_next"],
+      waTemplate: WA_ROLE_GOAL, weight: 15,
     },
     {
-      id: "c1_draft", label: "First half plan", time: "10:45",
-      proofs: ["crm_ss"], fields: [...f.metrics, "cycle_note"],
-      requiredFields: f.metrics.slice(0, 1), waTemplate: "", weight: 8,
+      id: "c1_outcome", label: "Phase 1 Actuals · 1:15 PM", time: "13:15",
+      proofs: ["crm_ss", "whatsapp"], fields: [...ACC, ...outcome()],
+      requiredFields: ["ap_promise", "ap_actual", "ap_gap", ...f.metrics],
+      waTemplate: WA_ROLE_P1, weight: 18,
     },
     {
-      id: "c1_outcome", label: "First half result", time: "12:45",
-      proofs: ["crm_ss"], fields: outcome(),
-      requiredFields: f.metrics, waTemplate: WA_ROLE_PHASE, weight: 12,
+      id: "break1", label: "Break 1", time: "13:15–14:00",
+      proofs: [], fields: ["expected_finish"], waTemplate: WA_ROLE_BREAK, weight: 2,
     },
     {
-      id: "pre_break", label: "1:00 PM update", time: "13:00",
-      proofs: ["whatsapp"], fields: [...f.metrics, "wins", "blockers", "tomorrow_priority"],
-      requiredFields: ["wins"], waTemplate: WA_ROLE_PHASE, weight: 10,
+      id: "recovery", label: "Recovery Commit · 2:00 PM", time: "14:00",
+      proofs: ["selfie"], fields: ["ap_gap", "ap_gap_reason", "ap_next", ...f.metrics],
+      requiredFields: ["ap_next"], waTemplate: WA_ROLE_RECOVER, weight: 10,
     },
     {
-      id: "break1", label: "Break", time: "13:15–13:30",
-      proofs: ["selfie"], fields: ["expected_finish"], waTemplate: WA_ROLE_BREAK, weight: 3,
+      id: "c2_outcome", label: "Phase 2 Actuals · 5:00 PM", time: "17:00",
+      proofs: ["crm_ss", "whatsapp"], fields: [...ACC, ...outcome()],
+      requiredFields: ["ap_promise", "ap_actual", "ap_gap", "ap_next", ...f.metrics],
+      waTemplate: WA_ROLE_P2, weight: 18,
     },
     {
-      id: "resume", label: "Back on the floor", time: "13:30",
-      proofs: ["selfie"], fields: [], waTemplate: WA_ROLE_START, weight: 3,
+      id: "break2", label: "Break 2", time: "17:00–17:20",
+      proofs: [], fields: ["expected_finish"], waTemplate: WA_ROLE_BREAK, weight: 2,
     },
     {
-      id: "c2_calls", label: "Second half work", time: "13:30–17:00",
-      proofs: ["crm_ss"], fields: [...f.metrics, "cycle_note"],
-      requiredFields: f.metrics.slice(0, 1), waTemplate: "", weight: 10,
-    },
-    {
-      id: "c2_outcome", label: "5:00 PM update", time: "17:00",
-      proofs: ["selfie", "whatsapp"], fields: outcome(["tomorrow_priority"]),
-      requiredFields: f.metrics, waTemplate: WA_ROLE_PHASE, weight: 12,
-    },
-    {
-      id: "c3_final", label: "Final push", time: "17:00–20:00",
-      proofs: ["crm_ss"], fields: outcome(),
-      requiredFields: f.metrics, waTemplate: WA_ROLE_PHASE, weight: 12,
-    },
-    {
-      id: "impact", label: "End of day submission", time: "By 20:00",
+      id: "impact", label: "Final Impact · Day End · 8:00 PM", time: "20:00",
       proofs: ["selfie", "whatsapp"],
-      fields: [...f.metrics, "wins", "blockers", "learning", "mistake", "tomorrow_priority"],
-      requiredFields: ["wins", "learning", "tomorrow_priority", ...f.metrics],
-      waTemplate: WA_ROLE_EOD, weight: 18,
+      fields: ["ap_promise", "ap_actual", "ap_goal_hit", "ap_outcome", "ap_gap_reason",
+               ...f.metrics, "wins", "blockers", "learning", "mistake", "tomorrow_priority"],
+      requiredFields: ["ap_goal_hit", "ap_outcome", "wins", "tomorrow_priority", ...f.metrics],
+      waTemplate: WA_ROLE_EOD, weight: 30,
     },
   ];
 
@@ -358,9 +380,12 @@ export function roleFlowFor(role: string): RoleFlow | undefined {
 /** Phase labels for the day, taken straight from the operating model. */
 export function phaseWorkFor(f: RoleFlow): Array<{ id: string; window: string; work: string }> {
   return [
-    { id: "morning", window: "Shift start–1:00 PM", work: f.p1 },
-    { id: "midday", window: "1:00–1:30 PM", work: "Send the 1:00 PM update, take the break, and restart with a clear next action." },
-    { id: "evening", window: "1:00–8:00 PM", work: `${f.p2} Then: ${f.p3}` },
-    { id: "eod", window: "By 8:00 PM", work: "Submit goal versus actual with evidence, pending cases, next owner and tomorrow's first priority." },
+    { id: "goal", window: "10:35–10:50 AM", work: "Declare today's goal as one number, then commit what lands by 1:15 PM." },
+    { id: "morning", window: "10:50 AM–1:15 PM", work: f.p1 },
+    { id: "break1", window: "1:15–2:00 PM", work: "Phase 1 actuals filed — promised vs delivered vs gap. Break 1." },
+    { id: "evening", window: "2:00–5:00 PM", work: `Recovery commit, then: ${f.p2}` },
+    { id: "break2", window: "5:00–5:20 PM", work: "Phase 2 actuals filed — final gap named and the 8 PM commitment locked. Break 2." },
+    { id: "final", window: "5:20–8:00 PM", work: f.p3 },
+    { id: "eod", window: "8:00 PM", work: "Final impact: business outcome created, goal hit yes/no, tomorrow's pipeline locked." },
   ];
 }
