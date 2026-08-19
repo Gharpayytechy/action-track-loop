@@ -106,7 +106,22 @@ export function submitPhase(
   upsert(rec);
 }
 
+
+/** Store the selfie proof for one fixed moment of the day (morning, break, EOD). */
+export function saveSelfie(
+  employeeId: string,
+  roleId: CoreRoleId,
+  momentId: string,
+  img: string,
+  date = todayKey(),
+) {
+  const rec = getCoreDay(employeeId, roleId, date);
+  rec.selfies = { ...(rec.selfies || {}), [momentId]: { ts: Date.now(), img } };
+  upsert(rec);
+}
+
 export function addRecovery(employeeId: string, roleId: CoreRoleId, plan: RecoveryPlan, date = todayKey()) {
+
   const rec = getCoreDay(employeeId, roleId, date);
   rec.recoveries = [...(rec.recoveries || []), plan];
   upsert(rec);
