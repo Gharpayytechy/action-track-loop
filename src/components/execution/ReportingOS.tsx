@@ -99,6 +99,26 @@ export function NowLine() {
   );
 }
 
+/**
+ * Live countdown on the three minute edit window that opens the moment a
+ * checkpoint is filed. Ticks every second, and only while a window is open.
+ */
+export function useEditWindow(submittedAt?: number): number {
+  const [left, setLeft] = useState(0);
+  useEffect(() => {
+    if (!submittedAt) { setLeft(0); return; }
+    const calc = () => Math.max(0, submittedAt + EDIT_WINDOW_MS - Date.now());
+    setLeft(calc());
+    const i = setInterval(() => {
+      const next = calc();
+      setLeft(next);
+      if (next <= 0) clearInterval(i);
+    }, 1000);
+    return () => clearInterval(i);
+  }, [submittedAt]);
+  return left;
+}
+
 function CheckpointCard({ cpId, flow, actorId, nowM, day }: {
   cpId: CheckpointId;
   flow: RoleFlow;
