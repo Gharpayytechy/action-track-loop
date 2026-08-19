@@ -1,9 +1,17 @@
 // Role-specific daily flows for every role in the Gharpayy Role + KRA System (v1.0).
-// Each role runs the same control-point rhythm defined in the operating model:
-//   Morning Goal (10:15–10:45) → Phase 1 (shift start–1:00 PM) →
-//   1:00 PM update + break → Phase 2 (1:00–5:00 PM) → 5:00 PM update →
-//   Phase 3 (5:00 PM–EOD) → EOD submission (by 8:00 PM)
-// The work described in each phase and the metrics captured are role-specific.
+// Each role runs the SAME operating rhythm — only the work and the metrics differ:
+//
+//   10:35 AM  Day Start · Goal    → declare the goal (one number) + the 10:36
+//                                   commitment for 1:15 PM
+//   1:15 PM   Phase 1 Actuals     → promised vs delivered vs gap → Break 1
+//   1:15–2:00 Break 1
+//   2:00 PM   Recovery Commit     → break ends, commit what lands by 5:00 PM
+//   5:00 PM   Phase 2 Actuals     → final gap + the 8 PM commitment → Break 2
+//   5:00–5:20 Break 2
+//   8:00 PM   Final Impact · Day End → outcome created, goal hit y/n, tomorrow locked
+//
+// One rule above everything: nobody is rewarded for being busy. Every checkpoint
+// answers promise → actual → gap → next → outcome before any KPI is accepted.
 
 import type { Playbook, StageDef } from "@/lib/execution/playbooks";
 
