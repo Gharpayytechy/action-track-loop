@@ -187,3 +187,69 @@
   100% { opacity: 1; transform: translateY(0) scale(1); }
 }
 .wa-pop { animation: wa-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+/* ---------------- WhatsApp PHASES · 10 PM NIGHT MODE ---------------- */
+.wa-night {
+  --wa-bubble-out: #075048;
+  --wa-bubble-in: #17242C;
+  --wa-bubble-in-text: #E9EDEF;
+  --wa-chat-bg: #060D12;
+  --wa-meta: #8FA3AD;
+  color-scheme: dark;
+  position: relative;
+  isolation: isolate;
+}
+.wa-night .wa-chat-bg {
+  background-color: var(--wa-chat-bg);
+  background-image:
+    radial-gradient(900px 420px at 15% -10%, rgba(37,211,102,0.10), transparent 70%),
+    radial-gradient(700px 380px at 95% 0%, rgba(64,120,255,0.10), transparent 70%),
+    radial-gradient(600px 500px at 50% 110%, rgba(120,60,255,0.10), transparent 70%),
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,0.035) 0, rgba(255,255,255,0) 20px),
+    radial-gradient(circle at 72% 66%, rgba(255,255,255,0.03) 0, rgba(255,255,255,0) 26px),
+    radial-gradient(circle at 42% 82%, rgba(255,255,255,0.025) 0, rgba(255,255,255,0) 16px);
+  background-size: auto, auto, auto, 260px 260px, 260px 260px, 260px 260px;
+}
+.wa-night .wa-header {
+  background: linear-gradient(180deg, rgba(9,26,30,0.92), rgba(6,16,20,0.88));
+  backdrop-filter: blur(14px) saturate(140%);
+  border-bottom: 1px solid rgba(37,211,102,0.18);
+  box-shadow: 0 10px 30px -18px rgba(0,0,0,0.9);
+}
+.wa-night .wa-bubble-in,
+.wa-night .wa-bubble-out {
+  box-shadow: 0 10px 26px -18px rgba(0,0,0,0.95), inset 0 1px 0 rgba(255,255,255,0.045);
+  border: 1px solid rgba(255,255,255,0.05);
+}
+.wa-night .wa-bubble-in::before { background: var(--wa-bubble-in); }
+.wa-night .wa-bubble-out::before { background: var(--wa-bubble-out); }
+.wa-night .wa-chip {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.07);
+  color: var(--wa-meta);
+  backdrop-filter: blur(6px);
+}
+.wa-glow { box-shadow: 0 0 0 1px rgba(37,211,102,0.35), 0 0 34px -8px rgba(37,211,102,0.45); }
+.wa-starfield::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    radial-gradient(1px 1px at 12% 18%, rgba(255,255,255,0.55), transparent 60%),
+    radial-gradient(1px 1px at 78% 12%, rgba(255,255,255,0.45), transparent 60%),
+    radial-gradient(1px 1px at 34% 62%, rgba(255,255,255,0.35), transparent 60%),
+    radial-gradient(1.4px 1.4px at 62% 84%, rgba(255,255,255,0.4), transparent 60%),
+    radial-gradient(1px 1px at 90% 56%, rgba(255,255,255,0.3), transparent 60%);
+  animation: wa-twinkle 6s ease-in-out infinite;
+}
+@keyframes wa-twinkle { 0%,100% { opacity: 0.35; } 50% { opacity: 0.85; } }
+@keyframes wa-breathe { 0%,100% { opacity: 0.55; transform: scale(1); } 50% { opacity: 1; transform: scale(1.12); } }
+.wa-breathe { animation: wa-breathe 2.6s ease-in-out infinite; }
+@keyframes wa-typing { 0%,60%,100% { transform: translateY(0); opacity: .5 } 30% { transform: translateY(-4px); opacity: 1 } }
+.wa-dot { animation: wa-typing 1.2s infinite; }
+.wa-dot:nth-child(2) { animation-delay: .15s }
+.wa-dot:nth-child(3) { animation-delay: .3s }
+@keyframes wa-sweep { 0% { transform: translateX(-120%); } 100% { transform: translateX(220%); } }
+.wa-sweep::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,0.12), transparent);
+  animation: wa-sweep 3.4s ease-in-out infinite;
+}
