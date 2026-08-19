@@ -412,17 +412,30 @@ export function WhatsAppReportingThread({ actorId, roleKey }: {
           </p>
         </In>
 
-        {CHECKPOINTS.map((c) => (
-          <CheckpointThread
-            key={c.id}
-            cpId={c.id}
-            flow={flow}
-            actorId={actorId}
-            day={day}
-            nowM={m}
-            openByDefault={c.id === openDefault}
-          />
-        ))}
+        {CHECKPOINTS.map((c) => {
+          const brk = breakAfter(c.id);
+          return (
+            <div key={c.id} className="space-y-3">
+              <CheckpointThread
+                cpId={c.id}
+                flow={flow}
+                actorId={actorId}
+                day={day}
+                nowM={m}
+                openByDefault={c.id === openDefault}
+              />
+              {brk && (
+                <BreakBubble
+                  label={brk.label}
+                  clock={brk.clock}
+                  thenWhat={brk.thenWhat}
+                  live={activeBreak(m)?.id === brk.id}
+                  started={Boolean(day.submitted[c.id])}
+                />
+              )}
+            </div>
+          );
+        })}
 
         <DayChip>End of today's reporting cadence</DayChip>
       </div>
