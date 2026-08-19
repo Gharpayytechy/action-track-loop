@@ -47,12 +47,12 @@ export const FLOW_META: Record<
   FlowStepId,
   { label: string; time: string; kind: "start" | "break" | "resume" | "eod"; attKind: any; needsUpdate: boolean; needsScreenshot: boolean; needsPlan?: boolean }
 > = {
-  start:           { label: "Start of Day",       time: "09:30", kind: "start",  attKind: "clock_in",    needsUpdate: false, needsScreenshot: false, needsPlan: true },
-  midday_break:    { label: "Lunch Break",        time: "13:15", kind: "break",  attKind: "break_start", needsUpdate: true,  needsScreenshot: true },
-  midday_resume:   { label: "Resume · 2nd Half",  time: "14:00", kind: "resume", attKind: "break_end",   needsUpdate: false, needsScreenshot: false },
-  evening_break:   { label: "Evening Break",      time: "17:20", kind: "break",  attKind: "break_start", needsUpdate: true,  needsScreenshot: true },
-  evening_resume:  { label: "Resume · Final Push",time: "17:40", kind: "resume", attKind: "break_end",   needsUpdate: false, needsScreenshot: false },
-  eod:             { label: "EOD · Impact Update",time: "20:00", kind: "eod",    attKind: "clock_out",   needsUpdate: true,  needsScreenshot: true },
+  start:           { label: "Day Start · Goal",     time: "10:35", kind: "start",  attKind: "clock_in",    needsUpdate: false, needsScreenshot: false, needsPlan: true },
+  midday_break:    { label: "Break 1",              time: "13:15", kind: "break",  attKind: "break_start", needsUpdate: true,  needsScreenshot: true },
+  midday_resume:   { label: "Recovery Commit",      time: "14:00", kind: "resume", attKind: "break_end",   needsUpdate: false, needsScreenshot: false },
+  evening_break:   { label: "Break 2",              time: "17:00", kind: "break",  attKind: "break_start", needsUpdate: true,  needsScreenshot: true },
+  evening_resume:  { label: "Resume · Final Impact",time: "17:20", kind: "resume", attKind: "break_end",   needsUpdate: false, needsScreenshot: false },
+  eod:             { label: "Final Impact · Day End",time: "20:00", kind: "eod",   attKind: "clock_out",   needsUpdate: true,  needsScreenshot: true },
 };
 
 const KEY = "gp_daily_flow_v1";
