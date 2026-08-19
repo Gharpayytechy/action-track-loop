@@ -128,7 +128,7 @@ function RoleFlowPage() {
         <TabsList className="flex-wrap h-auto">
           <TabsTrigger value="run">Run the day</TabsTrigger>
           <TabsTrigger value="reporting">Reporting OS</TabsTrigger>
-          <TabsTrigger value="flow">All phases</TabsTrigger>
+          <TabsTrigger value="flow">WhatsApp PHASES</TabsTrigger>
           <TabsTrigger value="playbook">Playbook</TabsTrigger>
           <TabsTrigger value="analytics">My analytics</TabsTrigger>
           <TabsTrigger value="team">Team analytics</TabsTrigger>
