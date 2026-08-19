@@ -27,8 +27,11 @@ export function liveCheckpoint(m: number) {
 }
 
 export function useMinuteTick() {
-  const [m, setM] = useState(() => nowMin());
+  // Start from a deterministic value so SSR and the first client render agree,
+  // then switch to the real clock after hydration.
+  const [m, setM] = useState(-1);
   useEffect(() => {
+    setM(nowMin());
     const i = setInterval(() => setM(nowMin()), 60_000);
     return () => clearInterval(i);
   }, []);
