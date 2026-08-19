@@ -27,10 +27,17 @@ export const Route = createFileRoute("/flow/")({
 function FlowIndex() {
   const { actor } = useAttendanceState();
   const [hydrated, setHydrated] = useState(false);
-  useEffect(() => { seedCoreDemo(); setHydrated(true); }, []);
+  // Clock-derived values must not render on the server: the server's "now" and
+  // the browser's "now" disagree, which shows up as a hydration mismatch.
+  const [clock, setClock] = useState<{ cp: ReturnType<typeof currentCheckpoint>; phaseId: string } | null>(null);
+  useEffect(() => {
+    seedCoreDemo();
+    setClock({ cp: currentCheckpoint(), phaseId: activePhaseId() });
+    setHydrated(true);
+  }, []);
   const v = useSyncExternalStore(subscribeCore, () => coreVersion(), () => 0);
-  const cp = currentCheckpoint();
-  const phaseId = activePhaseId();
+  const cp = clock?.cp ?? "p1";
+  const phaseId = clock?.phaseId ?? "";
 
   const cards = useMemo(() => {
     void v;
