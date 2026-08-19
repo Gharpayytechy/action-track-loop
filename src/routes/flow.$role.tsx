@@ -21,7 +21,7 @@ import { GuidedRun } from "@/components/execution/GuidedRun";
 import { PhaseReportForm } from "@/components/execution/PhaseReportForm";
 import { EMPLOYEES } from "@/data/seed";
 import { ROLE_FLOWS as REPORT_FLOWS } from "@/data/reporting-os";
-import { ReportingOSPanel, ReportingHeaderStat, NowLine } from "@/components/execution/ReportingOS";
+import { ReportingHeaderStat, NowLine } from "@/components/execution/ReportingOS";
 import { ImpactChat } from "@/components/execution/ImpactChat";
 import { WhatsAppReportingThread } from "@/components/execution/WhatsAppReportingThread";
 import { WhatsAppPhases } from "@/components/execution/WhatsAppPhases";
