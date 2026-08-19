@@ -53,13 +53,77 @@ export interface RoleFlow {
 const t = (h: number, m = 0) => h * 60 + m;
 
 export const CHECKPOINTS: Checkpoint[] = [
-  { id: "gm", code: "GM", label: "Good Morning", clock: "Before 9:30 AM", atMin: t(8, 0), dueMin: t(9, 30), purpose: "Plan the day. Own the numbers before the floor moves." },
-  { id: "p1", code: "P1", label: "1 PM Report", clock: "1:00 PM", atMin: t(12, 30), dueMin: t(13, 15), purpose: "Mid-day check. Is every lead owned and moving?" },
-  { id: "p2", code: "P2", label: "4 PM Report", clock: "4:00 PM", atMin: t(15, 30), dueMin: t(16, 15), purpose: "Pre-close push. Recover the gap while the day is still alive." },
-  { id: "p3", code: "P3", label: "5 PM Report", clock: "5:00 PM", atMin: t(16, 45), dueMin: t(17, 15), purpose: "Day closure. Lock the result, name the misses." },
-  { id: "wrap", code: "WRAP", label: "8 PM Wrap-Up", clock: "8:00 PM", atMin: t(19, 30), dueMin: t(20, 15), purpose: "EOD system closure. Final reconciliation, clean-up, tomorrow's plan." },
-  { id: "weekly", code: "WEEK", label: "Weekly Report", clock: "Sunday 8:00 PM", atMin: t(19, 30), dueMin: t(20, 30), purpose: "Six days of checkpoints turned into decisions." },
+  {
+    id: "gm", code: "GOAL", label: "Day Start · Goal", clock: "10:35 AM",
+    atMin: t(10, 35), dueMin: t(10, 50),
+    purpose: "Declare the goal, then commit: what must be achieved by 1:15 PM?",
+  },
+  {
+    id: "p1", code: "P1", label: "Phase 1 Actuals", clock: "1:15 PM",
+    atMin: t(13, 0), dueMin: t(13, 15),
+    purpose: "Reality check. Promised vs delivered — then the break starts.",
+  },
+  {
+    id: "p2", code: "RECOVER", label: "Recovery Commit", clock: "2:00 PM",
+    atMin: t(14, 0), dueMin: t(14, 20),
+    purpose: "Break is over. Name the gap and commit: what must be done by 5:00 PM?",
+  },
+  {
+    id: "p3", code: "P2", label: "Phase 2 Actuals", clock: "5:00 PM",
+    atMin: t(16, 45), dueMin: t(17, 0),
+    purpose: "Final gap identified. Lock what the impact phase must deliver by 8 PM.",
+  },
+  {
+    id: "wrap", code: "IMPACT", label: "Final Impact · Day End", clock: "8:00 PM",
+    atMin: t(19, 30), dueMin: t(20, 0),
+    purpose: "Measure the business outcome created. Lock tomorrow's pipeline. Day ends.",
+  },
+  {
+    id: "weekly", code: "WEEK", label: "Weekly Report", clock: "Sunday 8:00 PM",
+    atMin: t(19, 30), dueMin: t(20, 30),
+    purpose: "Six days of checkpoints turned into decisions.",
+  },
 ];
+
+/** The single line that governs the whole system. */
+export const RHYTHM_RULE = [
+  "10:35 decides the goal.",
+  "1:15 exposes reality.",
+  "5:00 forces recovery.",
+  "8:00 measures impact.",
+];
+
+/** Scheduled recovery breaks that sit between checkpoints. */
+export interface BreakWindow {
+  id: string;
+  label: string;
+  clock: string;
+  startMin: number;
+  endMin: number;
+  after: CheckpointId;   // break opens once this checkpoint is filed
+  thenWhat: string;      // what the floor owes when the break ends
+}
+
+export const BREAKS: BreakWindow[] = [
+  {
+    id: "b1", label: "Break 1", clock: "1:15 – 2:00 PM",
+    startMin: t(13, 15), endMin: t(14, 0), after: "p1",
+    thenWhat: "Recovery + acceleration begins. Commit what lands by 5:00 PM.",
+  },
+  {
+    id: "b2", label: "Break 2", clock: "5:00 – 5:20 PM",
+    startMin: t(17, 0), endMin: t(17, 20), after: "p3",
+    thenWhat: "Final Impact phase begins. Everything now aims at the 8:00 PM outcome.",
+  },
+];
+
+export function breakAfter(cp: CheckpointId): BreakWindow | undefined {
+  return BREAKS.find((b) => b.after === cp);
+}
+
+export function activeBreak(m: number): BreakWindow | undefined {
+  return BREAKS.find((b) => m >= b.startMin && m < b.endMin);
+}
 
 export function checkpointById(id: CheckpointId) {
   return CHECKPOINTS.find((c) => c.id === id)!;
