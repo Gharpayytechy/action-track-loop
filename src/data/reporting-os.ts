@@ -147,7 +147,7 @@ const CONTROL_TOWER: RoleFlow = {
       { id: "ct_gm_waiting", label: "Chats waiting for us", kind: "number", source: "auto", meaning: "Must be 0 beyond SLA." },
       { id: "ct_gm_tours", label: "Tours today", kind: "number", source: "auto", meaning: "Scheduled today across all zones." },
       { id: "ct_gm_risks", label: "Top 3 operating risks", kind: "list", source: "human", meaning: "Exact stage + count + owner." },
-      { id: "ct_gm_interventions", label: "Top 3 interventions before 1 PM", kind: "list", source: "human", meaning: "What Control Tower will actively fix." },
+      { id: "ct_gm_interventions", label: "Top 3 interventions before 1:15 PM", kind: "list", source: "human", meaning: "What Control Tower will actively fix." },
     ],
     p1: [
       { id: "ct_p1_assigned", label: "Assigned %", kind: "percent", source: "auto", meaning: "Assigned active leads / leads requiring owner." },
@@ -157,7 +157,7 @@ const CONTROL_TOWER: RoleFlow = {
       { id: "ct_p1_tours_sched", label: "Tours scheduled", kind: "number", source: "auto", meaning: "Flow Ops source." },
       { id: "ct_p1_visits", label: "Visits today confirmed", kind: "number", source: "auto", meaning: "TCM source." },
       { id: "ct_p1_broken", label: "Primary broken stage", kind: "text", source: "auto+human", meaning: "Largest count / value leakage." },
-      { id: "ct_p1_recovery", label: "Recovery plan to 4 PM", kind: "text", source: "human", meaning: "Exact people / cases / action / support owner." },
+      { id: "ct_p1_recovery", label: "Recovery plan to 5:00 PM", kind: "text", source: "human", meaning: "Exact people / cases / action / support owner." },
     ],
     p2: [
       { id: "ct_p2_unconf", label: "Unconfirmed tours at risk", kind: "number", source: "auto", meaning: "Tours today not confirmed." },
@@ -165,9 +165,9 @@ const CONTROL_TOWER: RoleFlow = {
       { id: "ct_p2_no_outcome", label: "Completed tours without outcome", kind: "number", source: "auto", meaning: "TCM leakage." },
       { id: "ct_p2_pay_risk", label: "Payments / owner confirmations at risk", kind: "number", source: "auto", meaning: "Closing leakage." },
       { id: "ct_p2_idle", label: "Idle / underloaded people", kind: "number", source: "auto", meaning: "Needs reallocation or diagnosis." },
-      { id: "ct_p2_taken", label: "Interventions taken since 1 PM", kind: "list", source: "human", meaning: "Action + owner + result." },
+      { id: "ct_p2_taken", label: "Interventions taken since 1:15 PM", kind: "list", source: "human", meaning: "Action + owner + result." },
       { id: "ct_p2_risk", label: "Risk if we do nothing", kind: "text", source: "human", meaning: "Expected lost tours / bookings / revenue." },
-      { id: "ct_p2_support", label: "Support needed before 5 PM", kind: "text", source: "human", meaning: "Exact cross-team help." },
+      { id: "ct_p2_support", label: "Support needed before 5:00 PM", kind: "text", source: "human", meaning: "Exact cross-team help." },
     ],
     p3: [
       { id: "ct_p3_bbd", label: "BBD target vs actual", kind: "text", source: "auto", meaning: "21 by P2 / 30 EOD reference." },
