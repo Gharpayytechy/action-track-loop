@@ -530,7 +530,7 @@ function nextAction(role: CoreRole, cp: "p1" | "p2" | "eod", primary: { t: Targe
       ? `All ${role.name} targets are met. Lock evidence, file the EOD report and hand over to ${role.handoverTo}.`
       : `You are ahead of the ${cp === "p1" ? "1 PM" : "5 PM"} checkpoint. Push into the stretch band on ${primary.t.label}.`;
   }
-  return `Close ${primary.gap} more ${primary.t.label.toLowerCase()} before the ${cp === "p1" ? "1:00 PM" : cp === "p2" ? "5:00 PM" : "8:00 PM"} checkpoint — this is the primary gap right now.`;
+  return `Close ${primary.gap} more ${primary.t.label.toLowerCase()} before the ${cp === "p1" ? "1:15 PM" : cp === "p2" ? "5:00 PM" : "8:00 PM"} checkpoint — this is the primary gap right now.`;
 }
 
 function Info({ label, value }: { label: string; value: string }) {
