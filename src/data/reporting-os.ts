@@ -1,6 +1,18 @@
-// Reporting OS — day-wise checkpoint flow (Good Morning → 1 PM → 4 PM → 5 PM → 8 PM EOD → Weekly)
-// Operationalized from the 100X Reporting OS framework: every role reports the same
-// cadence, and every number links to the next role in the connected funnel.
+// Reporting OS — the daily operating rhythm.
+//
+//   10:35 AM  Day starts        → goal declared
+//   10:36 AM  Commitment        → what must be achieved by 1:15 PM
+//   1:15 PM   Phase 1 actuals   → break starts
+//   2:00 PM   Break ends        → recovery + acceleration commitment to 5:00 PM
+//   5:00 PM   Phase 2 actuals   → final gap identified → break starts
+//   5:20 PM   Break ends        → final impact phase begins
+//   8:00 PM   Final impact      → tomorrow pipeline locked → day ends
+//
+// One rule above everything: 10:35 decides the goal, 1:15 exposes reality,
+// 5:00 forces recovery, 8:00 measures impact. Nobody is rewarded for being busy.
+// Every checkpoint answers: what did you promise, what happened, what is the
+// gap, what will you do next, what business outcome did you create?
+
 
 export type CheckpointId = "gm" | "p1" | "p2" | "p3" | "wrap" | "weekly";
 
