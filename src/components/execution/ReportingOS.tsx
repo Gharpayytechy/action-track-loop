@@ -13,7 +13,7 @@ import {
 import {
   useReportDay, useReportsToday, setReportField, submitCheckpoint, unsubmitCheckpoint,
   checkpointFill, reportingFitness, reportText, bridgeStatuses, confirmBridge,
-  type ReportDay,
+  EDIT_WINDOW_MS, formatMsLeft, type ReportDay,
 } from "@/lib/reporting-store";
 import { crmValue, fieldLocked, fieldTone, sourceLabel } from "@/lib/execution/crm-bridge";
 
@@ -99,6 +99,26 @@ export function NowLine() {
   );
 }
 
+/**
+ * Live countdown on the three minute edit window that opens the moment a
+ * checkpoint is filed. Ticks every second, and only while a window is open.
+ */
+export function useEditWindow(submittedAt?: number): number {
+  const [left, setLeft] = useState(0);
+  useEffect(() => {
+    if (!submittedAt) { setLeft(0); return; }
+    const calc = () => Math.max(0, submittedAt + EDIT_WINDOW_MS - Date.now());
+    setLeft(calc());
+    const i = setInterval(() => {
+      const next = calc();
+      setLeft(next);
+      if (next <= 0) clearInterval(i);
+    }, 1000);
+    return () => clearInterval(i);
+  }, [submittedAt]);
+  return left;
+}
+
 function CheckpointCard({ cpId, flow, actorId, nowM, day }: {
   cpId: CheckpointId;
   flow: RoleFlow;
@@ -114,6 +134,7 @@ function CheckpointCard({ cpId, flow, actorId, nowM, day }: {
   const fill = checkpointFill(day, flow.key, cpId, actorId);
   const [open, setOpen] = useState(status === "live" || status === "late");
   const [copied, setCopied] = useState(false);
+  const editLeft = useEditWindow(day.submitted[cpId]);
 
   const tone =
     status === "done" ? "border-success/40 bg-success/5"
@@ -186,12 +207,18 @@ function CheckpointCard({ cpId, flow, actorId, nowM, day }: {
           </div>
           <div className="flex flex-wrap items-center gap-2 pt-1">
             {submitted ? (
-              <button
-                onClick={() => unsubmitCheckpoint(actorId, flow.key, cpId)}
-                className="h-8 px-3 inline-flex items-center gap-1.5 rounded-md border border-border bg-secondary text-xs hover:bg-secondary/70"
-              >
-                <Undo2 className="h-3.5 w-3.5" /> Reopen
-              </button>
+              editLeft > 0 ? (
+                <button
+                  onClick={() => unsubmitCheckpoint(actorId, flow.key, cpId)}
+                  className="h-8 px-3 inline-flex items-center gap-1.5 rounded-md border border-warning/40 bg-warning/10 text-xs hover:bg-warning/20"
+                >
+                  <Undo2 className="h-3.5 w-3.5" /> Edit · {formatMsLeft(editLeft)} left
+                </button>
+              ) : (
+                <span className="h-8 px-3 inline-flex items-center gap-1.5 rounded-md border border-border bg-secondary/60 text-xs text-muted-foreground">
+                  <Lock className="h-3.5 w-3.5" /> Locked on the record
+                </span>
+              )
             ) : (
               <button
                 disabled={missingHuman.length > 0}

@@ -8,6 +8,8 @@ import {
 import {
   ReportingOSPanel, ReportingHeaderStat, NowLine,
 } from "@/components/execution/ReportingOS";
+import { WhatsAppReportingThread } from "@/components/execution/WhatsAppReportingThread";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const Route = createFileRoute("/reporting")({
   component: ReportingPage,
@@ -27,6 +29,9 @@ function ReportingPage() {
   const { actor } = useAttendanceState();
   const mine = flowForEmployee(actor.id);
   const [roleKey, setRoleKey] = useState<RoleFlowKey>(mine?.key ?? "control_tower");
+  const [view, setView] = useState<"chat" | "board">("chat");
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => setHydrated(true), []);
   useEffect(() => {
     if (mine) setRoleKey(mine.key);
   }, [mine?.key]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -80,7 +85,20 @@ function ReportingPage() {
         </div>
       </div>
 
-      <ReportingOSPanel actorId={actor.id} roleKey={roleKey} />
+      <Tabs value={view} onValueChange={(v) => setView(v as "chat" | "board")}>
+        <TabsList>
+          <TabsTrigger value="chat">WhatsApp thread</TabsTrigger>
+          <TabsTrigger value="board">Board view</TabsTrigger>
+        </TabsList>
+        <TabsContent value="chat" className="mt-4">
+          {hydrated
+            ? <WhatsAppReportingThread actorId={actor.id} roleKey={roleKey} />
+            : <div className="rounded-xl border border-border bg-card p-5 text-sm text-muted-foreground">Loading today's thread…</div>}
+        </TabsContent>
+        <TabsContent value="board" className="mt-4">
+          <ReportingOSPanel actorId={actor.id} roleKey={roleKey} />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

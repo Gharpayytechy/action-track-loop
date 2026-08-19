@@ -91,6 +91,28 @@ export function unsubmitCheckpoint(actorId: string, roleKey: RoleFlowKey, cp: Ch
   });
 }
 
+/**
+ * WhatsApp-style edit window. A filed checkpoint stays editable for exactly
+ * three minutes after it was sent. After that it is on the record and the only
+ * way to change it is to file a correction with your lead.
+ */
+export const EDIT_WINDOW_MS = 3 * 60 * 1000;
+
+export function editMsLeft(day: ReportDay, cp: CheckpointId, now = Date.now()): number {
+  const ts = day.submitted[cp];
+  if (!ts) return 0;
+  return Math.max(0, ts + EDIT_WINDOW_MS - now);
+}
+
+export function isEditable(day: ReportDay, cp: CheckpointId, now = Date.now()): boolean {
+  return editMsLeft(day, cp, now) > 0;
+}
+
+export function formatMsLeft(ms: number): string {
+  const total = Math.ceil(ms / 1000);
+  return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, "0")}`;
+}
+
 export function confirmBridge(actorId: string, roleKey: RoleFlowKey, bridgeId: string) {
   patch(actorId, roleKey, (d) => ({ ...d, confirmed: { ...d.confirmed, [bridgeId]: Date.now() } }));
 }
@@ -135,13 +157,41 @@ export function reportingFitness(day: ReportDay, roleKey: RoleFlowKey): { score:
 export function reportText(day: ReportDay, roleKey: RoleFlowKey, cp: CheckpointId): string {
   const flow = ROLE_FLOWS[roleKey];
   const c = checkpointById(cp);
-  const lines = [`${flow.title.toUpperCase()} — ${c.label} (${c.clock}) — ${day.date}`, ""];
-  flow.checkpoints[cp].forEach((f) => {
-    const v = fieldValue(day, day.actorId, f.id, roleKey).trim();
-    lines.push(`${f.label}: ${v || "—"}`);
-  });
-  lines.push("", `Handoff: ${flow.handsOffTo}`);
-  return lines.join("\n");
+  const fields = flow.checkpoints[cp];
+  const filled = fields.filter((f) => fieldValue(day, day.actorId, f.id, roleKey).trim() !== "").length;
+
+  const lines = [
+    `*${flow.title.toUpperCase()} · ${c.label}*`,
+    `${c.clock} · ${day.date} · ${filled}/${fields.length} fields`,
+    "",
+  ];
+
+  const numbers = fields.filter((f) => f.kind === "number" || f.kind === "percent");
+  const words = fields.filter((f) => f.kind !== "number" && f.kind !== "percent");
+
+  if (numbers.length) {
+    lines.push("*Numbers*");
+    numbers.forEach((f) => {
+      const v = fieldValue(day, day.actorId, f.id, roleKey).trim();
+      lines.push(`• ${f.label}: ${v || "not filed"}${f.kind === "percent" && v ? "%" : ""}`);
+    });
+    lines.push("");
+  }
+  if (words.length) {
+    lines.push("*Judgement*");
+    words.forEach((f) => {
+      const v = fieldValue(day, day.actorId, f.id, roleKey).trim();
+      lines.push(`• ${f.label}: ${v || "not filed"}`);
+    });
+    lines.push("");
+  }
+
+  lines.push(`Handoff → ${flow.handsOffTo}`);
+  const ts = day.submitted[cp];
+  if (ts) {
+    lines.push(`Filed ${new Date(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`);
+  }
+  return lines.join("\n").trim();
 }
 
 // ---- Connected funnel: no number counts until the next role confirms it ----
