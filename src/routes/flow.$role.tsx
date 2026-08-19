@@ -152,7 +152,7 @@ function RoleFlowPage() {
           </Card>
           <NowLine />
           {hydrated
-            ? <ReportingOSPanel actorId={actor.id} roleKey={role.id} />
+            ? <WhatsAppReportingThread actorId={actor.id} roleKey={role.id} />
             : <Card className="p-5 text-sm text-muted-foreground">Loading today's report…</Card>}
         </TabsContent>
 
