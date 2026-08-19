@@ -134,13 +134,11 @@ export function ImpactChat({
   // Resume: everything already answered is shown instantly; the conversation
   // continues live from the first thing still open.
   const [revealed, setRevealed] = useState(() => {
-    let i = 0;
-    while (i < beats.length) {
-      const b = beats[i];
-      if (interactive(b) && !answered(b)) return i + 1;
-      i++;
-    }
-    return beats.length;
+    // Replay only what's already been answered; everything after that arrives
+    // live, one message at a time, with typing.
+    let lastAnswered = -1;
+    beats.forEach((b, i) => { if (interactive(b) && answered(b)) lastAnswered = i; });
+    return lastAnswered + 1;
   });
   const [typing, setTyping] = useState(false);
 
