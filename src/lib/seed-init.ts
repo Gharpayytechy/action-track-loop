@@ -12,6 +12,7 @@ import { ensureXPSeed, awardXP, xpFor } from "./xp-engine";
 import { ensureCoinsSeed, awardCoins, coinsFor } from "./coins";
 import { ensureQuestSeed } from "./quests-store";
 import { ensureDynSeed } from "./execution/dyn-seed";
+import { ensureReportingSeed } from "./reporting-store";
 import { EMPLOYEES } from "@/data/seed";
 
 let booted = false;
@@ -33,6 +34,7 @@ export function bootArena() {
   ensureCoinsSeed();
   ensureQuestSeed();
   ensureDynSeed();
+  ensureReportingSeed();
 
   // Seed XP/coins so the leaderboard isn't empty on first visit.
   for (const emp of EMPLOYEES) {
