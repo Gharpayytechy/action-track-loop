@@ -66,6 +66,7 @@ const NAV: NavItem[] = [
   { to: "/daily",       label: "Daily Flow",   icon: Sun,             tiers: ALL },
   { to: "/reporting",   label: "Reporting OS", icon: ClipboardList,   tiers: ALL },
   { to: "/flow",                 label: "Role Flows",         icon: Target, tiers: ALL },
+  { to: "/flows",                label: "All Role Flows",     icon: ClipboardList, tiers: ALL },
   { to: "/flow/control_tower",   label: "Control Tower",      icon: Shield, tiers: ALL },
   { to: "/flow/flow_ops",        label: "Flow Ops",           icon: Activity, tiers: ALL },
   { to: "/flow/tcm",             label: "Tour Conversion",    icon: Users, tiers: ALL },

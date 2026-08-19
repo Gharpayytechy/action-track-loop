@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "@tanstack/react-router";
 import { StageRenderer } from "@/components/execution/StageRenderer";
 import {
-  resolvePlaybookFor, defaultPlaybookForRole, subscribePlaybooks, playbooksVersion,
+  resolvePlaybookFor, defaultPlaybookForRole, subscribePlaybooks, playbooksVersion, getPlaybook,
   type StageDef,
 } from "@/lib/execution/playbooks";
 import {
@@ -34,6 +34,9 @@ import {
 
 
 export const Route = createFileRoute("/daily")({
+  validateSearch: (s: Record<string, unknown>): { pb?: string } => ({
+    pb: typeof s.pb === "string" ? s.pb : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Daily Flow · Execution OS" },
@@ -160,6 +163,7 @@ function toneClass(tone: "up" | "down" | "flat"): string {
 
 function DailyPage() {
   const { actor } = useAttendanceState();
+  const { pb } = Route.useSearch();
   useSyncExternalStore(subscribeDyn, dynVersion, () => 0);
   useSyncExternalStore(subscribePlaybooks, playbooksVersion, () => 0);
   useSyncExternalStore(subscribeDailyCfg, dailyCfgVersion, () => 0);
@@ -168,7 +172,9 @@ function DailyPage() {
   const [viewDate, setViewDate] = useState<string>(today);
   const [showHistory, setShowHistory] = useState<boolean>(false);
 
-  const playbook = resolvePlaybookFor(actor.id, () => defaultPlaybookForRole(actor.role));
+  const playbook =
+    (pb ? getPlaybook(pb) : undefined) ??
+    resolvePlaybookFor(actor.id, () => defaultPlaybookForRole(actor.role));
 
   if (!playbook) {
     return (

@@ -29,6 +29,7 @@ import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as KudosRouteImport } from './routes/kudos'
 import { Route as InboxRouteImport } from './routes/inbox'
 import { Route as HrmsRouteImport } from './routes/hrms'
+import { Route as FlowsRouteImport } from './routes/flows'
 import { Route as DailyLegacyRouteImport } from './routes/daily-legacy'
 import { Route as DailyRouteImport } from './routes/daily'
 import { Route as ConsoleRouteImport } from './routes/console'
@@ -144,6 +145,11 @@ const HrmsRoute = HrmsRouteImport.update({
   path: '/hrms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FlowsRoute = FlowsRouteImport.update({
+  id: '/flows',
+  path: '/flows',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DailyLegacyRoute = DailyLegacyRouteImport.update({
   id: '/daily-legacy',
   path: '/daily-legacy',
@@ -224,6 +230,7 @@ export interface FileRoutesByFullPath {
   '/console': typeof ConsoleRoute
   '/daily': typeof DailyRoute
   '/daily-legacy': typeof DailyLegacyRoute
+  '/flows': typeof FlowsRoute
   '/hrms': typeof HrmsRoute
   '/inbox': typeof InboxRoute
   '/kudos': typeof KudosRoute
@@ -260,6 +267,7 @@ export interface FileRoutesByTo {
   '/console': typeof ConsoleRoute
   '/daily': typeof DailyRoute
   '/daily-legacy': typeof DailyLegacyRoute
+  '/flows': typeof FlowsRoute
   '/hrms': typeof HrmsRoute
   '/inbox': typeof InboxRoute
   '/kudos': typeof KudosRoute
@@ -297,6 +305,7 @@ export interface FileRoutesById {
   '/console': typeof ConsoleRoute
   '/daily': typeof DailyRoute
   '/daily-legacy': typeof DailyLegacyRoute
+  '/flows': typeof FlowsRoute
   '/hrms': typeof HrmsRoute
   '/inbox': typeof InboxRoute
   '/kudos': typeof KudosRoute
@@ -335,6 +344,7 @@ export interface FileRouteTypes {
     | '/console'
     | '/daily'
     | '/daily-legacy'
+    | '/flows'
     | '/hrms'
     | '/inbox'
     | '/kudos'
@@ -371,6 +381,7 @@ export interface FileRouteTypes {
     | '/console'
     | '/daily'
     | '/daily-legacy'
+    | '/flows'
     | '/hrms'
     | '/inbox'
     | '/kudos'
@@ -407,6 +418,7 @@ export interface FileRouteTypes {
     | '/console'
     | '/daily'
     | '/daily-legacy'
+    | '/flows'
     | '/hrms'
     | '/inbox'
     | '/kudos'
@@ -444,6 +456,7 @@ export interface RootRouteChildren {
   ConsoleRoute: typeof ConsoleRoute
   DailyRoute: typeof DailyRoute
   DailyLegacyRoute: typeof DailyLegacyRoute
+  FlowsRoute: typeof FlowsRoute
   HrmsRoute: typeof HrmsRoute
   InboxRoute: typeof InboxRoute
   KudosRoute: typeof KudosRoute
@@ -614,6 +627,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HrmsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/flows': {
+      id: '/flows'
+      path: '/flows'
+      fullPath: '/flows'
+      preLoaderRoute: typeof FlowsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/daily-legacy': {
       id: '/daily-legacy'
       path: '/daily-legacy'
@@ -724,6 +744,7 @@ const rootRouteChildren: RootRouteChildren = {
   ConsoleRoute: ConsoleRoute,
   DailyRoute: DailyRoute,
   DailyLegacyRoute: DailyLegacyRoute,
+  FlowsRoute: FlowsRoute,
   HrmsRoute: HrmsRoute,
   InboxRoute: InboxRoute,
   KudosRoute: KudosRoute,
