@@ -125,11 +125,29 @@ function RoleFlowPage() {
       <Tabs defaultValue="run">
         <TabsList className="flex-wrap h-auto">
           <TabsTrigger value="run">Run the day</TabsTrigger>
+          <TabsTrigger value="reporting">Reporting OS</TabsTrigger>
           <TabsTrigger value="flow">All phases</TabsTrigger>
           <TabsTrigger value="playbook">Playbook</TabsTrigger>
           <TabsTrigger value="analytics">My analytics</TabsTrigger>
           <TabsTrigger value="team">Team analytics</TabsTrigger>
         </TabsList>
+
+        {/* ---------------- REPORTING OS: GM → 1PM → 4PM → 5PM → 8PM → WEEKLY ---------------- */}
+        <TabsContent value="reporting" className="space-y-5 mt-5">
+          <Card className="p-5 flex flex-wrap items-start gap-4">
+            <div className="flex-1 min-w-[220px]">
+              <div className="text-[11px] font-mono uppercase tracking-widest text-primary">Reporting OS</div>
+              <div className="font-display text-lg font-semibold mt-1">{REPORT_FLOWS[role.id].title} filing cadence</div>
+              <p className="text-sm text-muted-foreground mt-1">{REPORT_FLOWS[role.id].mandate}</p>
+              <div className="mt-2 text-xs font-mono text-primary">{REPORT_FLOWS[role.id].handsOffTo}</div>
+            </div>
+            <ReportingHeaderStat actorId={actor.id} roleKey={role.id} />
+          </Card>
+          <NowLine />
+          {hydrated
+            ? <ReportingOSPanel actorId={actor.id} roleKey={role.id} />
+            : <Card className="p-5 text-sm text-muted-foreground">Loading today's report…</Card>}
+        </TabsContent>
 
         {/* ---------------- GUIDED, STEP BY STEP ---------------- */}
         <TabsContent value="run" className="space-y-5 mt-5">
