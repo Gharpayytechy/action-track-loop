@@ -196,8 +196,7 @@ export function ImpactChat({
 
   /* ------- rendering one beat ------- */
 
-  const renderBeat = (b: Beat, i: number) => {
-    const isLast = i === revealed - 1;
+  const renderBeat = (b: Beat) => {
     const done = answered(b);
     const ack = pick(ACKS, b.id);
 
@@ -239,7 +238,7 @@ export function ImpactChat({
                 <Out time={day.checks[b.stepId] ? new Date(day.checks[b.stepId]).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : undefined}>
                   {day.checks[b.stepId] ? b.yes : b.no}
                 </Out>
-                {isLast || true ? <In avatar>{day.checks[b.stepId] ? ack : pick(SOFT_ACKS, b.id)}</In> : null}
+                <In avatar>{day.checks[b.stepId] ? ack : pick(SOFT_ACKS, b.id)}</In>
               </>
             )}
           </div>
