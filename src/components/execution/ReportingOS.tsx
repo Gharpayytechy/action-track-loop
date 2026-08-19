@@ -186,12 +186,18 @@ function CheckpointCard({ cpId, flow, actorId, nowM, day }: {
           </div>
           <div className="flex flex-wrap items-center gap-2 pt-1">
             {submitted ? (
-              <button
-                onClick={() => unsubmitCheckpoint(actorId, flow.key, cpId)}
-                className="h-8 px-3 inline-flex items-center gap-1.5 rounded-md border border-border bg-secondary text-xs hover:bg-secondary/70"
-              >
-                <Undo2 className="h-3.5 w-3.5" /> Reopen
-              </button>
+              editLeft > 0 ? (
+                <button
+                  onClick={() => unsubmitCheckpoint(actorId, flow.key, cpId)}
+                  className="h-8 px-3 inline-flex items-center gap-1.5 rounded-md border border-warning/40 bg-warning/10 text-xs hover:bg-warning/20"
+                >
+                  <Undo2 className="h-3.5 w-3.5" /> Edit · {formatMsLeft(editLeft)} left
+                </button>
+              ) : (
+                <span className="h-8 px-3 inline-flex items-center gap-1.5 rounded-md border border-border bg-secondary/60 text-xs text-muted-foreground">
+                  <Lock className="h-3.5 w-3.5" /> Locked on the record
+                </span>
+              )
             ) : (
               <button
                 disabled={missingHuman.length > 0}
