@@ -12,6 +12,7 @@ import { ensureXPSeed, awardXP, xpFor } from "./xp-engine";
 import { ensureCoinsSeed, awardCoins, coinsFor } from "./coins";
 import { ensureQuestSeed } from "./quests-store";
 import { ensureDynSeed } from "./execution/dyn-seed";
+import { ensureReportingSeed } from "./reporting-store";
 import { EMPLOYEES } from "@/data/seed";
 
 let booted = false;
