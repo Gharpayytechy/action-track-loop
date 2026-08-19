@@ -172,10 +172,6 @@ function RoleFlowPage() {
           )}
         </TabsContent>
 
-        {/* ---------------- DAILY FLOW ---------------- */}
-        <TabsContent value="flow" className="space-y-5 mt-5">
-        </TabsContent>
-
         {/* ---------------- WHATSAPP PHASES: the whole rhythm as a thread ---------------- */}
         <TabsContent value="phases" className="space-y-5 mt-5">
           {hydrated ? (
@@ -193,7 +189,8 @@ function RoleFlowPage() {
           )}
         </TabsContent>
 
-        <TabsContent value="flow-body" className="space-y-5 mt-5">
+        {/* ---------------- DAILY FLOW ---------------- */}
+        <TabsContent value="flow" className="space-y-5 mt-5">
           <Card className="p-5 border-primary/40 bg-primary/5">
             <div className="flex items-center gap-2 text-[11px] font-mono uppercase tracking-widest text-primary">
               <Target className="h-3.5 w-3.5" /> This is what we are supposed to do next
