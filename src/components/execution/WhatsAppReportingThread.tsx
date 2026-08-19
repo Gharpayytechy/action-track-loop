@@ -8,7 +8,7 @@
 
 import { useMemo, useState } from "react";
 import {
-  CHECKPOINTS, ROLE_FLOWS, checkpointStatus, checkpointById,
+  CHECKPOINTS, ROLE_FLOWS, checkpointStatus, checkpointById, breakAfter, activeBreak,
   type CheckpointId, type ReportField, type RoleFlow, type RoleFlowKey,
 } from "@/data/reporting-os";
 import {
@@ -21,7 +21,7 @@ import { crmValue, fieldLocked, sourceLabel } from "@/lib/execution/crm-bridge";
 import { WhatsAppCopyBlock } from "@/components/execution/WhatsAppCopyBlock";
 import {
   Check, CheckCheck, Clock, Lock, Cpu, User, Pencil, Send, Zap, Flame,
-  AlertTriangle, ArrowRight, ShieldCheck,
+  AlertTriangle, ArrowRight, ShieldCheck, Coffee,
 } from "lucide-react";
 
 /* ------------------------------ bubbles ------------------------------ */
