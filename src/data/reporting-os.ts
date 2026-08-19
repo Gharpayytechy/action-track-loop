@@ -344,11 +344,50 @@ const CLOSING: RoleFlow = {
   },
 };
 
+/**
+ * The five questions the rhythm must answer for every role, every day:
+ * what did you promise, what happened, what is the gap, what next, what
+ * outcome did you create. These are prepended to each role's own fields so
+ * no checkpoint can be filed as a pile of activity with no promise attached.
+ */
+const RHYTHM_FIELDS: Partial<Record<CheckpointId, ReportField[]>> = {
+  gm: [
+    { id: "rx_goal", label: "Today's goal (one number)", kind: "text", source: "human", meaning: "Declared at 10:35. The single outcome the day is judged on." },
+    { id: "rx_commit_115", label: "Commitment by 1:15 PM", kind: "text", source: "human", meaning: "Declared at 10:36. What must be achieved before Phase 1 closes." },
+  ],
+  p1: [
+    { id: "rx_p1_promised", label: "Promised by 1:15", kind: "text", source: "human", meaning: "Restate the 10:36 commitment. No rewriting history." },
+    { id: "rx_p1_actual", label: "Actually delivered", kind: "text", source: "human", meaning: "What really happened by 1:15." },
+    { id: "rx_p1_gap", label: "Gap + why", kind: "text", source: "human", meaning: "The honest difference and its first broken cause." },
+  ],
+  p2: [
+    { id: "rx_commit_500", label: "Commitment by 5:00 PM", kind: "text", source: "human", meaning: "Break is over at 2:00. What recovery + acceleration delivers by 5." },
+  ],
+  p3: [
+    { id: "rx_p2_actual", label: "Delivered by 5:00", kind: "text", source: "human", meaning: "Phase 2 actuals against the 2:00 PM commitment." },
+    { id: "rx_final_gap", label: "Final gap to goal", kind: "text", source: "human", meaning: "Exactly what is still missing from the 10:35 goal." },
+    { id: "rx_commit_800", label: "Commitment by 8:00 PM", kind: "text", source: "human", meaning: "Set at 5:20 when the break ends. What the impact phase must close." },
+  ],
+  wrap: [
+    { id: "rx_outcome", label: "Final business outcome created", kind: "text", source: "human", meaning: "Not activity. The result the business can bank." },
+    { id: "rx_goal_hit", label: "Goal hit?", kind: "yesno", source: "human", meaning: "Against the number declared at 10:35." },
+    { id: "rx_tomorrow", label: "Tomorrow's pipeline locked", kind: "text", source: "human", meaning: "What is already loaded for tomorrow before the day ends." },
+  ],
+};
+
+function withRhythm(flow: RoleFlow): RoleFlow {
+  const checkpoints = { ...flow.checkpoints };
+  (Object.keys(RHYTHM_FIELDS) as CheckpointId[]).forEach((cp) => {
+    checkpoints[cp] = [...(RHYTHM_FIELDS[cp] ?? []), ...(checkpoints[cp] ?? [])];
+  });
+  return { ...flow, checkpoints };
+}
+
 export const ROLE_FLOWS: Record<RoleFlowKey, RoleFlow> = {
-  control_tower: CONTROL_TOWER,
-  flow_ops: FLOW_OPS,
-  tcm: TCM,
-  closing: CLOSING,
+  control_tower: withRhythm(CONTROL_TOWER),
+  flow_ops: withRhythm(FLOW_OPS),
+  tcm: withRhythm(TCM),
+  closing: withRhythm(CLOSING),
 };
 
 export const ROLE_FLOW_ORDER: RoleFlowKey[] = ["control_tower", "flow_ops", "tcm", "closing"];
