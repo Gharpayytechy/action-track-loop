@@ -14,6 +14,8 @@ const RESULTS = [
   { kind: "page" as const, id: "p6", label: "Coach", sub: "AI command center", to: "/command" },
   { kind: "page" as const, id: "p7", label: "Inbox", sub: "All notifications", to: "/inbox" },
   { kind: "page" as const, id: "p8", label: "Roster", sub: "Live attendance map", to: "/roster" },
+  { kind: "page" as const, id: "p9", label: "All Role Flows", sub: "Tech, HR, Recruitment & every other role flow", to: "/flows" },
+  { kind: "page" as const, id: "p10", label: "Reporting OS", sub: "Day flow: 10:35 → 1:15 → 2:00 → 5:00 → 8:00", to: "/reporting" },
 ];
 
 interface Props {
