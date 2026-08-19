@@ -451,3 +451,39 @@ function HeroStat({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
+
+/**
+ * The scheduled break that sits between two checkpoints. It is not a form —
+ * it is the visible pause that separates "what happened" from "what you will
+ * do next", and it states what the floor owes the moment it ends.
+ */
+function BreakBubble({
+  label, clock, thenWhat, live, started,
+}: {
+  label: string;
+  clock: string;
+  thenWhat: string;
+  live: boolean;
+  started: boolean;
+}) {
+  return (
+    <div className="flex justify-center">
+      <div
+        className={`max-w-[85%] rounded-xl border border-dashed px-3 py-2 text-center ${
+          live
+            ? "border-amber-400/70 bg-amber-50/95"
+            : started
+              ? "border-emerald-400/50 bg-emerald-50/80"
+              : "border-black/15 bg-white/70"
+        }`}
+      >
+        <div className="flex items-center justify-center gap-1.5 text-[11px] font-mono uppercase tracking-widest text-amber-700">
+          <Coffee className="h-3.5 w-3.5" />
+          {label} · {clock}
+          {live && <span className="text-amber-800">· on break</span>}
+        </div>
+        <p className="mt-1 text-[11px] text-neutral-600 leading-snug">{thenWhat}</p>
+      </div>
+    </div>
+  );
+}
