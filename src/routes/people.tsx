@@ -64,7 +64,7 @@ function PeoplePage() {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {list.map((e) => {
-          const status = liveStatusFor(e.id);
+          const status = hydrated ? liveStatusFor(e.id) : "Off";
           const score = computeScore(e).total;
           const dot = status === "Clocked In" ? "bg-success" : status === "On Break" ? "bg-warning" : status === "In Field" ? "bg-primary" : "bg-muted-foreground/40";
           return (
