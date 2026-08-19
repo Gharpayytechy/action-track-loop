@@ -93,4 +93,25 @@ export const ROLE_METRIC_FIELDS: RoleMetricField[] = [
   m("decisions_made", "Decisions made", "Manager", 3),
   m("blockers_cleared", "Blockers cleared", "Manager", 3),
   m("handoff_reviews", "Cross-team handoffs reviewed", "Manager", 3),
+
+  // Technology
+  m("bugs_fixed", "Bugs fixed & shipped", "Tech", 5),
+  m("releases_shipped", "Releases shipped", "Tech", 1),
+  m("uptime_incidents", "Incidents resolved", "Tech", 2),
+  m("prs_reviewed", "Pull requests reviewed", "Tech", 5),
+  m("data_checks", "Data integrity checks", "Tech", 3),
+
+  // People / HR
+  m("active_verified", "Active people verified", "People", 40),
+  m("inactive_flagged", "Inactive cases flagged", "People", 5),
+  m("perf_reviews", "Performance reviews done", "People", 5),
+  m("comms_sent", "Team communications sent", "People", 3),
+  m("hr_cases_closed", "HR cases closed", "People", 5),
+
+  // Recruitment
+  m("sourced_profiles", "Profiles sourced", "Hiring", 30),
+  m("screening_calls", "Screening calls done", "Hiring", 10),
+  m("interviews_scheduled", "Interviews scheduled", "Hiring", 5),
+  m("offers_rolled", "Offers rolled out", "Hiring", 2),
+  m("joinings_confirmed", "Joinings confirmed", "Hiring", 1),
 ];

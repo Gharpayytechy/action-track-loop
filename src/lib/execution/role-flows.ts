@@ -236,6 +236,33 @@ export const ROLE_FLOWS: RoleFlow[] = [
     metrics: ["decisions_made", "blockers_cleared", "handoff_reviews"],
     match: ["department lead", "operations manager", "ops manager", "leadership", "admin"],
   },
+  {
+    roleId: "TEC-BUILD", playbookId: "pb_role_tec_build", roleName: "Technology & Product Engineer", department: "Technology",
+    result: "Shipped, stable software where every reported break is fixed or owned the same day.",
+    p1: "Triage the bug and incident queue, confirm reproduction, and pick the fixes that unblock revenue and operations first.",
+    p2: "Build and review the committed changes, test against real data, and ship to production with monitoring in place.",
+    p3: "Verify live behaviour, close incidents with root cause, and lock tomorrow's build queue.",
+    metrics: ["bugs_fixed", "releases_shipped", "uptime_incidents", "prs_reviewed", "data_checks"],
+    match: ["tech", "engineer", "developer", "product engineer", "technology"],
+  },
+  {
+    roleId: "HR-PEOPLE", playbookId: "pb_role_hr_people", roleName: "HR & People Operations Executive", department: "People & Culture",
+    result: "Every person is accounted for, performing to a known number, and communicated with the same day.",
+    p1: "Establish the people truth: who is active, who is inactive, attendance, leave and role coverage across teams.",
+    p2: "Chase missing updates, run performance conversations on the lowest performers, and send the day's team communication.",
+    p3: "Close HR cases with evidence, escalate repeat performance risk and publish tomorrow's people plan.",
+    metrics: ["active_verified", "inactive_flagged", "perf_reviews", "comms_sent", "hr_cases_closed"],
+    match: ["hr", "people ops", "people operations", "human resource"],
+  },
+  {
+    roleId: "REC-HIRE", playbookId: "pb_role_rec_hire", roleName: "Recruitment Executive", department: "Talent Acquisition",
+    result: "Role-fit candidates move from sourced to joined with no open seat left unattended.",
+    p1: "Review open seats by urgency, source fresh role-fit profiles and clear the unscreened pipeline.",
+    p2: "Run screening calls, schedule interviews with hiring managers and keep every candidate warm with a next step.",
+    p3: "Close offers, confirm joinings, log drop reasons and lock tomorrow's sourcing targets.",
+    metrics: ["sourced_profiles", "screening_calls", "interviews_scheduled", "offers_rolled", "joinings_confirmed"],
+    match: ["recruit", "recruiter", "talent acquisition", "hiring"],
+  },
 ];
 
 // ---- WhatsApp phase templates (kept short; the phase composer writes the full update) ----
