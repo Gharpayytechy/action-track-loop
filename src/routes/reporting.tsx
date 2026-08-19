@@ -29,6 +29,9 @@ function ReportingPage() {
   const { actor } = useAttendanceState();
   const mine = flowForEmployee(actor.id);
   const [roleKey, setRoleKey] = useState<RoleFlowKey>(mine?.key ?? "control_tower");
+  const [view, setView] = useState<"chat" | "board">("chat");
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => setHydrated(true), []);
   useEffect(() => {
     if (mine) setRoleKey(mine.key);
   }, [mine?.key]); // eslint-disable-line react-hooks/exhaustive-deps
