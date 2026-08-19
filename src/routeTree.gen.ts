@@ -17,6 +17,7 @@ import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ScoreRouteImport } from './routes/score'
 import { Route as RosterRouteImport } from './routes/roster'
 import { Route as ReportsRouteImport } from './routes/reports'
+import { Route as ReportingRouteImport } from './routes/reporting'
 import { Route as RecruitingRouteImport } from './routes/recruiting'
 import { Route as QuestsRouteImport } from './routes/quests'
 import { Route as PlannedOffRouteImport } from './routes/planned-off'
@@ -81,6 +82,11 @@ const RosterRoute = RosterRouteImport.update({
 const ReportsRoute = ReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReportingRoute = ReportingRouteImport.update({
+  id: '/reporting',
+  path: '/reporting',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RecruitingRoute = RecruitingRouteImport.update({
@@ -229,6 +235,7 @@ export interface FileRoutesByFullPath {
   '/planned-off': typeof PlannedOffRoute
   '/quests': typeof QuestsRoute
   '/recruiting': typeof RecruitingRoute
+  '/reporting': typeof ReportingRoute
   '/reports': typeof ReportsRoute
   '/roster': typeof RosterRoute
   '/score': typeof ScoreRoute
@@ -264,6 +271,7 @@ export interface FileRoutesByTo {
   '/planned-off': typeof PlannedOffRoute
   '/quests': typeof QuestsRoute
   '/recruiting': typeof RecruitingRoute
+  '/reporting': typeof ReportingRoute
   '/reports': typeof ReportsRoute
   '/roster': typeof RosterRoute
   '/score': typeof ScoreRoute
@@ -300,6 +308,7 @@ export interface FileRoutesById {
   '/planned-off': typeof PlannedOffRoute
   '/quests': typeof QuestsRoute
   '/recruiting': typeof RecruitingRoute
+  '/reporting': typeof ReportingRoute
   '/reports': typeof ReportsRoute
   '/roster': typeof RosterRoute
   '/score': typeof ScoreRoute
@@ -337,6 +346,7 @@ export interface FileRouteTypes {
     | '/planned-off'
     | '/quests'
     | '/recruiting'
+    | '/reporting'
     | '/reports'
     | '/roster'
     | '/score'
@@ -372,6 +382,7 @@ export interface FileRouteTypes {
     | '/planned-off'
     | '/quests'
     | '/recruiting'
+    | '/reporting'
     | '/reports'
     | '/roster'
     | '/score'
@@ -407,6 +418,7 @@ export interface FileRouteTypes {
     | '/planned-off'
     | '/quests'
     | '/recruiting'
+    | '/reporting'
     | '/reports'
     | '/roster'
     | '/score'
@@ -443,6 +455,7 @@ export interface RootRouteChildren {
   PlannedOffRoute: typeof PlannedOffRoute
   QuestsRoute: typeof QuestsRoute
   RecruitingRoute: typeof RecruitingRoute
+  ReportingRoute: typeof ReportingRoute
   ReportsRoute: typeof ReportsRoute
   RosterRoute: typeof RosterRoute
   ScoreRoute: typeof ScoreRoute
@@ -515,6 +528,13 @@ declare module '@tanstack/react-router' {
       path: '/reports'
       fullPath: '/reports'
       preLoaderRoute: typeof ReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reporting': {
+      id: '/reporting'
+      path: '/reporting'
+      fullPath: '/reporting'
+      preLoaderRoute: typeof ReportingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/recruiting': {
@@ -715,6 +735,7 @@ const rootRouteChildren: RootRouteChildren = {
   PlannedOffRoute: PlannedOffRoute,
   QuestsRoute: QuestsRoute,
   RecruitingRoute: RecruitingRoute,
+  ReportingRoute: ReportingRoute,
   ReportsRoute: ReportsRoute,
   RosterRoute: RosterRoute,
   ScoreRoute: ScoreRoute,
