@@ -103,6 +103,17 @@ export const DEFAULT_FIELDS: FieldDef[] = [
   // Field ops
   { id: "site_checks", label: "Site checks done", type: "kpiChip", group: "Ops" },
   { id: "tags", label: "Tags", type: "multiselect", group: "Meta", options: ["Urgent", "Client", "Internal", "Follow-up"] },
+
+  // ---- Accountability spine: promise → actual → gap → next → outcome ----
+  // Present at EVERY checkpoint, ahead of role KPIs, so no checkpoint can be
+  // filed as pure activity. Keyword options keep it to taps, not typing.
+  { id: "ap_promise", label: "What I promised for this checkpoint", type: "text", group: "Accountability", placeholder: "One number — e.g. 40 calls, 3 tours" },
+  { id: "ap_actual", label: "What I actually delivered", type: "text", group: "Accountability", placeholder: "One number — the real one" },
+  { id: "ap_gap", label: "Gap", type: "select", group: "Accountability", options: ["Ahead", "On target", "Slight gap", "Big gap", "Missed"] },
+  { id: "ap_gap_reason", label: "Why the gap", type: "select", group: "Accountability", options: ["No gap", "Low connects", "Lead quality", "No inventory", "Customer delay", "Owner delay", "Waiting on approval", "System / CRM", "Travel time", "Started late", "My execution"] },
+  { id: "ap_next", label: "Next commitment (by the next checkpoint)", type: "text", group: "Accountability", placeholder: "One number I will land next" },
+  { id: "ap_outcome", label: "Business outcome created", type: "select", group: "Accountability", options: ["Revenue booked", "Bed booked", "Tour secured", "Payment collected", "Supply added", "Pipeline built", "Risk removed", "Nothing yet"] },
+  { id: "ap_goal_hit", label: "Goal hit?", type: "select", group: "Accountability", options: ["Yes", "No", "Partial"] },
 ];
 
 // ---- Runtime field library store (localStorage; admin can add / archive) ----
