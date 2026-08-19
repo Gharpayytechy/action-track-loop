@@ -33,7 +33,7 @@ export const Route = createFileRoute("/admin/playbooks")({
       { name: "description", content: "Design daily flows for every role. Toggle fields, proofs and KPI chips per person. Fully configurable." },
     ],
   }),
-  validateSearch: (s: Record<string, unknown>) => ({ tab: (s.tab as string) || "playbooks" }),
+  validateSearch: (s: Record<string, unknown>): { tab?: string } => ({ tab: (s.tab as string) || "playbooks" }),
   component: () => <RoleGate allow={["leadership","hr"]}><PlaybookManager /></RoleGate>,
   errorComponent: ({ error }) => <div className="p-6 text-sm text-destructive">{error.message}</div>,
   notFoundComponent: () => <div className="p-6 text-sm">Not found.</div>,
