@@ -22,6 +22,8 @@ import { PhaseReportForm } from "@/components/execution/PhaseReportForm";
 import { EMPLOYEES } from "@/data/seed";
 import { ROLE_FLOWS as REPORT_FLOWS } from "@/data/reporting-os";
 import { ReportingOSPanel, ReportingHeaderStat, NowLine } from "@/components/execution/ReportingOS";
+import { WhatsAppPhases } from "@/components/execution/WhatsAppPhases";
+
 import {
   ArrowRight, Minus, Plus, ShieldAlert, Target, TrendingUp, Clock, CheckCircle2,
   AlertTriangle, Check, Circle, ChevronDown, PlayCircle, Lock, Users,
@@ -128,7 +130,7 @@ function RoleFlowPage() {
         <TabsList className="flex-wrap h-auto">
           <TabsTrigger value="run">Run the day</TabsTrigger>
           <TabsTrigger value="reporting">Reporting OS</TabsTrigger>
-          <TabsTrigger value="flow">All phases</TabsTrigger>
+          <TabsTrigger value="flow">WhatsApp PHASES</TabsTrigger>
           <TabsTrigger value="playbook">Playbook</TabsTrigger>
           <TabsTrigger value="analytics">My analytics</TabsTrigger>
           <TabsTrigger value="team">Team analytics</TabsTrigger>
@@ -229,21 +231,22 @@ function RoleFlowPage() {
           </div>
 
           <div className="space-y-3">
-            <div className="flex items-center gap-2 font-medium"><CheckCircle2 className="h-4 w-4 text-primary" /> Today's flow — tick every step</div>
-            {phases.map((p, i) => (
-              <PhaseCard
-                key={p.id}
-                phase={p}
-                index={i}
+            <div className="flex items-center gap-2 font-medium"><CheckCircle2 className="h-4 w-4 text-primary" /> WhatsApp PHASES — run the whole day as a chat</div>
+            {hydrated ? (
+              <WhatsAppPhases
                 role={role}
+                phases={phases}
                 day={day}
                 actorId={actor.id}
-                cp={cp}
                 counts={counts}
-                openByDefault={p.id === nowPhase}
+                nowPhase={nowPhase}
+                headline={nextStep ? `Next up: ${nextStep.step.label} — ${nextStep.phase.name}, due ${nextStep.phase.due}.` : "Every step is ticked for today."}
               />
-            ))}
+            ) : (
+              <Card className="p-5 text-sm text-muted-foreground">Loading today's phases…</Card>
+            )}
           </div>
+
 
           {needsRecovery && (
             <RecoveryCard
