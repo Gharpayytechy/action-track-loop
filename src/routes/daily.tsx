@@ -31,6 +31,7 @@ import {
   composePhaseMessage, isPhaseSent, markPhaseSent, phaseSentAt,
   subscribePhaseSent, phaseSentVersion,
 } from "@/lib/execution/phase-message";
+import { ROLE_FLOWS } from "@/lib/execution/role-flows";
 
 
 export const Route = createFileRoute("/daily")({
@@ -39,8 +40,12 @@ export const Route = createFileRoute("/daily")({
   }),
   head: () => ({
     meta: [
-      { title: "Daily Flow · Execution OS" },
-      { name: "description", content: "Structured daily workflow with proofs, updates, and WhatsApp-ready messages built in." },
+      { title: "Role Flow · Gharpayy Execution OS" },
+      { name: "description", content: "Run your role flow on the 10:35 → 1:15 → 2:00 → 5:00 → 8:00 rhythm, with proofs, actuals and WhatsApp-ready updates built in." },
+      { property: "og:title", content: "Role Flow · Gharpayy Execution OS" },
+      { property: "og:description", content: "Every checkpoint answers promise → actual → gap → next → outcome before any KPI is accepted." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: DailyPage,
