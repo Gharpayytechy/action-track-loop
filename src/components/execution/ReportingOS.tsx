@@ -114,6 +114,7 @@ function CheckpointCard({ cpId, flow, actorId, nowM, day }: {
   const fill = checkpointFill(day, flow.key, cpId, actorId);
   const [open, setOpen] = useState(status === "live" || status === "late");
   const [copied, setCopied] = useState(false);
+  const editLeft = useEditWindow(day.submitted[cpId]);
 
   const tone =
     status === "done" ? "border-success/40 bg-success/5"
