@@ -13,7 +13,7 @@ import {
 import {
   useReportDay, useReportsToday, setReportField, submitCheckpoint, unsubmitCheckpoint,
   checkpointFill, reportingFitness, reportText, bridgeStatuses, confirmBridge,
-  editMsLeft, formatMsLeft, type ReportDay,
+  EDIT_WINDOW_MS, formatMsLeft, type ReportDay,
 } from "@/lib/reporting-store";
 import { crmValue, fieldLocked, fieldTone, sourceLabel } from "@/lib/execution/crm-bridge";
 
