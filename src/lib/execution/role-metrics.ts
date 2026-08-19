@@ -100,6 +100,9 @@ export const ROLE_METRIC_FIELDS: RoleMetricField[] = [
   m("uptime_incidents", "Incidents resolved", "Tech", 2),
   m("prs_reviewed", "Pull requests reviewed", "Tech", 5),
   m("data_checks", "Data integrity checks", "Tech", 3),
+  m("tech_blockers_unblocked", "Team blockers unblocked", "Tech", 3),
+  m("regressions_caught", "Regressions caught pre-ship", "Tech", 2),
+  m("rootcauses_written", "Root causes written", "Tech", 2),
 
   // People / HR
   m("active_verified", "Active people verified", "People", 40),
@@ -107,6 +110,9 @@ export const ROLE_METRIC_FIELDS: RoleMetricField[] = [
   m("perf_reviews", "Performance reviews done", "People", 5),
   m("comms_sent", "Team communications sent", "People", 3),
   m("hr_cases_closed", "HR cases closed", "People", 5),
+  m("attendance_exceptions", "Attendance exceptions actioned", "People", 8),
+  m("coaching_logs", "Coaching conversations logged", "People", 4),
+  m("coverage_gaps_filled", "Coverage gaps filled", "People", 2),
 
   // Recruitment
   m("sourced_profiles", "Profiles sourced", "Hiring", 30),
@@ -114,4 +120,7 @@ export const ROLE_METRIC_FIELDS: RoleMetricField[] = [
   m("interviews_scheduled", "Interviews scheduled", "Hiring", 5),
   m("offers_rolled", "Offers rolled out", "Hiring", 2),
   m("joinings_confirmed", "Joinings confirmed", "Hiring", 1),
+  m("interviews_completed", "Interviews completed", "Hiring", 4),
+  m("pipeline_next_steps", "Candidates with a next step", "Hiring", 15),
+  m("dropoffs_logged", "Drop-offs logged with reason", "Hiring", 5),
 ];
