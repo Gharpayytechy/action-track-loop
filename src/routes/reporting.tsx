@@ -85,6 +85,8 @@ function ReportingPage() {
         </div>
       </div>
 
+      <RhythmStrip />
+
       <Tabs value={view} onValueChange={(v) => setView(v as "chat" | "board")}>
         <TabsList>
           <TabsTrigger value="chat">WhatsApp thread</TabsTrigger>
