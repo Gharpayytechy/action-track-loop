@@ -72,9 +72,10 @@ function buildPhases(stages: StageDef[]): Phase[] {
   stages.forEach((stage, flatIdx) => {
     const id = stage.id;
     const entry = { stage, flatIdx };
-    // 4-step grouping: Morning · Midday · Evening · EOD.
-    if (id === "login" || id === "mission" || id === "c1_draft" || id === "c1_calls" || id === "c1_outcome") push("morning", entry);
-    else if (id === "pre_break" || id === "break1" || id === "resume") push("midday", entry);
+    // 4-step grouping matching the rhythm:
+    //   10:35 Goal · 1:15 Phase 1 (+ Break 1 / 2:00 recovery) · 5:00 Phase 2 (+ Break 2) · 8:00 Final Impact
+    if (id === "login" || id === "mission" || id === "c1_draft" || id === "c1_calls") push("morning", entry);
+    else if (id === "c1_outcome" || id === "pre_break" || id === "break1" || id === "resume" || id === "recovery") push("midday", entry);
     else if (id === "c2_draft" || id === "c2_calls" || id === "c2_outcome" || id === "break2" || id.startsWith("c3_")) push("evening", entry);
     else if (id === "impact") push("eod", entry);
     else push("more", entry);
