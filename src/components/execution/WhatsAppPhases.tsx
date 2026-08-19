@@ -500,6 +500,7 @@ export function WhatsAppPhases({
   const current = phases.find((p) => p.id === nowPhase);
   const mins = nowMinutes();
   const left = current ? current.dueMins - mins : 0;
+  const liveBreak = activeBreak();
 
   const jump = (id: string) =>
     document.getElementById(`wa-phase-${id}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -574,18 +575,23 @@ export function WhatsAppPhases({
             <p className="font-semibold leading-relaxed">{headline}</p>
           </In>
         )}
-        {phases.map((p, i) => (
-          <PhaseThread
-            key={p.id}
-            phase={p}
-            index={i}
-            role={role}
-            day={day}
-            actorId={actorId}
-            counts={counts}
-            openByDefault={p.id === nowPhase}
-          />
-        ))}
+        {phases.map((p, i) => {
+          const brk = BREAKS.find((b) => b.after === p.id);
+          return (
+            <div key={p.id} className="space-y-3">
+              <PhaseThread
+                phase={p}
+                index={i}
+                role={role}
+                day={day}
+                actorId={actorId}
+                counts={counts}
+                openByDefault={p.id === nowPhase}
+              />
+              {brk && <BreakBubble marker={brk} live={liveBreak?.id === brk.id} />}
+            </div>
+          );
+        })}
         <WrapBubble role={role} wrap={wrap} auto={auto} />
         <DayChip>End of today's phases</DayChip>
       </div>
