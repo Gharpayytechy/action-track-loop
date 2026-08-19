@@ -31,6 +31,7 @@ import {
   composePhaseMessage, isPhaseSent, markPhaseSent, phaseSentAt,
   subscribePhaseSent, phaseSentVersion,
 } from "@/lib/execution/phase-message";
+import { ROLE_FLOWS } from "@/lib/execution/role-flows";
 
 
 export const Route = createFileRoute("/daily")({
@@ -39,8 +40,12 @@ export const Route = createFileRoute("/daily")({
   }),
   head: () => ({
     meta: [
-      { title: "Daily Flow · Execution OS" },
-      { name: "description", content: "Structured daily workflow with proofs, updates, and WhatsApp-ready messages built in." },
+      { title: "Role Flow · Gharpayy Execution OS" },
+      { name: "description", content: "Run your role flow on the 10:35 → 1:15 → 2:00 → 5:00 → 8:00 rhythm, with proofs, actuals and WhatsApp-ready updates built in." },
+      { property: "og:title", content: "Role Flow · Gharpayy Execution OS" },
+      { property: "og:description", content: "Every checkpoint answers promise → actual → gap → next → outcome before any KPI is accepted." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: DailyPage,
@@ -262,6 +267,8 @@ function DailyPage() {
       ? "Begin today's flow"
       : "Continue where you left off";
 
+  const flow = ROLE_FLOWS.find((f) => f.playbookId === playbook.id);
+
   return (
     <div className="p-4 md:p-8 space-y-6 max-w-3xl mx-auto">
       {/* Hero: greeting, playbook, progress. History hidden behind info toggle. */}
@@ -270,20 +277,30 @@ function DailyPage() {
           <div className="min-w-0">
             <div className="text-xs uppercase tracking-widest text-muted-foreground font-mono flex items-center gap-2">
               <Sparkles className="h-3.5 w-3.5 text-primary" />
-              {playbook.name}
+              Role flow{flow ? ` · ${flow.department}` : ""}
             </div>
             <h1 className="font-display text-3xl md:text-4xl font-semibold tracking-tight mt-1">
-              {greet()}, {actor.name.split(" ")[0]}.
+              {flow?.roleName ?? playbook.name}
             </h1>
-            <p className="text-sm text-muted-foreground mt-1.5 max-w-2xl">
-              {done >= total
-                ? "All phases are complete for today."
-                : done === 0
-                  ? "Your workflow is ready. Open the first phase to begin."
-                  : `You are ${pct}% through today's workflow. Continue with the next phase when ready.`}
-            </p>
+            {flow && (
+              <p className="text-sm text-muted-foreground mt-1.5 max-w-2xl">{flow.result}</p>
+            )}
+            <div className="flex flex-wrap items-center gap-2 mt-3">
+              {flow && <Badge variant="outline" className="font-mono text-[10px]">{flow.roleId}</Badge>}
+              <Badge variant="outline" className="font-mono text-[10px]">10:35 · 1:15 · 2:00 · 5:00 · 8:00</Badge>
+              <span className="text-xs text-muted-foreground">
+                {greet()}, {actor.name.split(" ")[0]} — {done >= total
+                  ? "role flow complete for today."
+                  : done === 0
+                    ? "your role flow is ready."
+                    : `${pct}% through your role flow.`}
+              </span>
+            </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
+            <Link to="/flows" className="inline-flex items-center gap-1 text-xs h-9 px-3 rounded-md border hover:bg-secondary">
+              <ArrowLeft className="h-3.5 w-3.5" /> All flows
+            </Link>
             <button
               type="button"
               onClick={() => setShowHistory((s) => !s)}

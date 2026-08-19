@@ -3,7 +3,7 @@ import { EMPLOYEES, type AppRole } from "@/data/seed";
 import { liveStatusFor } from "@/lib/attendance-store";
 import { computeScore } from "@/lib/score-engine";
 import { Avatar } from "@/components/Avatar";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Search } from "lucide-react";
 
 import { RoleGate } from "@/components/RoleGate";
@@ -23,6 +23,8 @@ const ROLE_TONE: Record<AppRole, string> = {
 function PeoplePage() {
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState<AppRole | "all">("all");
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => setHydrated(true), []);
 
   const list = EMPLOYEES.filter((e) => {
     if (filter !== "all" && e.appRole !== filter) return false;
@@ -62,7 +64,7 @@ function PeoplePage() {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {list.map((e) => {
-          const status = liveStatusFor(e.id);
+          const status = hydrated ? liveStatusFor(e.id) : "Off";
           const score = computeScore(e).total;
           const dot = status === "Clocked In" ? "bg-success" : status === "On Break" ? "bg-warning" : status === "In Field" ? "bg-primary" : "bg-muted-foreground/40";
           return (
