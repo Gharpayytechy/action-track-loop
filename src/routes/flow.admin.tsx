@@ -18,6 +18,7 @@ import {
 } from "@/lib/presence-store";
 import { DAYOFF_LABEL, dayOffVersion, nameOf, plansOn, subscribeDayOff, tomorrowKey } from "@/lib/dayoff-store";
 import { AlertTriangle, ArrowRight, ShieldAlert, TrendingUp, Users, Activity, CalendarOff, FileText } from "lucide-react";
+import { ROLE_FLOWS } from "@/lib/execution/role-flows";
 
 export const Route = createFileRoute("/flow/admin")({
   head: () => ({
@@ -101,6 +102,9 @@ function AdminAnalytics() {
   ).sort((a, b) => a.avg - b.avg);
 
   const orgAvg = data.length ? Math.round(data.reduce((a, d) => a + d.roleAvg, 0) / data.length) : 0;
+  const teamFlows = ROLE_FLOWS.filter((flow) =>
+    ["TEC-BUILD", "HR-PEOPLE", "REC-HIRE"].includes(flow.roleId),
+  );
 
   if (!hydrated) return <div className="p-6 text-sm text-muted-foreground">Loading execution reporting…</div>;
 
@@ -118,6 +122,34 @@ function AdminAnalytics() {
           <Badge variant="outline" className={alerts.length ? "border-destructive/40 text-destructive" : ""}>{alerts.length} alerts</Badge>
         </div>
       </div>
+
+      <section className="space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <div className="text-[11px] font-mono uppercase tracking-widest text-primary">Team role flows</div>
+            <h2 className="font-display text-xl font-semibold">Tech, HR &amp; Recruitment</h2>
+          </div>
+          <Link to="/flows" className="inline-flex items-center gap-1.5 text-sm font-medium text-primary">
+            See all role flows <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+        <div className="grid gap-3 md:grid-cols-3">
+          {teamFlows.map((flow) => (
+            <Card key={flow.roleId} className="p-4 space-y-2 border-primary/30">
+              <Badge variant="outline" className="font-mono text-[10px]">{flow.roleId}</Badge>
+              <div className="font-display font-semibold">{flow.roleName}</div>
+              <p className="text-xs text-muted-foreground line-clamp-3">{flow.result}</p>
+              <Link
+                to="/daily"
+                search={{ pb: flow.playbookId }}
+                className="inline-flex items-center gap-1 text-sm font-semibold text-primary"
+              >
+                Open role flow <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </Card>
+          ))}
+        </div>
+      </section>
 
       <Card className="p-4">
         <div className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground mb-3">Floor status right now</div>
