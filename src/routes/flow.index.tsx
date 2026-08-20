@@ -9,6 +9,7 @@ import { subscribeCore, coreVersion, getCoreDay } from "@/lib/execution/core-pro
 import { seedCoreDemo } from "@/lib/execution/core-seed";
 import { useAttendanceState } from "@/hooks/useAttendance";
 import { ArrowRight, Target, BarChart3, Clock } from "lucide-react";
+import { ROLE_FLOWS } from "@/lib/execution/role-flows";
 
 export const Route = createFileRoute("/flow/")({
   head: () => ({
@@ -58,6 +59,10 @@ function FlowIndex() {
     });
   }, [actor.id, cp, phaseId, v, hydrated]);
 
+  const teamFlows = ROLE_FLOWS.filter((flow) =>
+    ["TEC-BUILD", "HR-PEOPLE", "REC-HIRE"].includes(flow.roleId),
+  );
+
   return (
     <div className="p-4 md:p-6 space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -74,6 +79,38 @@ function FlowIndex() {
           </Link>
         </div>
       </div>
+
+      <section className="space-y-3">
+        <div className="flex flex-wrap items-end justify-between gap-2">
+          <div>
+            <div className="text-[11px] font-mono uppercase tracking-widest text-primary">New team role flows</div>
+            <h2 className="font-display text-xl font-semibold">Tech, HR &amp; Recruitment</h2>
+          </div>
+          <Link to="/flows" className="inline-flex items-center gap-1.5 text-sm font-medium text-primary">
+            View every role flow <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+        <div className="grid gap-4 md:grid-cols-3">
+          {teamFlows.map((flow) => (
+            <Card key={flow.roleId} className="p-5 space-y-3 border-primary/30">
+              <div>
+                <Badge variant="outline" className="font-mono text-[10px] mb-2">{flow.roleId}</Badge>
+                <h3 className="font-display text-lg font-semibold leading-tight">{flow.roleName}</h3>
+                <div className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground mt-1">{flow.department}</div>
+              </div>
+              <p className="text-sm text-muted-foreground line-clamp-4">{flow.result}</p>
+              <div className="text-xs text-muted-foreground">{flow.metrics.length} role KPIs · 5 WhatsApp checkpoints</div>
+              <Link
+                to="/daily"
+                search={{ pb: flow.playbookId }}
+                className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary"
+              >
+                Open this role flow <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </Card>
+          ))}
+        </div>
+      </section>
 
       <div className="grid gap-4 md:grid-cols-2">
         {cards.map(({ r, lines, avg, phase, total, done, nextStep }) => (
