@@ -140,8 +140,8 @@ function AdminAnalytics() {
               <div className="font-display font-semibold">{flow.roleName}</div>
               <p className="text-xs text-muted-foreground line-clamp-3">{flow.result}</p>
               <Link
-                to="/daily"
-                search={{ pb: flow.playbookId }}
+                to="/flow/role/$id"
+                params={{ id: flow.roleId }}
                 className="inline-flex items-center gap-1 text-sm font-semibold text-primary"
               >
                 Open role flow <ArrowRight className="h-3.5 w-3.5" />

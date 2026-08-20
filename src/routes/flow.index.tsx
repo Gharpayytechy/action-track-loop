@@ -101,8 +101,8 @@ function FlowIndex() {
               <p className="text-sm text-muted-foreground line-clamp-4">{flow.result}</p>
               <div className="text-xs text-muted-foreground">{flow.metrics.length} role KPIs · 5 WhatsApp checkpoints</div>
               <Link
-                to="/daily"
-                search={{ pb: flow.playbookId }}
+                to="/flow/role/$id"
+                params={{ id: flow.roleId }}
                 className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary"
               >
                 Open this role flow <ArrowRight className="h-3.5 w-3.5" />
@@ -149,7 +149,7 @@ function FlowIndex() {
               params={{ role: r.id }}
               className="inline-flex items-center gap-1.5 text-sm font-medium text-primary"
             >
-              Open daily flow <ArrowRight className="h-3.5 w-3.5" />
+              Open role flow <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </Card>
         ))}
