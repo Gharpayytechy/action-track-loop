@@ -44,6 +44,7 @@ import { Route as FlowRoleRouteImport } from './routes/flow.$role'
 import { Route as AdminPlaybooksRouteImport } from './routes/admin.playbooks'
 import { Route as AdminOpsRouteImport } from './routes/admin.ops'
 import { Route as AdminConsoleRouteImport } from './routes/admin.console'
+import { Route as FlowRoleIdRouteImport } from './routes/flow.role.$id'
 
 const WarRoomRoute = WarRoomRouteImport.update({
   id: '/war-room',
@@ -220,6 +221,11 @@ const AdminConsoleRoute = AdminConsoleRouteImport.update({
   path: '/admin/console',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FlowRoleIdRoute = FlowRoleIdRouteImport.update({
+  id: '/flow/role/$id',
+  path: '/flow/role/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -257,6 +263,7 @@ export interface FileRoutesByFullPath {
   '/flow/$role': typeof FlowRoleRoute
   '/flow/admin': typeof FlowAdminRoute
   '/flow/': typeof FlowIndexRoute
+  '/flow/role/$id': typeof FlowRoleIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -294,6 +301,7 @@ export interface FileRoutesByTo {
   '/flow/$role': typeof FlowRoleRoute
   '/flow/admin': typeof FlowAdminRoute
   '/flow': typeof FlowIndexRoute
+  '/flow/role/$id': typeof FlowRoleIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -332,6 +340,7 @@ export interface FileRoutesById {
   '/flow/$role': typeof FlowRoleRoute
   '/flow/admin': typeof FlowAdminRoute
   '/flow/': typeof FlowIndexRoute
+  '/flow/role/$id': typeof FlowRoleIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -371,6 +380,7 @@ export interface FileRouteTypes {
     | '/flow/$role'
     | '/flow/admin'
     | '/flow/'
+    | '/flow/role/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -408,6 +418,7 @@ export interface FileRouteTypes {
     | '/flow/$role'
     | '/flow/admin'
     | '/flow'
+    | '/flow/role/$id'
   id:
     | '__root__'
     | '/'
@@ -445,6 +456,7 @@ export interface FileRouteTypes {
     | '/flow/$role'
     | '/flow/admin'
     | '/flow/'
+    | '/flow/role/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -483,6 +495,7 @@ export interface RootRouteChildren {
   FlowRoleRoute: typeof FlowRoleRoute
   FlowAdminRoute: typeof FlowAdminRoute
   FlowIndexRoute: typeof FlowIndexRoute
+  FlowRoleIdRoute: typeof FlowRoleIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -732,6 +745,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminConsoleRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/flow/role/$id': {
+      id: '/flow/role/$id'
+      path: '/flow/role/$id'
+      fullPath: '/flow/role/$id'
+      preLoaderRoute: typeof FlowRoleIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -771,6 +791,7 @@ const rootRouteChildren: RootRouteChildren = {
   FlowRoleRoute: FlowRoleRoute,
   FlowAdminRoute: FlowAdminRoute,
   FlowIndexRoute: FlowIndexRoute,
+  FlowRoleIdRoute: FlowRoleIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
