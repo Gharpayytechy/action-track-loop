@@ -87,11 +87,11 @@ function FlowsDirectory() {
                     {f.metrics.length} KPIs · {work.length} timed phases
                   </div>
                   <Link
-                    to="/daily"
-                    search={{ pb: f.playbookId }}
+                    to="/flow/role/$id"
+                    params={{ id: f.roleId }}
                     className="inline-flex items-center gap-1.5 text-sm font-medium text-primary"
                   >
-                    Open daily flow <ArrowRight className="h-3.5 w-3.5" />
+                    Open role flow <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
                 </Card>
               );
