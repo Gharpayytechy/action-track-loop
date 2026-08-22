@@ -47,7 +47,11 @@ const STATUS_ICON: Record<DeliveryStatus, React.ElementType> = {
 
 function ReportCenter() {
   const [tick, setTick] = useState(0);
-  useEffect(() => subscribeReports(() => setTick((t) => t + 1)), []);
+  useEffect(() => {
+    const off = subscribeReports(() => setTick((t) => t + 1));
+    return () => { off(); };
+  }, []);
+
   const [hydrated, setHydrated] = useState(false);
   useEffect(() => setHydrated(true), []);
 
