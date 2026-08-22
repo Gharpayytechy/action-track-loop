@@ -44,6 +44,7 @@ import { Route as FlowRoleRouteImport } from './routes/flow.$role'
 import { Route as AdminPlaybooksRouteImport } from './routes/admin.playbooks'
 import { Route as AdminOpsRouteImport } from './routes/admin.ops'
 import { Route as AdminConsoleRouteImport } from './routes/admin.console'
+import { Route as AdminCommandCenterRouteImport } from './routes/admin.command-center'
 import { Route as FlowRoleIdRouteImport } from './routes/flow.role.$id'
 
 const WarRoomRoute = WarRoomRouteImport.update({
@@ -221,6 +222,11 @@ const AdminConsoleRoute = AdminConsoleRouteImport.update({
   path: '/admin/console',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminCommandCenterRoute = AdminCommandCenterRouteImport.update({
+  id: '/admin/command-center',
+  path: '/admin/command-center',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FlowRoleIdRoute = FlowRoleIdRouteImport.update({
   id: '/flow/role/$id',
   path: '/flow/role/$id',
@@ -257,6 +263,7 @@ export interface FileRoutesByFullPath {
   '/tasks': typeof TasksRoute
   '/team': typeof TeamRoute
   '/war-room': typeof WarRoomRoute
+  '/admin/command-center': typeof AdminCommandCenterRoute
   '/admin/console': typeof AdminConsoleRoute
   '/admin/ops': typeof AdminOpsRoute
   '/admin/playbooks': typeof AdminPlaybooksRoute
@@ -295,6 +302,7 @@ export interface FileRoutesByTo {
   '/tasks': typeof TasksRoute
   '/team': typeof TeamRoute
   '/war-room': typeof WarRoomRoute
+  '/admin/command-center': typeof AdminCommandCenterRoute
   '/admin/console': typeof AdminConsoleRoute
   '/admin/ops': typeof AdminOpsRoute
   '/admin/playbooks': typeof AdminPlaybooksRoute
@@ -334,6 +342,7 @@ export interface FileRoutesById {
   '/tasks': typeof TasksRoute
   '/team': typeof TeamRoute
   '/war-room': typeof WarRoomRoute
+  '/admin/command-center': typeof AdminCommandCenterRoute
   '/admin/console': typeof AdminConsoleRoute
   '/admin/ops': typeof AdminOpsRoute
   '/admin/playbooks': typeof AdminPlaybooksRoute
@@ -374,6 +383,7 @@ export interface FileRouteTypes {
     | '/tasks'
     | '/team'
     | '/war-room'
+    | '/admin/command-center'
     | '/admin/console'
     | '/admin/ops'
     | '/admin/playbooks'
@@ -412,6 +422,7 @@ export interface FileRouteTypes {
     | '/tasks'
     | '/team'
     | '/war-room'
+    | '/admin/command-center'
     | '/admin/console'
     | '/admin/ops'
     | '/admin/playbooks'
@@ -450,6 +461,7 @@ export interface FileRouteTypes {
     | '/tasks'
     | '/team'
     | '/war-room'
+    | '/admin/command-center'
     | '/admin/console'
     | '/admin/ops'
     | '/admin/playbooks'
@@ -489,6 +501,7 @@ export interface RootRouteChildren {
   TasksRoute: typeof TasksRoute
   TeamRoute: typeof TeamRoute
   WarRoomRoute: typeof WarRoomRoute
+  AdminCommandCenterRoute: typeof AdminCommandCenterRoute
   AdminConsoleRoute: typeof AdminConsoleRoute
   AdminOpsRoute: typeof AdminOpsRoute
   AdminPlaybooksRoute: typeof AdminPlaybooksRoute
@@ -745,6 +758,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminConsoleRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/command-center': {
+      id: '/admin/command-center'
+      path: '/admin/command-center'
+      fullPath: '/admin/command-center'
+      preLoaderRoute: typeof AdminCommandCenterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/flow/role/$id': {
       id: '/flow/role/$id'
       path: '/flow/role/$id'
@@ -785,6 +805,7 @@ const rootRouteChildren: RootRouteChildren = {
   TasksRoute: TasksRoute,
   TeamRoute: TeamRoute,
   WarRoomRoute: WarRoomRoute,
+  AdminCommandCenterRoute: AdminCommandCenterRoute,
   AdminConsoleRoute: AdminConsoleRoute,
   AdminOpsRoute: AdminOpsRoute,
   AdminPlaybooksRoute: AdminPlaybooksRoute,
