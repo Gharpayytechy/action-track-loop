@@ -216,8 +216,8 @@ export function buildFounderUpdate(cfg: UpdateConfig): string {
   }
 
   if (cfg.link) {
-    L.push(`${cfg.linkMode === "live" ? "View live dashboard" : "View 
-snapshot"}: ${cfg.link}`);
+    L.push(`${cfg.linkMode === "live" ? "View live dashboard" : "View snapshot"}: ${cfg.link}`);
+
     L.push("");
   }
 
