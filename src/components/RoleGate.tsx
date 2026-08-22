@@ -6,7 +6,8 @@ import { useAttendanceState } from "@/hooks/useAttendance";
 export function RoleGate({ allow, children }: { allow: Tier[]; children: React.ReactNode }) {
   const { actor } = useAttendanceState();
   const tier = tierOf(actor);
-  if (allow.includes(tier)) return <>{children}</>;
+  // Super Admin sees every surface by design.
+  if (tier === "superadmin" || allow.includes(tier)) return <>{children}</>;
   return (
     <div className="px-4 md:px-8 py-12 max-w-xl mx-auto">
       <div className="rounded-xl bg-card border border-border p-8 text-center">

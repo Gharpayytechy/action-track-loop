@@ -29,6 +29,7 @@ import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as KudosRouteImport } from './routes/kudos'
 import { Route as InboxRouteImport } from './routes/inbox'
 import { Route as HrmsRouteImport } from './routes/hrms'
+import { Route as FounderRouteImport } from './routes/founder'
 import { Route as FlowsRouteImport } from './routes/flows'
 import { Route as DailyLegacyRouteImport } from './routes/daily-legacy'
 import { Route as DailyRouteImport } from './routes/daily'
@@ -41,9 +42,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as FlowIndexRouteImport } from './routes/flow.index'
 import { Route as FlowAdminRouteImport } from './routes/flow.admin'
 import { Route as FlowRoleRouteImport } from './routes/flow.$role'
+import { Route as AdminReportCenterRouteImport } from './routes/admin.report-center'
 import { Route as AdminPlaybooksRouteImport } from './routes/admin.playbooks'
 import { Route as AdminOpsRouteImport } from './routes/admin.ops'
 import { Route as AdminConsoleRouteImport } from './routes/admin.console'
+import { Route as AdminCommandCenterRouteImport } from './routes/admin.command-center'
 import { Route as FlowRoleIdRouteImport } from './routes/flow.role.$id'
 
 const WarRoomRoute = WarRoomRouteImport.update({
@@ -146,6 +149,11 @@ const HrmsRoute = HrmsRouteImport.update({
   path: '/hrms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FounderRoute = FounderRouteImport.update({
+  id: '/founder',
+  path: '/founder',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FlowsRoute = FlowsRouteImport.update({
   id: '/flows',
   path: '/flows',
@@ -206,6 +214,11 @@ const FlowRoleRoute = FlowRoleRouteImport.update({
   path: '/flow/$role',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminReportCenterRoute = AdminReportCenterRouteImport.update({
+  id: '/admin/report-center',
+  path: '/admin/report-center',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminPlaybooksRoute = AdminPlaybooksRouteImport.update({
   id: '/admin/playbooks',
   path: '/admin/playbooks',
@@ -219,6 +232,11 @@ const AdminOpsRoute = AdminOpsRouteImport.update({
 const AdminConsoleRoute = AdminConsoleRouteImport.update({
   id: '/admin/console',
   path: '/admin/console',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminCommandCenterRoute = AdminCommandCenterRouteImport.update({
+  id: '/admin/command-center',
+  path: '/admin/command-center',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FlowRoleIdRoute = FlowRoleIdRouteImport.update({
@@ -237,6 +255,7 @@ export interface FileRoutesByFullPath {
   '/daily': typeof DailyRoute
   '/daily-legacy': typeof DailyLegacyRoute
   '/flows': typeof FlowsRoute
+  '/founder': typeof FounderRoute
   '/hrms': typeof HrmsRoute
   '/inbox': typeof InboxRoute
   '/kudos': typeof KudosRoute
@@ -257,9 +276,11 @@ export interface FileRoutesByFullPath {
   '/tasks': typeof TasksRoute
   '/team': typeof TeamRoute
   '/war-room': typeof WarRoomRoute
+  '/admin/command-center': typeof AdminCommandCenterRoute
   '/admin/console': typeof AdminConsoleRoute
   '/admin/ops': typeof AdminOpsRoute
   '/admin/playbooks': typeof AdminPlaybooksRoute
+  '/admin/report-center': typeof AdminReportCenterRoute
   '/flow/$role': typeof FlowRoleRoute
   '/flow/admin': typeof FlowAdminRoute
   '/flow/': typeof FlowIndexRoute
@@ -275,6 +296,7 @@ export interface FileRoutesByTo {
   '/daily': typeof DailyRoute
   '/daily-legacy': typeof DailyLegacyRoute
   '/flows': typeof FlowsRoute
+  '/founder': typeof FounderRoute
   '/hrms': typeof HrmsRoute
   '/inbox': typeof InboxRoute
   '/kudos': typeof KudosRoute
@@ -295,9 +317,11 @@ export interface FileRoutesByTo {
   '/tasks': typeof TasksRoute
   '/team': typeof TeamRoute
   '/war-room': typeof WarRoomRoute
+  '/admin/command-center': typeof AdminCommandCenterRoute
   '/admin/console': typeof AdminConsoleRoute
   '/admin/ops': typeof AdminOpsRoute
   '/admin/playbooks': typeof AdminPlaybooksRoute
+  '/admin/report-center': typeof AdminReportCenterRoute
   '/flow/$role': typeof FlowRoleRoute
   '/flow/admin': typeof FlowAdminRoute
   '/flow': typeof FlowIndexRoute
@@ -314,6 +338,7 @@ export interface FileRoutesById {
   '/daily': typeof DailyRoute
   '/daily-legacy': typeof DailyLegacyRoute
   '/flows': typeof FlowsRoute
+  '/founder': typeof FounderRoute
   '/hrms': typeof HrmsRoute
   '/inbox': typeof InboxRoute
   '/kudos': typeof KudosRoute
@@ -334,9 +359,11 @@ export interface FileRoutesById {
   '/tasks': typeof TasksRoute
   '/team': typeof TeamRoute
   '/war-room': typeof WarRoomRoute
+  '/admin/command-center': typeof AdminCommandCenterRoute
   '/admin/console': typeof AdminConsoleRoute
   '/admin/ops': typeof AdminOpsRoute
   '/admin/playbooks': typeof AdminPlaybooksRoute
+  '/admin/report-center': typeof AdminReportCenterRoute
   '/flow/$role': typeof FlowRoleRoute
   '/flow/admin': typeof FlowAdminRoute
   '/flow/': typeof FlowIndexRoute
@@ -354,6 +381,7 @@ export interface FileRouteTypes {
     | '/daily'
     | '/daily-legacy'
     | '/flows'
+    | '/founder'
     | '/hrms'
     | '/inbox'
     | '/kudos'
@@ -374,9 +402,11 @@ export interface FileRouteTypes {
     | '/tasks'
     | '/team'
     | '/war-room'
+    | '/admin/command-center'
     | '/admin/console'
     | '/admin/ops'
     | '/admin/playbooks'
+    | '/admin/report-center'
     | '/flow/$role'
     | '/flow/admin'
     | '/flow/'
@@ -392,6 +422,7 @@ export interface FileRouteTypes {
     | '/daily'
     | '/daily-legacy'
     | '/flows'
+    | '/founder'
     | '/hrms'
     | '/inbox'
     | '/kudos'
@@ -412,9 +443,11 @@ export interface FileRouteTypes {
     | '/tasks'
     | '/team'
     | '/war-room'
+    | '/admin/command-center'
     | '/admin/console'
     | '/admin/ops'
     | '/admin/playbooks'
+    | '/admin/report-center'
     | '/flow/$role'
     | '/flow/admin'
     | '/flow'
@@ -430,6 +463,7 @@ export interface FileRouteTypes {
     | '/daily'
     | '/daily-legacy'
     | '/flows'
+    | '/founder'
     | '/hrms'
     | '/inbox'
     | '/kudos'
@@ -450,9 +484,11 @@ export interface FileRouteTypes {
     | '/tasks'
     | '/team'
     | '/war-room'
+    | '/admin/command-center'
     | '/admin/console'
     | '/admin/ops'
     | '/admin/playbooks'
+    | '/admin/report-center'
     | '/flow/$role'
     | '/flow/admin'
     | '/flow/'
@@ -469,6 +505,7 @@ export interface RootRouteChildren {
   DailyRoute: typeof DailyRoute
   DailyLegacyRoute: typeof DailyLegacyRoute
   FlowsRoute: typeof FlowsRoute
+  FounderRoute: typeof FounderRoute
   HrmsRoute: typeof HrmsRoute
   InboxRoute: typeof InboxRoute
   KudosRoute: typeof KudosRoute
@@ -489,9 +526,11 @@ export interface RootRouteChildren {
   TasksRoute: typeof TasksRoute
   TeamRoute: typeof TeamRoute
   WarRoomRoute: typeof WarRoomRoute
+  AdminCommandCenterRoute: typeof AdminCommandCenterRoute
   AdminConsoleRoute: typeof AdminConsoleRoute
   AdminOpsRoute: typeof AdminOpsRoute
   AdminPlaybooksRoute: typeof AdminPlaybooksRoute
+  AdminReportCenterRoute: typeof AdminReportCenterRoute
   FlowRoleRoute: typeof FlowRoleRoute
   FlowAdminRoute: typeof FlowAdminRoute
   FlowIndexRoute: typeof FlowIndexRoute
@@ -640,6 +679,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HrmsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/founder': {
+      id: '/founder'
+      path: '/founder'
+      fullPath: '/founder'
+      preLoaderRoute: typeof FounderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/flows': {
       id: '/flows'
       path: '/flows'
@@ -724,6 +770,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FlowRoleRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/report-center': {
+      id: '/admin/report-center'
+      path: '/admin/report-center'
+      fullPath: '/admin/report-center'
+      preLoaderRoute: typeof AdminReportCenterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/playbooks': {
       id: '/admin/playbooks'
       path: '/admin/playbooks'
@@ -743,6 +796,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/console'
       fullPath: '/admin/console'
       preLoaderRoute: typeof AdminConsoleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/command-center': {
+      id: '/admin/command-center'
+      path: '/admin/command-center'
+      fullPath: '/admin/command-center'
+      preLoaderRoute: typeof AdminCommandCenterRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/flow/role/$id': {
@@ -765,6 +825,7 @@ const rootRouteChildren: RootRouteChildren = {
   DailyRoute: DailyRoute,
   DailyLegacyRoute: DailyLegacyRoute,
   FlowsRoute: FlowsRoute,
+  FounderRoute: FounderRoute,
   HrmsRoute: HrmsRoute,
   InboxRoute: InboxRoute,
   KudosRoute: KudosRoute,
@@ -785,9 +846,11 @@ const rootRouteChildren: RootRouteChildren = {
   TasksRoute: TasksRoute,
   TeamRoute: TeamRoute,
   WarRoomRoute: WarRoomRoute,
+  AdminCommandCenterRoute: AdminCommandCenterRoute,
   AdminConsoleRoute: AdminConsoleRoute,
   AdminOpsRoute: AdminOpsRoute,
   AdminPlaybooksRoute: AdminPlaybooksRoute,
+  AdminReportCenterRoute: AdminReportCenterRoute,
   FlowRoleRoute: FlowRoleRoute,
   FlowAdminRoute: FlowAdminRoute,
   FlowIndexRoute: FlowIndexRoute,

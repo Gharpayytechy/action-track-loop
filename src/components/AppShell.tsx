@@ -59,10 +59,13 @@ import {
 
 type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; tiers: Tier[] };
 
-const ALL: Tier[] = ["leadership", "hr", "leader", "recruiter", "teammate"];
+const ALL: Tier[] = ["superadmin", "leadership", "hr", "leader", "recruiter", "teammate"];
 
 const NAV: NavItem[] = [
   { to: "/",            label: "Arena Home",   icon: LayoutDashboard, tiers: ALL },
+  { to: "/admin/command-center", label: "Command Center", icon: Shield, tiers: ["superadmin","leadership","hr"] },
+  { to: "/admin/report-center", label: "Report Center", icon: ClipboardList, tiers: ["superadmin","leadership","hr"] },
+  { to: "/founder",     label: "Founder Mode", icon: Trophy,          tiers: ["superadmin","leadership"] },
   { to: "/daily",       label: "Daily Flow",   icon: Sun,             tiers: ALL },
   { to: "/reporting",   label: "Reporting OS", icon: ClipboardList,   tiers: ALL },
   { to: "/flows",                label: "Role Flows",         icon: Target, tiers: ALL },
@@ -70,12 +73,12 @@ const NAV: NavItem[] = [
   { to: "/flow/flow_ops",        label: "Flow Ops",           icon: Activity, tiers: ALL },
   { to: "/flow/tcm",             label: "Tour Conversion",    icon: Users, tiers: ALL },
   { to: "/flow/closing",         label: "Closing Specialist", icon: Coins, tiers: ALL },
-  { to: "/flow/admin",           label: "Role Analytics",     icon: Trophy, tiers: ["leadership","hr","leader"] },
-  { to: "/reports",              label: "Live Reports",       icon: ClipboardList, tiers: ["leadership","hr","leader"] },
-  { to: "/console",     label: "Operator Console", icon: Zap,         tiers: ["leadership","hr","leader","recruiter"] },
-  { to: "/live",        label: "Live Ops",     icon: Activity,        tiers: ["leadership","hr","leader"] },
-  { to: "/admin/ops",   label: "Ops Dashboard",icon: Activity,        tiers: ["leadership","hr","leader"] },
-  { to: "/admin/playbooks", label: "Playbook Manager", icon: Settings, tiers: ["leadership","hr"] },
+  { to: "/flow/admin",           label: "Role Analytics",     icon: Trophy, tiers: ["superadmin","leadership","hr","leader"] },
+  { to: "/reports",              label: "Live Reports",       icon: ClipboardList, tiers: ["superadmin","leadership","hr","leader"] },
+  { to: "/console",     label: "Operator Console", icon: Zap,         tiers: ["superadmin","leadership","hr","leader","recruiter"] },
+  { to: "/live",        label: "Live Ops",     icon: Activity,        tiers: ["superadmin","leadership","hr","leader"] },
+  { to: "/admin/ops",   label: "Ops Dashboard",icon: Activity,        tiers: ["superadmin","leadership","hr","leader"] },
+  { to: "/admin/playbooks", label: "Playbook Manager", icon: Settings, tiers: ["superadmin","leadership","hr"] },
   { to: "/score",       label: "My Score",     icon: Trophy,          tiers: ALL },
   { to: "/tasks",       label: "Tasks",        icon: CheckSquare,     tiers: ALL },
   { to: "/achievements",label: "Achievements", icon: Award,           tiers: ALL },
@@ -89,16 +92,16 @@ const NAV: NavItem[] = [
   { to: "/inbox",       label: "Inbox",        icon: Inbox,           tiers: ALL },
   { to: "/attendance",  label: "Attendance",   icon: Clock4,          tiers: ALL },
   // Leader & up (and recruiter — they coach candidates too)
-  { to: "/one-on-ones", label: "1:1 Notes",    icon: MessageSquareText, tiers: ["leadership","hr","leader","recruiter"] },
-  { to: "/people",      label: "People",       icon: Users,           tiers: ["leadership","hr","leader"] },
-  { to: "/roster",      label: "Live Roster",  icon: ClipboardList,   tiers: ["leadership","hr","leader"] },
-  { to: "/war-room",    label: "War Room",     icon: Activity,        tiers: ["leadership","leader"] },
-  { to: "/command",     label: "Coach AI",     icon: MessageSquare,   tiers: ["leadership","hr","leader"] },
+  { to: "/one-on-ones", label: "1:1 Notes",    icon: MessageSquareText, tiers: ["superadmin","leadership","hr","leader","recruiter"] },
+  { to: "/people",      label: "People",       icon: Users,           tiers: ["superadmin","leadership","hr","leader"] },
+  { to: "/roster",      label: "Live Roster",  icon: ClipboardList,   tiers: ["superadmin","leadership","hr","leader"] },
+  { to: "/war-room",    label: "War Room",     icon: Activity,        tiers: ["superadmin","leadership","leader"] },
+  { to: "/command",     label: "Coach AI",     icon: MessageSquare,   tiers: ["superadmin","leadership","hr","leader"] },
   // Recruiting — recruiter, HR, leadership
-  { to: "/recruiting",  label: "Recruiting",   icon: UserPlus,        tiers: ["leadership","hr","recruiter"] },
+  { to: "/recruiting",  label: "Recruiting",   icon: UserPlus,        tiers: ["superadmin","leadership","hr","recruiter"] },
   // HR & Leadership only
-  { to: "/hrms",        label: "HRMS",         icon: ShieldCheck,     tiers: ["leadership","hr"] },
-  { to: "/admin/console", label: "Console Admin", icon: ShieldCheck,   tiers: ["leadership","hr"] },
+  { to: "/hrms",        label: "HRMS",         icon: ShieldCheck,     tiers: ["superadmin","leadership","hr"] },
+  { to: "/admin/console", label: "Console Admin", icon: ShieldCheck,   tiers: ["superadmin","leadership","hr"] },
 ];
 
 const MOBILE_NAV_BASE = [
