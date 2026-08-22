@@ -41,6 +41,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as FlowIndexRouteImport } from './routes/flow.index'
 import { Route as FlowAdminRouteImport } from './routes/flow.admin'
 import { Route as FlowRoleRouteImport } from './routes/flow.$role'
+import { Route as AdminReportCenterRouteImport } from './routes/admin.report-center'
 import { Route as AdminPlaybooksRouteImport } from './routes/admin.playbooks'
 import { Route as AdminOpsRouteImport } from './routes/admin.ops'
 import { Route as AdminConsoleRouteImport } from './routes/admin.console'
@@ -207,6 +208,11 @@ const FlowRoleRoute = FlowRoleRouteImport.update({
   path: '/flow/$role',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminReportCenterRoute = AdminReportCenterRouteImport.update({
+  id: '/admin/report-center',
+  path: '/admin/report-center',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminPlaybooksRoute = AdminPlaybooksRouteImport.update({
   id: '/admin/playbooks',
   path: '/admin/playbooks',
@@ -267,6 +273,7 @@ export interface FileRoutesByFullPath {
   '/admin/console': typeof AdminConsoleRoute
   '/admin/ops': typeof AdminOpsRoute
   '/admin/playbooks': typeof AdminPlaybooksRoute
+  '/admin/report-center': typeof AdminReportCenterRoute
   '/flow/$role': typeof FlowRoleRoute
   '/flow/admin': typeof FlowAdminRoute
   '/flow/': typeof FlowIndexRoute
@@ -306,6 +313,7 @@ export interface FileRoutesByTo {
   '/admin/console': typeof AdminConsoleRoute
   '/admin/ops': typeof AdminOpsRoute
   '/admin/playbooks': typeof AdminPlaybooksRoute
+  '/admin/report-center': typeof AdminReportCenterRoute
   '/flow/$role': typeof FlowRoleRoute
   '/flow/admin': typeof FlowAdminRoute
   '/flow': typeof FlowIndexRoute
@@ -346,6 +354,7 @@ export interface FileRoutesById {
   '/admin/console': typeof AdminConsoleRoute
   '/admin/ops': typeof AdminOpsRoute
   '/admin/playbooks': typeof AdminPlaybooksRoute
+  '/admin/report-center': typeof AdminReportCenterRoute
   '/flow/$role': typeof FlowRoleRoute
   '/flow/admin': typeof FlowAdminRoute
   '/flow/': typeof FlowIndexRoute
@@ -387,6 +396,7 @@ export interface FileRouteTypes {
     | '/admin/console'
     | '/admin/ops'
     | '/admin/playbooks'
+    | '/admin/report-center'
     | '/flow/$role'
     | '/flow/admin'
     | '/flow/'
@@ -426,6 +436,7 @@ export interface FileRouteTypes {
     | '/admin/console'
     | '/admin/ops'
     | '/admin/playbooks'
+    | '/admin/report-center'
     | '/flow/$role'
     | '/flow/admin'
     | '/flow'
@@ -465,6 +476,7 @@ export interface FileRouteTypes {
     | '/admin/console'
     | '/admin/ops'
     | '/admin/playbooks'
+    | '/admin/report-center'
     | '/flow/$role'
     | '/flow/admin'
     | '/flow/'
@@ -505,6 +517,7 @@ export interface RootRouteChildren {
   AdminConsoleRoute: typeof AdminConsoleRoute
   AdminOpsRoute: typeof AdminOpsRoute
   AdminPlaybooksRoute: typeof AdminPlaybooksRoute
+  AdminReportCenterRoute: typeof AdminReportCenterRoute
   FlowRoleRoute: typeof FlowRoleRoute
   FlowAdminRoute: typeof FlowAdminRoute
   FlowIndexRoute: typeof FlowIndexRoute
@@ -737,6 +750,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FlowRoleRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/report-center': {
+      id: '/admin/report-center'
+      path: '/admin/report-center'
+      fullPath: '/admin/report-center'
+      preLoaderRoute: typeof AdminReportCenterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/playbooks': {
       id: '/admin/playbooks'
       path: '/admin/playbooks'
@@ -809,6 +829,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminConsoleRoute: AdminConsoleRoute,
   AdminOpsRoute: AdminOpsRoute,
   AdminPlaybooksRoute: AdminPlaybooksRoute,
+  AdminReportCenterRoute: AdminReportCenterRoute,
   FlowRoleRoute: FlowRoleRoute,
   FlowAdminRoute: FlowAdminRoute,
   FlowIndexRoute: FlowIndexRoute,
