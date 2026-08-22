@@ -3,6 +3,7 @@
 
 export type Tier = "A" | "B" | "C" | "D";
 export type Role =
+  | "Super Admin"
   | "Admin"
   | "Floor Lead"
   | "Operator"
@@ -86,6 +87,8 @@ export const EMPLOYEES: Employee[] = [
   { id: "e13", name: "Sneha Reddy",   role: "Floor Lead", appRole: "manager", experience: "Core", attendance: 98, performance: 95, consistency: 94, revenueImpact: 620000, taskCompletion: 96, conversion: 38, callsToday: 0,  callTarget: 0,  leadsActive: 0,  closedDeals: 0, lostDeals: 0, flags: [], status: "Active", streakDays: 38, team: "Tour Ops", shift: "10:30 - 20:00", avatarSeed: "SnehaR", zone: "HQ", managerId: "e1", bio: "Performance Enforcer. Owns the 10:16:60 number every single day.", joinedYearsAgo: 3, birthdayMMDD: "02-28" },
   { id: "e14", name: "Jiya Khanna",   role: "Coach",      appRole: "manager", experience: "Core", attendance: 100, performance: 91, consistency: 95, revenueImpact: 0,    taskCompletion: 94, conversion: 0,  callsToday: 0,  callTarget: 0,  leadsActive: 0,  closedDeals: 0, lostDeals: 0, flags: [], status: "Active", streakDays: 51, team: "Training", shift: "10:30 - 20:00", avatarSeed: "Jiya",   zone: "HQ", managerId: "e1", bio: "Training Architect. Raw hire to arena-ready in 48 hours.", joinedYearsAgo: 2, birthdayMMDD: "11-21" },
   { id: "e15", name: "Thanvi Kapoor", role: "Recruiter",  appRole: "manager", experience: "Core", attendance: 98, performance: 90, consistency: 92, revenueImpact: 0,     taskCompletion: 95, conversion: 36, callsToday: 0,  callTarget: 0,  leadsActive: 0,  closedDeals: 0, lostDeals: 0, flags: [], status: "Active", streakDays: 33, team: "Talent Ops", shift: "10:30 - 20:00", avatarSeed: "Thanvi", zone: "HQ", managerId: "e8", bio: "Talent Engine. Long-term operators only — quality is the standard.", joinedYearsAgo: 2, birthdayMMDD: "08-14" },
+
+  { id: "e0", name: "DZ Kapoor", role: "Super Admin", appRole: "admin", experience: "Core", attendance: 100, performance: 97, consistency: 98, revenueImpact: 0, taskCompletion: 99, conversion: 0, callsToday: 0, callTarget: 0, leadsActive: 0, closedDeals: 0, lostDeals: 0, flags: [], status: "Active", streakDays: 90, team: "HQ", shift: "Anytime", avatarSeed: "DZ", zone: "All", managerId: null, bio: "Owns the operating system: command center, report engine, distribution and audit.", joinedYearsAgo: 5, birthdayMMDD: "01-15" },
 
   // Role + KRA system: one operator per role so every daily flow can be reviewed.
   { id: "e100", name: "Ishita Verma", role: "Lead Intake & CRM Executive", appRole: "employee", experience: "New", attendance: 88, performance: 72, consistency: 70, revenueImpact: 0, taskCompletion: 80, conversion: 0, callsToday: 0, callTarget: 0, leadsActive: 0, closedDeals: 0, lostDeals: 0, flags: [], status: "Active", streakDays: 3, team: "Demand Ops", shift: "10:15 - 20:00", avatarSeed: "Ishita", zone: "Bandra", managerId: "e1", bio: "Owns the Lead Intake & CRM Executive daily flow end to end.", joinedYearsAgo: 0, birthdayMMDD: "01-01" },
